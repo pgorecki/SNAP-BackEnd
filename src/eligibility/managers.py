@@ -33,3 +33,14 @@ class ClientEligibilityObjectManager(AgencyEligibilityConfigObjectManager):
         return super().get_queryset().filter(
             client__created_by__profile__agency=user.profile.agency
         )
+
+
+class EligibilityQueueObjectManager(models.Manager):
+    def for_user(self, user):
+        if user.is_superuser:
+            return super().get_queryset()
+        if not hasattr(user, 'profile'):
+            return self.none()
+
+        # TODO: change the logic to support security groups
+        return super().get_queryset()

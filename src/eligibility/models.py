@@ -3,9 +3,14 @@ from django.db import models
 from simple_history.models import HistoricalRecords
 from agency.models import Agency
 from client.models import Client
-from core.models import ObjectRoot
+from core.models import ObjectRoot, User
 from .enums import EligibilityStatus
-from .managers import EligibilityObjectManager, AgencyEligibilityConfigObjectManager, ClientEligibilityObjectManager
+from .managers import (
+    EligibilityObjectManager,
+    AgencyEligibilityConfigObjectManager,
+    ClientEligibilityObjectManager,
+    EligibilityQueueObjectManager,
+)
 
 
 class Eligibility(ObjectRoot):
@@ -49,3 +54,25 @@ class ClientEligibility(ObjectRoot):
     history = HistoricalRecords()
 
     objects = ClientEligibilityObjectManager()
+
+    @staticmethod
+    def newest(cls, client):
+        cls.objects.filter(client=client).first()
+
+
+class EligibilityQueue(ObjectRoot):
+    class Meta:
+        db_table = 'eligibility_queue'
+        ordering = ['-created_at']
+
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    requestor = models.ForeignKey(Agency, on_delete=models.CASCADE)
+    status = models.CharField(
+        blank=True,
+        null=True,
+        max_length=32,
+        choices=[(x.name, x.value) for x in EligibilityStatus]
+    )
+    resolved_by = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
+
+    objects = EligibilityQueueObjectManager()

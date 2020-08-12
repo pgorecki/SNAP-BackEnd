@@ -1,11 +1,12 @@
 from core.viewsets import ModelViewSet
 from core.permissions import IsAdmin, IsAgencyMember, IsAgencyMemberReadOnly
 from core.validation import validate_fields_with_rules
-from .models import Eligibility, AgencyEligibilityConfig, ClientEligibility
+from .models import Eligibility, AgencyEligibilityConfig, ClientEligibility, EligibilityQueue
 from .serializers import (
     EligibilityReader, EligibilityWriter,
     AgencyEligibilityConfigReader, AgencyEligibilityConfigWriter,
-    ClientEligibilityReader, ClientEligibilityWriter
+    ClientEligibilityReader, ClientEligibilityWriter,
+    EligibilityQueueReader, EligibilityQueueWriter,
 )
 from .filters import AgencyEligibilityConfigViewsetFilter, ClientEligibilityViewsetFilter
 
@@ -53,3 +54,17 @@ class ClientEligibilityViewset(ModelViewSet):
 
     def validate(self, request, data, action):
         validate_fields_with_rules(request.user, data, client='can_read_client', eligibility='can_read_eligibility')
+
+
+class EligibilityQueueViewset(ModelViewSet):
+    queryset = EligibilityQueue.objects.all()
+    read_serializer_class = EligibilityQueueReader
+    write_serializer_class = EligibilityQueueWriter
+    permission_classes = [IsAdmin | IsAgencyMember]
+
+    def perform_create(self, serializer):
+        serializer.save(
+            created_by=self.request.user,
+            requestor=self.request.user.profile.agency,
+            status=None,
+        )
