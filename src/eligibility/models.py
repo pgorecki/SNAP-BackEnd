@@ -1,4 +1,5 @@
 import uuid
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save
@@ -89,15 +90,24 @@ class EligibilityQueue(ObjectRoot):
     resolved_by = models.ForeignKey(User, on_delete=models.PROTECT, blank=True,
                                     null=True, related_name='resolved_eligibility')
 
+    def clean(self):
+        if self.status is None and self._meta.model.objects.filter(client=self.client, status=None).count():
+            raise ValidationError('This client already exists in the queue.')
+
     @property
     def is_resolved(self):
         return self.status is not None
 
     objects = EligibilityQueueObjectManager()
 
+    def __str__(self):
+        full_name = self.client.full_name
+        return f'{full_name} by {self.requestor}'
+
 
 @receiver(post_save, sender=EligibilityQueue)
 def update_client_eligibility(sender, instance, created, **kwargs):
+    assert Eligibility.objects.count()  # should be removed in the future?
     if instance._meta.model.objects.first() == instance and instance.is_resolved:
         instance.client.eligibility.create(
             status=instance.status,

@@ -33,10 +33,10 @@ class ObjectSerializer(serializers.ModelSerializer):
         return object._meta.object_name
 
 
-class CreatedByReader(serializers.ModelSerializer):
+class CreatedByReader(ObjectSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'id')
+        fields = ('id', 'object', 'first_name', 'last_name')
 
 
 class UserReader(CreatedByReader):

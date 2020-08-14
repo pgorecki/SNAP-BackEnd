@@ -81,10 +81,12 @@ urlpatterns = [
     path('dashboard/summary/', core.views.DashboardSummary.as_view(), name='dashboard_summary'),
 
     path('health/', core.views.HealthViewSet.as_view(), name='health'),
-    path('health/', core.views.HealthViewSet.as_view(), name='health'),
 
     re_path('swagger(?P<format>.json|.yaml)$',
             schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('swagger/', schema_view.with_ui('swagger',
+                                         cache_timeout=0), name='schema-swagger-ui'),
+
     path('sentry/', lambda x: 1 / 0, name='setry-test'),
 
     path('admin/', admin.site.urls),

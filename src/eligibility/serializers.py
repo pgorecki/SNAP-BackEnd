@@ -49,6 +49,7 @@ class EligibilityQueueReader(ObjectSerializer):
     client = ClientReader()
     requestor = AgencyReader()
     resolved_by = UserReader()
+    created_by = CreatedByReader(read_only=True)
 
     class Meta:
         model = EligibilityQueue

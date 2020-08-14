@@ -65,18 +65,17 @@ class EligibilityQueueViewset(ModelViewSet):
     permission_classes = [IsAdmin | IsAgencyMember]
 
     def validate(self, request, data, action):
-        # TODO add validation
-        return True
+        client = data.get('client')
+        if action == 'create':
+            if client.eligibility_queue.filter(status=None).count():
+                raise ApplicationValidationError({'client': ['Client is already in the queue']})
 
     def perform_create(self, serializer):
-        try:
-            serializer.save(
-                created_by=self.request.user,
-                requestor=self.request.user.profile.agency,
-                status=None,
-            )
-        except django.db.utils.IntegrityError:
-            raise ApplicationValidationError({'client': ['Client is already in the queue']})
+        serializer.save(
+            created_by=self.request.user,
+            requestor=self.request.user.profile.agency,
+            status=None,
+        )
 
     def perform_update(self, serializer):
         status = self.get_object().status
