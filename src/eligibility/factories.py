@@ -1,6 +1,6 @@
 import factory
 from agency.factories import AgencyFactory
-from .models import Eligibility
+from .models import Eligibility, EligibilityQueue
 
 
 class EligibilityFactory(factory.django.DjangoModelFactory):
@@ -8,6 +8,11 @@ class EligibilityFactory(factory.django.DjangoModelFactory):
         model = Eligibility
 
     name = factory.Sequence(lambda n: f'Eligibility {n}')
+
+
+class EligibilityQueueFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = EligibilityQueue
 
 
 class AgencyWithEligibilityFactory(AgencyFactory):
