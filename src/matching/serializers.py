@@ -1,4 +1,3 @@
-from rest_framework.utils import model_meta
 from core.serializers import ObjectSerializer, CreatedByReader
 from client.serializers import ClientReader
 from program.serializers import ProgramReader
@@ -46,19 +45,15 @@ class ClientMatchingReader(ObjectSerializer):
 
 
 class ClientMatchingWriter(ObjectSerializer):
-    class HistoryWriter(ObjectSerializer):
+    class ClientMatchingInlineHistoryWriter(ObjectSerializer):
         class Meta:
             model = ClientMatchingHistory
             fields = ('id', 'step', 'outcome')
 
-    class NoteWriter(ObjectSerializer):
+    class ClientMatchingInlineNoteWriter(ObjectSerializer):
         class Meta:
             model = ClientMatchingNote
             fields = ('id', 'note')
-
-    class Meta:
-        model = ClientMatching
-        fields = ('config', 'client', 'program', 'start_date', 'end_date', 'notes', 'history')
 
     # def create(self, validated_data):
     #     # TODO: check access permissions to survey, questions, respondent
@@ -73,16 +68,10 @@ class ClientMatchingWriter(ObjectSerializer):
 
     #     return response
 
-    history = HistoryWriter(many=True, required=False)
-    notes = NoteWriter(many=True, required=False)
+    history = ClientMatchingInlineHistoryWriter(many=True, required=False)
+    notes = ClientMatchingInlineNoteWriter(many=True, required=False)
 
     def update(self, instance, validated_data):
-        info = model_meta.get_field_info(instance)
-        for attr, value in validated_data.items():
-            if attr not in info.relations:
-                setattr(instance, attr, value)
-        instance.save()
-
         user = self.context['request'].user
         for note_data in validated_data.get('notes', []):
             if not note_data.get('id', None):
@@ -91,6 +80,10 @@ class ClientMatchingWriter(ObjectSerializer):
             if not history_data.get('id', None):
                 instance.history.create(created_by=user, **history_data)
         return instance
+
+    class Meta:
+        model = ClientMatching
+        fields = ('config', 'client', 'program', 'start_date', 'end_date', 'notes', 'history')
 
 
 class ClientMatchingHistoryReader(ObjectSerializer):
@@ -118,4 +111,4 @@ class ClientMatchingNoteReader(ObjectSerializer):
 class ClientMatchingNoteWriter(ObjectSerializer):
     class Meta:
         model = ClientMatchingNote
-        fields = ('note')
+        fields = ('note',)

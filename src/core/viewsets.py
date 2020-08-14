@@ -11,9 +11,9 @@ class ModelViewSet(viewsets.ModelViewSet):
         """
         if self.action in ['create', 'update', 'partial_update']:
             serializer_class = self.get_write_serializer_class()
-
-        # list, retrieve
-        serializer_class = self.get_read_serializer_class()
+        else:
+            # list, retrieve
+            serializer_class = self.get_read_serializer_class()
 
         assert serializer_class is not None
         return serializer_class

@@ -47,10 +47,10 @@ class ClientMatchingHistoryViewset(ModelViewSet):
     write_serializer_class = ClientMatchingHistoryWriter
 
     def get_queryset(self):
-        return ClientMatchingHistory.objects.filter(client_matching=self.kwargs['client_matching_pk'])
+        return ClientMatchingHistory.objects.filter(client_matching=self.kwargs.get('client_matching_pk', None))
 
     def perform_create(self, serializer):
-        client_matching = get_object_or_404(ClientMatching, pk=self.kwargs['client_matching_pk'])
+        client_matching = get_object_or_404(ClientMatching, pk=self.kwargs.get('client_matching_pk', None))
         serializer.save(created_by=self.request.user, client_matching=client_matching)
 
 
@@ -59,8 +59,8 @@ class ClientMatchingNoteViewset(ModelViewSet):
     write_serializer_class = ClientMatchingNoteWriter
 
     def get_queryset(self):
-        return ClientMatchingNote.objects.filter(client_matching=self.kwargs['client_matching_pk'])
+        return ClientMatchingNote.objects.filter(client_matching=self.kwargs.get('client_matching_pk', None))
 
     def perform_create(self, serializer):
-        client_matching = get_object_or_404(ClientMatching, pk=self.kwargs['client_matching_pk'])
+        client_matching = get_object_or_404(ClientMatching, pk=self.kwargs.get('client_matching_pk', None))
         serializer.save(created_by=self.request.user, client_matching=client_matching)
