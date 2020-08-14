@@ -77,7 +77,7 @@ class EligibilityQueue(ObjectRoot):
                 status=None), name='unique_eligilibity_request')
         ]
 
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='eligibility_queue')
     requestor = models.ForeignKey(Agency, on_delete=models.CASCADE)
     status = models.CharField(
         blank=True,

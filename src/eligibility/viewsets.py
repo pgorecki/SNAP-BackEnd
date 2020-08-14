@@ -1,3 +1,5 @@
+import django.db.utils
+from core.exceptions import ApplicationValidationError
 from core.viewsets import ModelViewSet
 from core.permissions import IsAdmin, IsAgencyMember, IsAgencyMemberReadOnly
 from core.validation import validate_fields_with_rules
@@ -62,9 +64,24 @@ class EligibilityQueueViewset(ModelViewSet):
     write_serializer_class = EligibilityQueueWriter
     permission_classes = [IsAdmin | IsAgencyMember]
 
+    def validate(self, request, data, action):
+        # TODO add validation
+        return True
+
     def perform_create(self, serializer):
-        serializer.save(
-            created_by=self.request.user,
-            requestor=self.request.user.profile.agency,
-            status=None,
-        )
+        try:
+            serializer.save(
+                created_by=self.request.user,
+                requestor=self.request.user.profile.agency,
+                status=None,
+            )
+        except django.db.utils.IntegrityError:
+            raise ApplicationValidationError({'client': ['Client is already in the queue']})
+
+    def perform_update(self, serializer):
+        status = self.get_object().status
+        new_status = serializer.validated_data.get('status')
+        if status is None and new_status is not None:
+            serializer.save(resolved_by=self.request.user)
+        else:
+            serializer.save()

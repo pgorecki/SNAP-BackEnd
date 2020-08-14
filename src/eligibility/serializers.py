@@ -1,4 +1,4 @@
-from core.serializers import ObjectSerializer, CreatedByReader
+from core.serializers import ObjectSerializer, CreatedByReader, UserReader
 from agency.serializers import AgencyReader
 from client.serializers import ClientReader
 from .models import Eligibility, AgencyEligibilityConfig, ClientEligibility, EligibilityQueue
@@ -48,10 +48,12 @@ class ClientEligibilityWriter(ObjectSerializer):
 class EligibilityQueueReader(ObjectSerializer):
     client = ClientReader()
     requestor = AgencyReader()
+    resolved_by = UserReader()
 
     class Meta:
         model = EligibilityQueue
-        fields = ('id', 'object', 'client', 'requestor', 'status', 'created_at', 'modified_at', 'created_by')
+        fields = ('id', 'object', 'client', 'requestor', 'status',
+                  'resolved_by', 'created_at', 'modified_at', 'created_by')
 
 
 class EligibilityQueueWriter(ObjectSerializer):
