@@ -43,10 +43,11 @@ class Enrollment(ObjectRoot):
         default=uuid.uuid4,
         editable=False
     )
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='enrollments')
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='enrollments')
     start_date = models.DateField(blank=True, null=True)
+    projected_end_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='enrollments')
     status = models.CharField(
         max_length=32,
         choices=[(x.name, x.value) for x in EnrollmentStatus]
@@ -61,6 +62,7 @@ class Enrollment(ObjectRoot):
         return f"{self.id}"
 
 
+# TODO remove, not used
 class ProgramEligibility(ObjectRoot):
     class Meta:
         verbose_name_plural = 'Program eligibility'
