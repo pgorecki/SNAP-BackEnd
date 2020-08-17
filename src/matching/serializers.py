@@ -1,3 +1,4 @@
+from rest_framework.utils import model_meta
 from core.serializers import ObjectSerializer, CreatedByReader
 from client.serializers import ClientReader
 from program.serializers import ProgramReader
@@ -72,6 +73,7 @@ class ClientMatchingWriter(ObjectSerializer):
     notes = ClientMatchingInlineNoteWriter(many=True, required=False)
 
     def update(self, instance, validated_data):
+        print(validated_data)
         user = self.context['request'].user
         for note_data in validated_data.get('notes', []):
             if not note_data.get('id', None):
@@ -79,6 +81,16 @@ class ClientMatchingWriter(ObjectSerializer):
         for history_data in validated_data.get('history', []):
             if not history_data.get('id', None):
                 instance.history.create(created_by=user, **history_data)
+
+        info = model_meta.get_field_info(instance)
+        for attr, value in validated_data.items():
+            if attr in info.relations and info.relations[attr].to_many:
+                pass
+            else:
+                setattr(instance, attr, value)
+
+        instance.save()
+
         return instance
 
     class Meta:
