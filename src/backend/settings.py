@@ -50,6 +50,7 @@ class BaseConfiguration(Configuration):
         'survey',
         'program',
         'eligibility',
+        'iep',
         'security',
         'note',
         'matching',
