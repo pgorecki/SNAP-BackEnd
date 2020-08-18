@@ -1,5 +1,8 @@
 from django.db import models
+from django.dispatch import receiver
+from django.core.exceptions import ValidationError
 from core.models import ObjectRoot, User
+from core.validation import model_validation, ModelValidationMixin
 from client.models import Client
 from program.models import Enrollment
 from .choices import IEPStatus
@@ -8,7 +11,7 @@ from .choices import IEPStatus
 class ClientIEP(ObjectRoot):
     class Meta:
         db_table = 'iep_client'
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='iep')
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='ieps')
     case_manager = models.ForeignKey(User, related_name='iep', on_delete=models.SET_NULL, null=True)
     orientation_completed = models.BooleanField(default=False)
     status = models.CharField(
@@ -19,9 +22,71 @@ class ClientIEP(ObjectRoot):
     outcome = models.CharField(max_length=64, default='', blank=True, help_text='Outcome when completed')
 
 
-class ClientIEPEnrollment(models.Model):
+class ClientIEPEnrollment(ModelValidationMixin, models.Model):
     class Meta:
         db_table = 'iep_enrollment'
 
-    iep = models.ForeignKey(ClientIEP, on_delete=models.CASCADE)
+    iep = models.ForeignKey(ClientIEP, on_delete=models.CASCADE, related_name='iep_enrollments')
     enrollment = models.OneToOneField(Enrollment, on_delete=models.CASCADE, blank=True, null=True)
+
+    # def clean(self):
+    #     if self.iep and self.enrollment and self.iep.client.id != self.enrollment.client.id:
+    #         raise ValidationError(
+    #             f'IEP client id ({self.iep.client.id}) does not match enrollment client id ({self.enrollment.client.id})')
+
+    #     self.iep.clean()
+
+
+@receiver(model_validation, sender=Enrollment)
+def validate_iep_Enrollment(sender, instance, *args, **kwargs):
+    """
+    When enrollment is save, check if it is an IEP enrollment and if the programs are the same
+    """
+    iep_enrollment = ClientIEPEnrollment.objects.filter(enrollment=instance).first()
+    if iep_enrollment is None or iep_enrollment.iep is None:
+        return
+
+    iep = iep_enrollment.iep
+
+    for other_iep_enrollment in iep.iep_enrollments.exclude(enrollment=instance):
+        other_enrollment = other_iep_enrollment.enrollment
+        if other_enrollment.program.agency != instance.program.agency:
+            raise ValidationError(
+                f'IEP enrollment programs {instance.program} and {other_enrollment.program} are not from same agency')
+
+
+@receiver(model_validation, sender=ClientIEP)
+def validate_iep_ClientIEP(sender, instance, *args, **kwargs):
+    """
+    When enrollment is save, check if it is an IEP enrollment and if the programs are the same
+    """
+
+    program = None
+
+    for iep_enrollment in instance.iep_enrollments.all():
+        enrollment = iep_enrollment.enrollment
+        if program is None:
+            program = enrollment.program
+        elif enrollment.program.agency != program.agency:
+            raise ValidationError(
+                f'IEP enrollment programs {program} and {enrollment.program} are not from same agency')
+
+
+@receiver(model_validation, sender=ClientIEPEnrollment)
+def validate_client_consistency_ClientIEPEnrollment(sender, instance, *args, **kwargs):
+    if instance.iep and instance.enrollment and instance.iep.client.id != instance.enrollment.client.id:
+        raise ValidationError(
+            f'IEP client id({instance.iep.client.id}) does not \
+            match with enrollment client id({instance.enrollment.client.id})')
+
+
+@receiver(model_validation, sender=Enrollment)
+def validate_client_consistency_Enrollment(sender, instance, *args, **kwargs):
+    print('validate_client_consistency_Enrollment')
+    iep_enrollment = ClientIEPEnrollment.objects.filter(enrollment=instance).first()
+    if iep_enrollment is None:
+        return
+
+    iep = iep_enrollment.iep
+    if iep.client.id != instance.client.id:
+        raise ValidationError(f'Enrollment client {instance.client.id} does not match to IEP client {iep.client.id}')
