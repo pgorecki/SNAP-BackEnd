@@ -10,7 +10,11 @@ from .serializers import (
     ClientEligibilityReader, ClientEligibilityWriter,
     EligibilityQueueReader, EligibilityQueueWriter,
 )
-from .filters import AgencyEligibilityConfigViewsetFilter, ClientEligibilityViewsetFilter
+from .filters import (
+    AgencyEligibilityConfigViewsetFilter,
+    ClientEligibilityViewsetFilter,
+    EligibilityQueueViewsetFilter
+)
 
 
 class EligibilityViewset(ModelViewSet):
@@ -63,6 +67,7 @@ class EligibilityQueueViewset(ModelViewSet):
     read_serializer_class = EligibilityQueueReader
     write_serializer_class = EligibilityQueueWriter
     permission_classes = [IsAdmin | IsAgencyMember]
+    filterset_class = EligibilityQueueViewsetFilter
 
     def validate(self, request, data, action):
         client = data.get('client')

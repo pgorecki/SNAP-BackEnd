@@ -29,6 +29,7 @@ class Client(ObjectRoot):
     last_name = models.CharField(max_length=64)
     dob = models.DateField()
     ssn = models.CharField(max_length=64, blank=True, default='')
+    is_new = models.BooleanField(default=True)
 
     snap_id = models.CharField(max_length=256, blank=True, null=True)
     address = models.OneToOneField(ClientAddress, on_delete=models.CASCADE, null=True)
