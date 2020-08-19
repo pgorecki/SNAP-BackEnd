@@ -10,8 +10,10 @@ class ClientAddressReader(ObjectSerializer):
         fields = ('object', 'street', 'city', 'state', 'zip', 'county')
 
 
-class ClientAddressWriter(ClientAddressReader):
-    pass
+class ClientAddressWriter(ObjectSerializer):
+    class Meta:
+        model = ClientAddress
+        fields = ('street', 'city', 'state', 'zip', 'county')
 
 
 class ClientReader(ObjectSerializer):
@@ -25,10 +27,8 @@ class ClientReader(ObjectSerializer):
 
 
 class ClientWriter(NestedCreateMixin, NestedUpdateMixin, ObjectSerializer):
-    created_by = CreatedByReader(read_only=True)
     address = ClientAddressWriter(required=False)
 
     class Meta:
         model = Client
-        fields = ('id', 'object', 'first_name', 'middle_name', 'last_name',
-                  'dob', 'ssn', 'address', 'created_at', 'modified_at', 'created_by')
+        fields = ('first_name', 'middle_name', 'last_name', 'dob', 'ssn', 'address')
