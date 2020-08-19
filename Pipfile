@@ -25,6 +25,7 @@ python-json-logger = "*"
 django-simple-history = "*"
 rules = "*"
 drf-nested-routers = "*"
+drf-writable-nested = "*"
 
 [dev-packages]
 autopep8 = "*"

@@ -3,6 +3,20 @@ from core.models import ObjectRoot
 from core.managers import AgencyObjectManager
 
 
+class ClientAddress(models.Model):
+    class Meta:
+        db_table = 'client_address'
+
+    street = models.CharField(max_length=256, blank=True, default='')
+    city = models.CharField(max_length=64, blank=True, default='')
+    state = models.CharField(max_length=64, blank=True, default='')
+    zip = models.CharField(max_length=8, blank=True, default='')
+    county = models.CharField(max_length=64, blank=True, default='')
+
+    def __str__(self):
+        return f'{self.street} {self.city} {self.state} {self.zip}'
+
+
 class Client(ObjectRoot):
     class Meta:
         db_table = 'client'
@@ -17,6 +31,7 @@ class Client(ObjectRoot):
     ssn = models.CharField(max_length=64, blank=True, default='')
 
     snap_id = models.CharField(max_length=256, blank=True, null=True)
+    address = models.OneToOneField(ClientAddress, on_delete=models.CASCADE, null=True)
 
     objects = AgencyObjectManager()
 
@@ -27,19 +42,3 @@ class Client(ObjectRoot):
 
     def __str__(self):
         return self.full_name
-
-
-class ClientAddress(models.Model):
-    class Meta:
-        db_table = 'client_address'
-
-    client = models.OneToOneField(Client, on_delete=models.CASCADE, null=True)
-
-    address = models.CharField(max_length=256, blank=True, default='')
-    city = models.CharField(max_length=64, blank=True, default='')
-    state = models.CharField(max_length=64, blank=True, default='')
-    zip = models.CharField(max_length=8, blank=True, default='')
-    county = models.CharField(max_length=64, blank=True, default='')
-
-    def __str__(self):
-        return f'{self.address} {self.city} {self.state} {self.zip}'

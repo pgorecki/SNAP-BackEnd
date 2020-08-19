@@ -43,11 +43,15 @@ def test_create_client_by_user1():
     response = api_client.post(url, {
         'first_name': 'John',
         'last_name': 'Doe',
-        'dob': '2000-01-01'
+        'dob': '2000-01-01',
+        'address': {
+            'city': 'Boston'
+        }
     }, format='json')
     assert response.status_code == 201
     assert response.data['first_name'] == 'John'
     assert response.data['created_by']['id'] == user1.id
+    assert response.data['address']['city'] == 'Boston'
 
 
 def test_update_own_client_by_user1():

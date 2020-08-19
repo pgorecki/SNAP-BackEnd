@@ -89,7 +89,7 @@ def setup_logging(log_level: str, logs_filename: str):
 
             # Toggle SQL query logging
             'django.db.backends': {
-                'level': 'DEBUG',
+                'level': 'INFO',
                 'handlers': ['json_console' or 'colored_console_db'],
                 'propagate': False,
             },
