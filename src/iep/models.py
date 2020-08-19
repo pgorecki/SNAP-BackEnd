@@ -12,8 +12,11 @@ class ClientIEP(ObjectRoot):
     class Meta:
         db_table = 'iep_client'
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='ieps')
-    case_manager = models.ForeignKey(User, related_name='iep', on_delete=models.SET_NULL, null=True)
+    case_manager = models.ForeignKey(User, related_name='iep', on_delete=models.SET_NULL, null=True, blank=True)
     orientation_completed = models.BooleanField(default=False)
+    start_date = models.DateField(blank=True, null=True)
+    projected_end_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
     status = models.CharField(
         max_length=32,
         choices=IEPStatus.choices,
