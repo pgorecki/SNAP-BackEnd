@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from django.core.exceptions import ValidationError
 from core.models import ObjectRoot, User
 from core.validation import model_validation, ModelValidationMixin
+from eligibility.models import EligibilityQueue
 from client.models import Client
 from program.models import Enrollment
 from .choices import IEPStatus
@@ -15,6 +16,7 @@ class ClientIEP(ObjectRoot):
     case_manager = models.ForeignKey(User, related_name='iep', on_delete=models.SET_NULL, null=True, blank=True)
     orientation_completed = models.BooleanField(default=False)
     start_date = models.DateField(blank=True, null=True)
+    eligibility_request = models.ForeignKey(EligibilityQueue, on_delete=models.SET_NULL, blank=True, null=True)
     projected_end_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     status = models.CharField(
