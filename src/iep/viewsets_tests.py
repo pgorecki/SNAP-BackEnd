@@ -1,6 +1,7 @@
 from rest_framework.test import APIClient
 from client.models import Client
 from agency.factories import AgencyFactory
+from program.factories import EnrollmentFactory
 from eligibility.factories import AgencyWithEligibilityFactory
 from .factories import ClientIEPFactory
 from .models import ClientIEP
@@ -12,7 +13,7 @@ def test_retrieve_client_iep():
     user = agency1.user_profiles.first().user
     client = Client.objects.first()
 
-    iep = ClientIEPFactory(client=client)
+    ClientIEPFactory(client=client)
 
     url = '/iep/'
     api_client = APIClient()
@@ -93,17 +94,61 @@ def test_update_iep_status():
 def test_list_iep_by_type__new():
     agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
     user = agency.user_profiles.first().user
-    client = Client.objects.first()
 
     api_client = APIClient()
     api_client.force_authenticate(user)
 
     # lets create new IEP
-    api_client.post('/iep/', {'client': Client.objects.first().id}, format='json')
+    api_client.post('/iep/', {'client': Client.objects.first().id}, format='json').data['id']
 
-    response = api_client.get('/iep/?type=new')
-    assert response.data == 123
+    assert api_client.get('/iep/?type=new').data['count'] == 1
+    assert api_client.get('/iep/?type=existing').data['count'] == 0
+    assert api_client.get('/iep/?type=historical').data['count'] == 0
 
+
+def test_list_iep_by_type__existing():
+    agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
+    user = agency.user_profiles.first().user
+    client = Client.objects.first()
+    client.is_new = False
+    client.save()
+
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+
+    # lets create new IEP
+    api_client.post('/iep/', {'client': Client.objects.first().id}, format='json').data['id']
+
+    assert api_client.get('/iep/?type=new').data['count'] == 0
+    assert api_client.get('/iep/?type=existing').data['count'] == 1
+    assert api_client.get('/iep/?type=historical').data['count'] == 0
+
+
+def test_list_iep_by_type__historical():
+    agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
+    user = agency.user_profiles.first().user
+
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+
+    # lets create new IEP
+    api_client.post('/iep/', {'client': Client.objects.first().id}, format='json').data['id']
+
+    # lets resolve eligibility request
+    iep = ClientIEP.objects.first()
+    iep.eligibility_request.status = 'ELIGIBLE'
+    iep.eligibility_request.save()
+
+    assert api_client.get('/iep/?type=new').data['count'] == 0
+    assert api_client.get('/iep/?type=existing').data['count'] == 0
+    assert api_client.get('/iep/?type=historical').data['count'] == 1
+
+
+def test_create_iep_enrollment():
+    agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
+    program = agency.programs.create()
+    user = agency.user_profiles.first().user
+    client = Client.objects.first()
     iep = ClientIEPFactory(client=client)
 
     url = f'/iep/{iep.id}/'
@@ -111,7 +156,92 @@ def test_list_iep_by_type__new():
     api_client.force_authenticate(user)
 
     response = api_client.patch(url, {
-        'status': 'in_progress',
+        'enrollments': [
+            {
+                'program': program.id,
+                'status': 'PLANNED',
+            },
+        ],
     }, format='json')
-    print(response.data)
+    print('response data', response.data)
     assert response.status_code == 200
+
+    assert iep.iep_enrollments.count() == 1
+
+
+def test_update_iep_enrollment():
+    agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
+    program = agency.programs.create()
+    user = agency.user_profiles.first().user
+    client = Client.objects.first()
+    iep = ClientIEPFactory(client=client)
+    enrollment = EnrollmentFactory(client=client, program=program)
+    iep.iep_enrollments.create(enrollment=enrollment)
+
+    url = f'/iep/{iep.id}/'
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+
+    response = api_client.patch(url, {
+        'enrollments': [
+            {
+                'id': enrollment.id,
+                'program': program.id,
+                'status': 'PLANNED',
+            },
+        ],
+    }, format='json')
+    print('response data', response.data)
+    assert response.status_code == 200
+
+    assert iep.iep_enrollments.count() == 1
+
+    updated_enrollment = iep.iep_enrollments.first().enrollment
+    assert updated_enrollment.id == enrollment.id
+    assert updated_enrollment.program.id == program.id
+    assert updated_enrollment.status == 'PLANNED'
+
+
+def test_delete_iep_enrollment():
+    agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
+    program = agency.programs.create()
+    user = agency.user_profiles.first().user
+    client = Client.objects.first()
+    iep = ClientIEPFactory(client=client)
+    enrollment = EnrollmentFactory(client=client, program=program)
+    iep.iep_enrollments.create(enrollment=enrollment)
+
+    url = f'/iep/{iep.id}/'
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+
+    assert iep.iep_enrollments.count() == 1
+
+    response = api_client.patch(url, {
+        'enrollments': [],
+    }, format='json')
+    print('response data', response.data)
+    assert response.status_code == 200
+
+    assert iep.iep_enrollments.count() == 0
+
+
+def test_cannot_remove_iep_enrollment_if_started():
+    agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
+    program = agency.programs.create()
+    user = agency.user_profiles.first().user
+    client = Client.objects.first()
+    iep = ClientIEPFactory(client=client)
+    enrollment = EnrollmentFactory(client=client, program=program, status='ENROLLED')
+    iep.iep_enrollments.create(enrollment=enrollment)
+
+    url = f'/iep/{iep.id}/'
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+
+    assert iep.iep_enrollments.count() == 1
+
+    response = api_client.patch(url, {
+        'enrollments': [],
+    }, format='json')
+    assert response.status_code == 400

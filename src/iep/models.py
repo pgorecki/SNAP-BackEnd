@@ -12,6 +12,8 @@ from .choices import IEPStatus
 class ClientIEP(ObjectRoot):
     class Meta:
         db_table = 'iep_client'
+        ordering = ['-created_at']
+
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='ieps')
     case_manager = models.ForeignKey(User, related_name='iep', on_delete=models.SET_NULL, null=True, blank=True)
     orientation_completed = models.BooleanField(default=False)
@@ -30,6 +32,7 @@ class ClientIEP(ObjectRoot):
 class ClientIEPEnrollment(ModelValidationMixin, models.Model):
     class Meta:
         db_table = 'iep_enrollment'
+        ordering = ['id']
 
     iep = models.ForeignKey(ClientIEP, on_delete=models.CASCADE, related_name='iep_enrollments')
     enrollment = models.OneToOneField(Enrollment, on_delete=models.CASCADE, blank=True, null=True)
