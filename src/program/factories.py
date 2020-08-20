@@ -1,6 +1,6 @@
 import factory
 from agency.factories import AgencyFactory
-from .models import Program
+from .models import Program, Enrollment
 
 
 class ProgramFactory(factory.django.DjangoModelFactory):
@@ -22,3 +22,8 @@ class AgencyWithProgramsFactory(AgencyFactory):
             assert isinstance(extracted, int)
             programs = ProgramFactory.create_batch(extracted)
             obj.programs.set(programs)
+
+
+class EnrollmentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Enrollment

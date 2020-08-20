@@ -25,6 +25,7 @@ import core.views
 import client.viewsets
 import survey.viewsets
 import eligibility.viewsets
+import iep.viewsets
 import program.viewsets
 import note.viewsets
 import matching.viewsets
@@ -58,6 +59,8 @@ router.register('eligibility/queue', eligibility.viewsets.EligibilityQueueViewse
                 basename='eligibility_queue')
 router.register('eligibility', eligibility.viewsets.EligibilityViewset,
                 basename='eligibility')
+router.register('iep', iep.viewsets.ClientIEPViewset,
+                basename='iep')
 router.register('programs/enrollments', program.viewsets.EnrollmentViewset,
                 basename='enrollment')
 router.register('programs/eligibility', program.viewsets.ProgramEligibilityViewset,

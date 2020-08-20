@@ -11,9 +11,10 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 from rest_framework.authtoken.models import Token
+from .validation import ModelValidationMixin
 
 
-class ObjectRoot(UUIDModel):
+class ObjectRoot(ModelValidationMixin, UUIDModel):
     class Meta:
         abstract = True
         ordering = ['created_at']
