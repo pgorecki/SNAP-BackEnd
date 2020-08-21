@@ -1,6 +1,7 @@
 from rest_framework.test import APIClient
 from agency.factories import AgencyFactory
 from program.factories import EnrollmentFactory, AgencyWithProgramsFactory
+from note.models import Note
 from client.models import Client
 
 
@@ -39,3 +40,30 @@ def test_create_enrollment_note():
     }, format='json')
 
     assert response.status_code == 201
+
+
+def test_list_notes_by_type():
+    # create test agency
+    agency = AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)
+    user = agency.user_profiles.first().user
+    client = Client.objects.first()
+    enrollment = EnrollmentFactory(client=client, program=agency.programs.first())
+    Note.objects.create(source=client, text='client note')
+    Note.objects.create(source=enrollment, text='enrollment note')
+
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+
+    response = api_client.get('/notes/')
+    assert response.status_code == 200
+    assert len(response.data['results']) == 2
+
+    response = api_client.get(f'/notes/?source_id={client.id}')
+    assert len(response.data['results']) == 1
+    assert response.data['results'][0]['source']['id'] == str(client.id)
+    assert response.data['results'][0]['source']['object'] == 'Client'
+
+    response = api_client.get(f'/notes/?source_id={enrollment.id}')
+    assert len(response.data['results']) == 1
+    assert response.data['results'][0]['source']['id'] == str(enrollment.id)
+    assert response.data['results'][0]['source']['object'] == 'Enrollment'

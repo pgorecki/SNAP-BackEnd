@@ -4,11 +4,11 @@ from rest_framework.exceptions import ValidationError
 
 
 class NoteFilter(django_filters.FilterSet):
-    client = django_filters.CharFilter(method='filter_by_client')
+    source_id = django_filters.CharFilter(method='filter_by_source_id')
 
-    def filter_by_client(self, qs, name, value):
+    def filter_by_source_id(self, qs, name, value):
         try:
             qs = qs.filter(source_id=value)
         except exceptions.ValidationError as e:
-            raise ValidationError({'client': e.messages})
+            raise ValidationError({'source_id': e.messages})
         return qs
