@@ -67,3 +67,18 @@ def test_list_notes_by_type():
     assert len(response.data['results']) == 1
     assert response.data['results'][0]['source']['id'] == str(enrollment.id)
     assert response.data['results'][0]['source']['object'] == 'Enrollment'
+
+
+def test_update_note_field():
+    # create test agency
+    agency = AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)
+    user = agency.user_profiles.first().user
+    client = Client.objects.first()
+    note = Note.objects.create(source=client, text='client note')
+
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+
+    response = api_client.patch(f'/notes/{note.id}/', {'text': 'updated text'}, format='json')
+    assert response.status_code == 200
+    assert response.data['text'] == 'updated text'
