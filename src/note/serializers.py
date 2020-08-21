@@ -11,5 +11,14 @@ class NoteReader(ObjectSerializer):
         fields = ('id', 'object', 'text', 'source', 'created_at', 'modified_at', 'created_by')
 
 
-class NoteWriter(NoteReader):
-    pass
+class NoteWriter(ObjectSerializer):
+    class SourceWriter(ContentObjectRelatedField):
+        def get_queryset(self):
+            # TODO: .....
+            print(('get_qs'))
+            return None
+    source = SourceWriter()
+
+    class Meta:
+        model = Note
+        fields = ('text', 'source')

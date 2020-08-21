@@ -10,6 +10,7 @@ class ContentObjectRelatedField(serializers.RelatedField):
     """
     MODELS = {
         'Client': ('client', 'Client'),
+        # 'Enrollment': ('program', 'Enrollment'),
     }
 
     def to_representation(self, object):
@@ -21,8 +22,13 @@ class ContentObjectRelatedField(serializers.RelatedField):
         return data
 
     def to_internal_value(self, data):
-        app_name, model_name = self.MODELS.get(data['type'], (None, None))
-        model = apps.get_model(app_name, model_name)
+        app_name, model_name = self.MODELS.get(data['type'], (None, data['type']))
+        if app_name is None:
+            for model in apps.get_models():
+                if model.__name__ == model_name:
+                    break
+        else:
+            model = apps.get_model(app_name, model_name)
         return model.objects.get(pk=data['id'])
 
 
