@@ -1,13 +1,36 @@
+from rest_framework import serializers
+from drf_yasg import openapi
 from django.apps import apps
 from django.utils.module_loading import import_string
 from django.contrib.auth.models import User
-from rest_framework import serializers
 
 
 class ContentObjectRelatedField(serializers.RelatedField):
     """
     A custom field to serialize generic relations
     """
+    class Meta:
+        swagger_schema_fields = {
+            "type": openapi.TYPE_OBJECT,
+            "title": "SourceObject",
+            "properties": {
+                "id": openapi.Schema(
+                     title="source object id",
+                     type=openapi.TYPE_STRING,
+                ),
+                "type": openapi.Schema(
+                    title="source object type, (Client, User, ...)",
+                    type=openapi.TYPE_STRING,
+                ),
+                "...": openapi.Schema(
+                    title="other fields of source object",
+                    type=openapi.TYPE_STRING,
+                    read_only=True,
+                )
+            },
+            "required": ["subject", "body"],
+        }
+
     MODELS = {
         'Client': ('client', 'Client'),
         # 'Enrollment': ('program', 'Enrollment'),

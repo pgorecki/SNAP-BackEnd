@@ -12,6 +12,7 @@ class NoteReader(ObjectSerializer):
 
 
 class NoteWriter(ObjectSerializer):
+
     class SourceWriter(ContentObjectRelatedField):
         def get_queryset(self):
             # TODO: .....
