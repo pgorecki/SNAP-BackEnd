@@ -1,6 +1,7 @@
 from rest_framework.test import APIClient
 from __tests__.factories import setup_2_agencies
 from client.models import Client
+from agency.factories import AgencyFactory
 
 # e2e tests
 
@@ -21,18 +22,58 @@ def test_get_clients_by_anonymous():
     assert response.status_code == 401
 
 
-def test_get_clients_by_agency_user(client):
-    agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+def test_get_client_public_list_data_by_logged_in_user():
+    # create test agency
+    AgencyFactory(users=1, clients=1)
+    agency2 = AgencyFactory(users=1, clients=0)
+    user2 = agency2.user_profiles.first().user
+
+    api_client = APIClient()
+    api_client.force_authenticate(user2)
+
+    response = api_client.get('/clients/')
+    assert response.status_code == 200
+    assert len(response.data['results']) == 1
+    client = response.data['results'][0]
+    assert client['dob'] is None
+    assert client['ssn'] is None
+    assert client['address'] is None
+
+
+def test_get_client_public_single_data_by_logged_in_user():
+    # create test agency
+    AgencyFactory(users=1, clients=1)
+    agency2 = AgencyFactory(users=1, clients=0)
+    user2 = agency2.user_profiles.first().user
+
+    api_client = APIClient()
+    api_client.force_authenticate(user2)
+
+    client = Client.objects.first()
+    response = api_client.get(f'/clients/{client.id}/')
+    assert response.status_code == 200
+    client = response.data
+    assert client['dob'] is None
+    assert client['ssn'] is None
+    assert client['address'] is None
+
+
+def test_get_client_private_data_due_via_agency_owner_rights(client):
+    agency1 = AgencyFactory(users=1, clients=1)
+    user1 = agency1.user_profiles.first().user
+
     url = '/clients/'
     api_client = APIClient()
     api_client.force_authenticate(user1)
 
     response = api_client.get(url)
+
     assert response.status_code == 200
     assert len(response.data['results']) == 1
-    assert response.data['results'][0]['object'] == 'Client'
-    assert response.data['results'][0]['first_name'] == 'John'
-    assert response.data['results'][0]['created_by']['id'] == user1.id
+    client = response.data['results'][0]
+    assert client['object'] == 'Client'
+    assert client['created_by']['id'] == user1.id
+    assert client['dob'] is not None
 
 
 def test_create_client_by_user1():

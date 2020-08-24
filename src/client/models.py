@@ -1,6 +1,6 @@
 from django.db import models
 from core.models import ObjectRoot
-from core.managers import AgencyObjectManager
+from .managers import ClientObjectManager
 
 
 class ClientAddress(models.Model):
@@ -34,7 +34,7 @@ class Client(ObjectRoot):
     snap_id = models.CharField(max_length=256, blank=True, null=True)
     address = models.OneToOneField(ClientAddress, on_delete=models.CASCADE, null=True)
 
-    objects = AgencyObjectManager()
+    objects = ClientObjectManager()
 
     @property
     def full_name(self):
