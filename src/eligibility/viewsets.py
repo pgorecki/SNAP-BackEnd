@@ -1,4 +1,3 @@
-import django.db.utils
 from core.exceptions import ApplicationValidationError
 from core.viewsets import ModelViewSet
 from core.permissions import IsAdmin, IsAgencyMember, IsAgencyMemberReadOnly

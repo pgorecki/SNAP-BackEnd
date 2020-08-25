@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError
 from core.models import ObjectRoot, User
@@ -98,3 +99,13 @@ def validate_client_consistency_Enrollment(sender, instance, *args, **kwargs):
     iep = iep_enrollment.iep
     if iep.client.id != instance.client.id:
         raise ValidationError(f'Enrollment client {instance.client.id} does not match to IEP client {iep.client.id}')
+
+
+@receiver(post_save, sender=ClientIEP)
+def update_client_is_new_field(sender, instance, created, **kwargs):
+    ieps_in_progress = ClientIEP.objects.filter(status=IEPStatus.IN_PROGRESS).count()
+    if ieps_in_progress:
+        instance.client.is_new = False
+    else:
+        instance.client.is_new = True
+    instance.client.save()

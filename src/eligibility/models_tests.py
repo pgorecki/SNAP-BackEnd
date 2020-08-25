@@ -1,9 +1,8 @@
-import pytest
 from django.db import transaction
 import django.db.utils
 from client.models import Client
-from .factories import AgencyWithEligibilityFactory, EligibilityQueueFactory
-from .models import Eligibility, ClientEligibility, EligibilityQueue
+from .factories import AgencyWithEligibilityFactory
+from .models import ClientEligibility, EligibilityQueue
 from .enums import EligibilityStatus
 
 

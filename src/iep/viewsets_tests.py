@@ -3,6 +3,7 @@ from client.models import Client
 from agency.factories import AgencyFactory
 from program.factories import EnrollmentFactory
 from eligibility.factories import AgencyWithEligibilityFactory
+from .choices import IEPStatus
 from .factories import ClientIEPFactory
 from .models import ClientIEP
 
@@ -110,14 +111,12 @@ def test_list_iep_by_type__existing():
     agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
     user = agency.user_profiles.first().user
     client = Client.objects.first()
-    client.is_new = False
-    client.save()
 
     api_client = APIClient()
     api_client.force_authenticate(user)
 
-    # lets create new IEP
-    api_client.post('/iep/', {'client': Client.objects.first().id}, format='json').data['id']
+    # lets create IEP which is in progress
+    client.ieps.create(status=IEPStatus.IN_PROGRESS)
 
     assert api_client.get('/iep/?type=new').data['count'] == 0
     assert api_client.get('/iep/?type=existing').data['count'] == 1
