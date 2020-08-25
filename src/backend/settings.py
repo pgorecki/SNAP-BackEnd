@@ -27,6 +27,9 @@ class BaseConfiguration(Configuration):
 
     ALLOWED_HOSTS = values.ListValue([])
 
+    SENTRY_DSN = values.Value()
+    SENTRY_ENVIRONMENT = values.Value(None)
+
     # Application definition
 
     INSTALLED_APPS = [
@@ -188,7 +191,6 @@ class Test(BaseConfiguration):
 
 class Staging(BaseConfiguration):
     DEBUG = False
-    # SENTRY_DSN = values.URLValue(environ_required=True)
     STATIC_ROOT = "/host/static/"
     MEDIA_ROOT = "/host/uploads/"
     ALLOWED_HOSTS = ['*']
@@ -201,9 +203,3 @@ class Staging(BaseConfiguration):
     def post_setup(cls):
         print('Using Staging config')
         # super().post_setup()
-        # import sentry_sdk
-        # from sentry_sdk.integrations.django import DjangoIntegration
-
-        # sentry_sdk.init(
-        #     dsn=str(cls.SENTRY_DSN), integrations=[DjangoIntegration()], environment="Staging"
-        # )

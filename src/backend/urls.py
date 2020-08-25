@@ -13,6 +13,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from sentry_sdk.integrations.django import DjangoIntegration
+import sentry_sdk
+from django.conf import settings
 from django.conf.urls import url, include, handler404, handler500
 from django.contrib import admin
 from django.urls import path, re_path
@@ -102,3 +105,16 @@ handler500 = core.views.error500
 
 # this code is executed only once on server statup
 logger.info('App started')
+
+
+if (
+    settings.DEBUG is False
+    and getattr(settings, "SENTRY_DSN", None) is not None
+    and getattr(settings, "SENTRY_ENVIRONMENT", None) is not None
+):
+    print('Setting up sentry')
+    sentry_sdk.init(
+        dsn=str(settings.SENTRY_DSN),
+        integrations=[DjangoIntegration()],
+        environment=settings.SENTRY_ENVIRONMENT,
+    )
