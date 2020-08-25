@@ -108,7 +108,7 @@ logger.info('App started')
 
 
 if (
-    settings.DEBUG is False
+    # settings.DEBUG is False
     and getattr(settings, "SENTRY_DSN", None) is not None
     and getattr(settings, "SENTRY_ENVIRONMENT", None) is not None
 ):
