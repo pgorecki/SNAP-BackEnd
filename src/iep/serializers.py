@@ -1,13 +1,11 @@
 from rest_framework import serializers
 from rest_framework.utils import model_meta
-from drf_writable_nested.serializers import NestedCreateMixin, NestedUpdateMixin
-from core.serializers import ObjectSerializer, CreatedByReader, UserReader
+from core.serializers import ObjectSerializer, CreatedByReader
 from core.exceptions import ApplicationValidationError
-from agency.serializers import AgencyReader
 from client.serializers import ClientReader
 from program.models import Enrollment
 from program.enums import EnrollmentStatus
-from program.serializers import EnrollmentWriter
+from eligibility.models import ClientEligibility
 from .models import ClientIEP, ClientIEPEnrollment
 
 
@@ -29,12 +27,17 @@ class ClientIEPReader(ObjectSerializer):
     created_by = CreatedByReader()
     client = ClientReader()
     enrollments = ClientIEPEnrollmentReader(many=True, source='iep_enrollments')
+    client_is_eligible = serializers.SerializerMethodField()
 
     class Meta:
         model = ClientIEP
         fields = ('id', 'object', 'client', 'orientation_completed', 'status',
+                  'client_is_eligible',
                   'enrollments', 'start_date', 'end_date', 'projected_end_date',
                   'outcome', 'created_by', 'created_at', 'modified_at')
+
+    def get_client_is_eligible(self, object) -> bool:
+        return ClientEligibility.is_eligible(object.client)
 
 
 class ClientIEPWriter(ObjectSerializer):

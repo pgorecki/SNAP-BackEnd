@@ -6,6 +6,7 @@ from rest_framework import routers, serializers, viewsets
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from agency.serializers import AgencyReader
 from core.logging import logger
 import survey.models
 import client.models
@@ -24,13 +25,24 @@ class UsersMe(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
+        permissions = set()
+        for g in request.user.groups.all():
+            for p in g.permissions.all():
+                permissions.add(p.codename)
+
+        for p in request.user.user_permissions.all():
+            permissions.add(p.codename)
+
         content = {
             'id': request.user.id,
             'username': request.user.username,
             'email': request.user.email,
             'first_name': request.user.first_name,
             'last_name': request.user.last_name,
-            'permissions': str(request.user.user_permissions),
+            'groups': str(request.user.groups.all()),
+            'permissions': permissions,
+            'is_superuser': request.user.is_superuser,
+            'agency': request.user.profile and AgencyReader(request.user.profile.agency).data
         }
         return Response(content)
 
