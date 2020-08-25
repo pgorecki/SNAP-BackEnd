@@ -43,12 +43,15 @@ def test_adding_second_unresolved_eq_will_fail_for_same_client():
 def test_changing_newest_eq_will_update_client_eligibility():
     agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
     client = Client.objects.first()
+    user = agency.user_profiles.first().user
 
     assert ClientEligibility.is_eligible(client=client) is False
 
     eq = EligibilityQueue.objects.create(client=client, requestor=agency, status=None)
     eq.status = EligibilityStatus.ELIGIBLE.name
+    eq.resolved_by = user
     eq.save()
 
     assert ClientEligibility.objects.count() == 1
     assert ClientEligibility.is_eligible(client=client)
+    assert client.eligibility.first().created_by == user

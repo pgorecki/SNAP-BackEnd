@@ -111,5 +111,6 @@ def update_client_eligibility(sender, instance, created, **kwargs):
     if instance._meta.model.objects.first() == instance and instance.is_resolved:
         instance.client.eligibility.create(
             status=instance.status,
-            eligibility=Eligibility.objects.first()  # should be removed in the future?
+            eligibility=Eligibility.objects.first(),  # should be removed in the future?
+            created_by=instance.resolved_by
         )
