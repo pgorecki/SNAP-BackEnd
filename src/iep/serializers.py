@@ -50,10 +50,6 @@ class ClientIEPWriter(ObjectSerializer):
                   'outcome')
 
     def update(self, instance, validated_data):
-        user = self.context['request'].user
-        print('xx', validated_data)
-        print('xx', instance.client)
-
         if 'enrollments' in validated_data:
             iep_enrollments_to_remove = set()
             existing_programs = set()

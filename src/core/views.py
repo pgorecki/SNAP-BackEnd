@@ -28,10 +28,12 @@ class UsersMe(APIView):
         permissions = set()
         for g in request.user.groups.all():
             for p in g.permissions.all():
-                permissions.add(p.codename)
+                permissions.add(p)
 
         for p in request.user.user_permissions.all():
-            permissions.add(p.codename)
+            permissions.add(p)
+
+        perms = map(lambda p: "{}.{}".format(p.content_type.app_label, p.codename), permissions)
 
         content = {
             'id': request.user.id,
@@ -39,8 +41,7 @@ class UsersMe(APIView):
             'email': request.user.email,
             'first_name': request.user.first_name,
             'last_name': request.user.last_name,
-            'groups': str(request.user.groups.all()),
-            'permissions': permissions,
+            'permissions': sorted(perms),
             'is_superuser': request.user.is_superuser,
             'agency': request.user.profile and AgencyReader(request.user.profile.agency).data
         }
