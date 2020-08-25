@@ -42,6 +42,26 @@ def test_create_enrollment_note():
     assert response.status_code == 201
 
 
+def test_create_non_existing_enrollment_note():
+    # create test agency
+    agency = AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)
+    user = agency.user_profiles.first().user
+    client = Client.objects.first()
+    EnrollmentFactory(client=client, program=agency.programs.first())
+
+    url = '/notes/'
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+
+    response = api_client.post(url, {
+        # we are deliberately using client id instead of enrollment id
+        'source': {'id': client.id, 'type': 'Enrollment'},
+        'text': 'a message'
+    }, format='json')
+
+    assert response.status_code == 400
+
+
 def test_list_notes_by_type():
     # create test agency
     agency = AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from drf_yasg import openapi
+from core.validation import ApplicationValidationError
 from django.apps import apps
 from django.utils.module_loading import import_string
 from django.contrib.auth.models import User
@@ -52,7 +53,11 @@ class ContentObjectRelatedField(serializers.RelatedField):
                     break
         else:
             model = apps.get_model(app_name, model_name)
-        return model.objects.get(pk=data['id'])
+        try:
+            return model.objects.get(pk=data['id'])
+        except Exception as e:
+            print(str(e))
+            raise ApplicationValidationError({'id': [str(e)]})
 
 
 class ObjectSerializer(serializers.ModelSerializer):
