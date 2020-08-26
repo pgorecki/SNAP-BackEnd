@@ -7,9 +7,9 @@ def move_respondent_to_client(apps, schema_editor):
     # We can't import the Person model directly as it may be a newer
     # version than this migration expects. We use the historical version.
     Response = apps.get_model('survey', 'Response')
+    Client = apps.get_model('client', 'Client')
     for r in Response.objects.all():
-        print(dir(r))
-        r.client_id = r.respondent_id
+        r.client = Client.objects.first(r.respondent_id)
         r.save()
 
 
