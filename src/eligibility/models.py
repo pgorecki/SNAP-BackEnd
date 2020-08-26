@@ -8,6 +8,7 @@ from simple_history.models import HistoricalRecords
 from agency.models import Agency
 from client.models import Client
 from core.models import ObjectRoot, User
+from iep.choices import IEPStatus
 from .enums import EligibilityStatus
 from .managers import (
     EligibilityObjectManager,
@@ -114,3 +115,18 @@ def update_client_eligibility(sender, instance, created, **kwargs):
             eligibility=Eligibility.objects.first(),  # should be removed in the future?
             created_by=instance.resolved_by
         )
+
+
+@receiver(post_save, sender=EligibilityQueue)
+def update_iep_status_based_on_eligiblity_queue(sender, instance, created, **kwargs):
+    if not instance.is_resolved:
+        return
+
+    if instance.status == EligibilityStatus.ELIGIBLE.name:
+        iep_status = IEPStatus.IN_ORIENTATION
+    if instance.status == EligibilityStatus.NOT_ELIGIBLE.name:
+        iep_status = IEPStatus.NOT_ELIGIBLE
+
+    for iep in instance.ieps.filter(status=IEPStatus.AWAITING_APPROVAL):
+        iep.status = iep_status
+        iep.save()

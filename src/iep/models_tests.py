@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from agency.factories import AgencyFactory
 from client.models import Client
 from program.factories import ProgramFactory, EnrollmentFactory
+from eligibility.enums import EligibilityStatus
+from eligibility.models import EligibilityQueue, Eligibility
 from .choices import IEPStatus
 from .factories import ClientIEPFactory, ClientIEPEnrollmentFactory
 
@@ -68,19 +70,40 @@ def test_iep_status_change_will_update_client_is_new_field():
 
     assert client.is_new is True
 
-# def test_iep_enrollments_must_be_unique():
-#     agency = AgencyFactory(users=1, clients=1)
-#     client = Client.objects.first()
-#     program = ProgramFactory(agency=agency)
-#     iep = ClientIEPFactory(client=client)
-#     enrollment = EnrollmentFactory(client=client, program=program)
-#     iep_enrollment1 = ClientIEPEnrollmentFactory(iep=iep, enrollment=enrollment)
-#     iep_enrollment2 = ClientIEPEnrollmentFactory(iep=iep, enrollment=enrollment)
 
-#     assert iep.iep_enrollments.count() == 2
+def test_approving_eligibility_request_will_change_status():
+    agency = AgencyFactory(users=1, clients=2)
+    program = ProgramFactory(agency=agency)
+    client = Client.objects.first()
 
-#     try:
-#         iep.clean()
-#         assert False
-#     except ValidationError:
-#         pass
+    iep = ClientIEPFactory(client=client)
+
+    Eligibility.objects.create(name='test')
+    eligibility_request = EligibilityQueue.objects.create(client=client, requestor=agency)
+    iep.eligibility_request = eligibility_request
+    iep.save()
+
+    iep.eligibility_request.status = EligibilityStatus.ELIGIBLE.name
+    iep.eligibility_request.save()
+
+    iep.refresh_from_db()
+    assert iep.status == IEPStatus.IN_ORIENTATION
+
+
+def test_denying_eligibility_request_will_change_status():
+    agency = AgencyFactory(users=1, clients=2)
+    program = ProgramFactory(agency=agency)
+    client = Client.objects.first()
+
+    iep = ClientIEPFactory(client=client)
+
+    Eligibility.objects.create(name='test')
+    eligibility_request = EligibilityQueue.objects.create(client=client, requestor=agency)
+    iep.eligibility_request = eligibility_request
+    iep.save()
+
+    iep.eligibility_request.status = EligibilityStatus.NOT_ELIGIBLE.name
+    iep.eligibility_request.save()
+
+    iep.refresh_from_db()
+    assert iep.status == IEPStatus.NOT_ELIGIBLE
