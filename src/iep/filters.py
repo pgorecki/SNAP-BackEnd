@@ -14,7 +14,7 @@ class ClientIEPViewsetFilter(django_filters.FilterSet):
         elif value == 'existing':
             return qs.filter(status__in=status, client__is_new=False)
         elif value == 'historical':
-            return qs.filter(status_in=[IEPStatus.ENDED, IEPStatus.NOT_ELIGIBLE])
+            return qs.filter(status__in=[IEPStatus.ENDED, IEPStatus.NOT_ELIGIBLE])
         else:
             raise ApplicationValidationError({'type': ['Allowed values are: [new|existing|historical]']})
         return qs
