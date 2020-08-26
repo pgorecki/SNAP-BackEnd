@@ -56,7 +56,6 @@ class BaseConfiguration(Configuration):
         'iep',
         'security',
         'note',
-        'matching',
     ]
 
     MIDDLEWARE = [

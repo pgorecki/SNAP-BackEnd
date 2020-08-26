@@ -31,7 +31,6 @@ import eligibility.viewsets
 import iep.viewsets
 import program.viewsets
 import note.viewsets
-import matching.viewsets
 from core.logging import logger
 
 schema_view = get_schema_view(
@@ -54,14 +53,10 @@ router.register('surveys', survey.viewsets.SurveyViewset, basename='survey')
 router.register('questions', survey.viewsets.QuestionViewset, basename='question')
 router.register('responses', survey.viewsets.ResponseViewset, basename='response')
 
-router.register('eligibility/agency_configs', eligibility.viewsets.AgencyEligibilityConfigViewset,
-                basename='agency_eligibility_config')
 router.register('eligibility/clients', eligibility.viewsets.ClientEligibilityViewset,
                 basename='eligibility_clients')
 router.register('eligibility/queue', eligibility.viewsets.EligibilityQueueViewset,
                 basename='eligibility_queue')
-router.register('eligibility', eligibility.viewsets.EligibilityViewset,
-                basename='eligibility')
 router.register('iep', iep.viewsets.ClientIEPViewset,
                 basename='iep')
 router.register('programs/enrollments', program.viewsets.EnrollmentViewset,
@@ -69,19 +64,10 @@ router.register('programs/enrollments', program.viewsets.EnrollmentViewset,
 router.register('programs/eligibility', program.viewsets.ProgramEligibilityViewset,
                 basename='eligibility')
 router.register('programs', program.viewsets.ProgramViewset, basename='program')
-router.register('matching/config', matching.viewsets.MatchingConfigViewset, basename='matching_config')
 
-router.register('matching', matching.viewsets.ClientMatchingViewset, basename='matching_client')
-
-client_matching_router = routers.NestedSimpleRouter(router, 'matching', lookup='client_matching')
-client_matching_router.register('history', matching.viewsets.ClientMatchingHistoryViewset,
-                                basename='matching_client_history')
-client_matching_router.register('notes', matching.viewsets.ClientMatchingNoteViewset,
-                                basename='matching_client_notes')
 
 urlpatterns = [
     url(r'^', include(router.urls)),
-    url(r'^', include(client_matching_router.urls)),
     path('users/me/', core.views.UsersMe.as_view(), name='users_me'),
     path('users/auth/', obtain_auth_token, name='users_auth'),
     path('dashboard/summary/', core.views.DashboardSummary.as_view(), name='dashboard_summary'),

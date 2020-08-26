@@ -1,61 +1,7 @@
 from rest_framework.test import APIClient
 from client.models import Client
 from .factories import AgencyWithEligibilityFactory, EligibilityQueueFactory
-from .models import Eligibility, ClientEligibility
-
-
-def test_retrieve_eligibility():
-    # create test agency
-    agency1 = AgencyWithEligibilityFactory(users=1, num_eligibility=3)
-    # create another agency
-    AgencyWithEligibilityFactory(users=1, num_eligibility=2)
-
-    user = agency1.user_profiles.first().user
-    url = '/eligibility/'
-    api_client = APIClient()
-    api_client.force_authenticate(user)
-
-    response = api_client.get(url)
-
-    assert Eligibility.objects.count() == 5
-    assert response.status_code == 200
-    assert len(response.data['results']) == 3
-
-
-def test_agency_user_cannot_create_eligibility():
-    agency = AgencyWithEligibilityFactory(users=1, num_eligibility=1)
-
-    user = agency.user_profiles.first().user
-    url = '/eligibility/'
-    api_client = APIClient()
-    api_client.force_authenticate(user)
-
-    response = api_client.post(url, {
-        'name': 'new eligibility'
-    })
-
-    assert response.status_code == 403
-    assert Eligibility.objects.count() == 1
-
-
-def test_list_eligibility_agency_configs():
-    agency = AgencyWithEligibilityFactory(users=1, num_eligibility=1)
-    AgencyWithEligibilityFactory(users=1, num_eligibility=1)
-
-    user = agency.user_profiles.first().user
-    url = '/eligibility/agency_configs/'
-    api_client = APIClient()
-    api_client.force_authenticate(user)
-
-    response = api_client.get(url)
-
-    assert response.status_code == 200
-
-    results = response.data['results']
-
-    assert len(results) == 1
-    assert results[0]['agency']['id'] == str(agency.id)
-    assert results[0]['eligibility']['id'] == str(agency.agencyeligibilityconfig_set.first().eligibility.id)
+from .models import ClientEligibility
 
 
 def test_list_client_eligibility():
