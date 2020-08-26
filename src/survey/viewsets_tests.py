@@ -185,7 +185,7 @@ def test_get_responses_by_agency_user(client):
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
     survey1 = Survey.objects.create(name='survey1', definition={}, created_by=user1)
     question1 = Question.objects.create(title='question1', created_by=user1)
-    response1 = Response.objects.create(survey=survey1, respondent=client1, created_by=user1)
+    response1 = Response.objects.create(survey=survey1, client=client1, created_by=user1)
     Answer.objects.create(response=response1, question=question1, value='yes')
     url = '/responses/'
     api_client = APIClient()
@@ -194,8 +194,8 @@ def test_get_responses_by_agency_user(client):
     assert response.status_code == 200
     assert len(response.data['results']) == 1
     assert response.data['results'][0]['object'] == 'Response'
-    assert response.data['results'][0]['respondent']['id'] == str(client1.id)
-    assert response.data['results'][0]['respondent']['object'] == 'Client'
+    assert response.data['results'][0]['client']['id'] == str(client1.id)
+    assert response.data['results'][0]['client']['object'] == 'Client'
     assert response.data['results'][0]['created_by']['id'] == user1.id
 
 
@@ -210,9 +210,46 @@ def test_create_response(client):
     api_client.force_authenticate(user1)
     data = {
         'survey': survey1.id,
-        'respondent': {
-            'id': client1.id,
-            'type': 'Client',
+        'client': client1.id,
+        'answers': [
+            {
+                'question': question1.id,
+                'value': 'yes',
+            },
+        ],
+    }
+    # check api response
+    response = api_client.post(url, data, format='json')
+    print(response.data)
+    assert response.status_code == 201
+
+    # check model
+    r = Response.objects.first()
+    ans = Answer.objects.first()
+    assert Response.objects.count() == 1
+    assert r.survey == survey1
+    assert r.client == client1
+    assert Answer.objects.count() == 1
+    assert ans.response == r
+    assert ans.question == question1
+    assert ans.value == 'yes'
+
+
+def test_create_response_with_context(client):
+    agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    survey1 = Survey.objects.create(name='survey1', definition={}, created_by=user1)
+    question1 = Question.objects.create(title='question1', created_by=user1)
+    client = Client.objects.create(first_name='John', last_name='Doe', dob='2000-01-01', created_by=user1)
+
+    url = '/responses/'
+    api_client = APIClient()
+    api_client.force_authenticate(user1)
+    data = {
+        'survey': survey1.id,
+        'client': client1.id,
+        'response_context': {
+            'id': survey1.id,
+            'type': 'Survey',
         },
         'answers': [
             {
@@ -223,18 +260,11 @@ def test_create_response(client):
     }
     # check api response
     response = api_client.post(url, data, format='json')
+    print(response.data)
     assert response.status_code == 201
-
     # check model
     r = Response.objects.first()
-    ans = Answer.objects.first()
-    assert Response.objects.count() == 1
-    assert r.survey == survey1
-    assert r.respondent == client1
-    assert Answer.objects.count() == 1
-    assert ans.response == r
-    assert ans.question == question1
-    assert ans.value == 'yes'
+    assert r.response_context == survey1
 
 
 def test_create_response_invalid_survey(client):
@@ -248,10 +278,7 @@ def test_create_response_invalid_survey(client):
     api_client.force_authenticate(user1)
     data = {
         'survey': 9999,  # non-existing survey
-        'respondent': {
-            'id': client1.id,
-            'type': 'Client',
-        },
+        'client': client1.id,
         'answers': [
             {
                 'question': question1.id,
@@ -270,7 +297,7 @@ def test_update_response(client):
     question1 = Question.objects.create(title='question1', created_by=user1)
     question2 = Question.objects.create(title='question2', created_by=user1)
     client = Client.objects.create(first_name='John', last_name='Doe', dob='2000-01-01', created_by=user1)
-    response = Response.objects.create(survey=survey1, respondent=client, created_by=user1)
+    response = Response.objects.create(survey=survey1, client=client, created_by=user1)
     response.answers.create(question=question1, value='no')
 
     url = f'/responses/{response.id}/'
@@ -278,10 +305,7 @@ def test_update_response(client):
     api_client.force_authenticate(user1)
     data = {
         'survey': survey1.id,
-        'respondent': {
-            'id': client1.id,
-            'type': 'Client',
-        },
+        'client': client1.id,
         'answers': [
             {
                 'question': question1.id,

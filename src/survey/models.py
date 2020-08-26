@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from core.models import ObjectRoot
 from core.managers import AgencyObjectManager
 from core.json_yaml_field import JsonYamlField
+from client.models import Client
 from survey.enums import QuestionCategory
 
 
@@ -70,12 +71,14 @@ class Response(ObjectRoot):
     class Meta:
         ordering = ['-created_at']
 
-    respondent_type = models.ForeignKey(ContentType, null=True, related_name='responses', on_delete=models.PROTECT)
-    respondent_id = models.UUIDField(primary_key=False)
-    respondent = GenericForeignKey('respondent_type', 'respondent_id')
     survey = models.ForeignKey(
         Survey, related_name='responses', on_delete=models.PROTECT
     )
+    client = models.ForeignKey(Client, related_name='responses', on_delete=models.CASCADE)
+    response_context_type = models.ForeignKey(
+        ContentType, related_name='responses', on_delete=models.SET_NULL, blank=True, null=True)
+    response_context_id = models.UUIDField(primary_key=False, blank=True, null=True)
+    response_context = GenericForeignKey('response_context_type', 'response_context_id')
 
     objects = AgencyObjectManager()
 
