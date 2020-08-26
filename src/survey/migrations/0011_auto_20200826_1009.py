@@ -9,7 +9,8 @@ def move_respondent_to_client(apps, schema_editor):
     Response = apps.get_model('survey', 'Response')
     Client = apps.get_model('client', 'Client')
     for r in Response.objects.all():
-        r.client = Client.objects.first(r.respondent_id)
+        client = Client.objects.first(r.respondent_id)
+        r.client = client or Client.objects.first()
         r.save()
 
 
