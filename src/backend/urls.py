@@ -67,7 +67,7 @@ router.register('programs', program.viewsets.ProgramViewset, basename='program')
 
 
 urlpatterns = [
-    url(r'^', include(router.urls)),
+    path('', include(router.urls)),
     path('users/me/', core.views.UsersMe.as_view(), name='users_me'),
     path('users/auth/', obtain_auth_token, name='users_auth'),
     path('dashboard/summary/', core.views.DashboardSummary.as_view(), name='dashboard_summary'),
@@ -82,7 +82,7 @@ urlpatterns = [
     path('sentry/', lambda x: 1 / 0, name='setry-test'),
 
     path('admin/', admin.site.urls),
-    url(r'^api-auth/', include('rest_framework.urls')),
+    path('api-auth/', include('rest_framework.urls')),
 ]
 
 
