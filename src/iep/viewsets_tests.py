@@ -99,8 +99,7 @@ def test_list_iep_by_type__new():
     api_client = APIClient()
     api_client.force_authenticate(user)
 
-    # lets create new IEP
-    api_client.post('/iep/', {'client': Client.objects.first().id}, format='json').data['id']
+    ClientIEPFactory(client=Client.objects.first(), status=IEPStatus.IN_ORIENTATION)
 
     assert api_client.get('/iep/?type=new').data['count'] == 1
     assert api_client.get('/iep/?type=existing').data['count'] == 0
@@ -116,7 +115,10 @@ def test_list_iep_by_type__existing():
     api_client.force_authenticate(user)
 
     # lets create IEP which is in progress
-    client.ieps.create(status=IEPStatus.IN_PROGRESS)
+    ClientIEPFactory(client=client, status=IEPStatus.IN_PROGRESS)
+
+    # and another one which is new
+    ClientIEPFactory(client=client, status=IEPStatus.IN_ORIENTATION)
 
     assert api_client.get('/iep/?type=new').data['count'] == 0
     assert api_client.get('/iep/?type=existing').data['count'] == 1
@@ -126,17 +128,13 @@ def test_list_iep_by_type__existing():
 def test_list_iep_by_type__historical():
     agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
     user = agency.user_profiles.first().user
+    client = Client.objects.first()
 
     api_client = APIClient()
     api_client.force_authenticate(user)
 
-    # lets create new IEP
-    api_client.post('/iep/', {'client': Client.objects.first().id}, format='json').data['id']
-
-    # lets resolve eligibility request
-    iep = ClientIEP.objects.first()
-    iep.eligibility_request.status = 'ELIGIBLE'
-    iep.eligibility_request.save()
+    # lets create IEP which is in progress
+    ClientIEPFactory(client=client, status=IEPStatus.ENDED)
 
     assert api_client.get('/iep/?type=new').data['count'] == 0
     assert api_client.get('/iep/?type=existing').data['count'] == 0
