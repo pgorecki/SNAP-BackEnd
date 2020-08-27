@@ -1,4 +1,34 @@
 from rest_framework.permissions import IsAuthenticated
+from ability.ability import Ability
+from backend.ability import declare_abilities
+
+
+class UserPermission():
+    def has_permission(self, request, view=None):
+        ability = Ability(request.user)
+        declare_abilities(request.user, ability)
+        actions_map = {
+            'list': 'view',
+            'retrieve': 'view',
+            'create': 'add',
+            'update': 'change',
+            'partial_update': 'change',
+            'destroy': 'delete'
+        }
+        return ability.can(action=actions_map[view.action], model=view.get_queryset().model)
+
+    def has_object_permission(self, request, view, obj):
+        ability = Ability(request.user)
+        declare_abilities(request.user, ability)
+        actions_map = {
+            'list': 'view',
+            'retrieve': 'view',
+            'create': 'add',
+            'update': 'change',
+            'partial_update': 'change',
+            'destroy': 'delete'
+        }
+        return ability.can(action=actions_map[view.action], model=view.get_queryset().model, instance=obj)
 
 
 class IsAgencyMemberReadOnly(IsAuthenticated):

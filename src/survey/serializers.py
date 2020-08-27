@@ -80,8 +80,6 @@ class ResponseReader(ObjectSerializer):
 class ResponseWriter(ObjectSerializer):
     class ResponseContextWriter(ContentObjectRelatedField):
         def get_queryset(self):
-            # TODO: .....
-            print(('get_qs'))
             return None
 
     answers = AnswerWriter(many=True)

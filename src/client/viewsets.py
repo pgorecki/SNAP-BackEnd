@@ -8,13 +8,14 @@ from core.logging import RequestLogger
 from .models import Client
 from .serializers import ClientReader, ClientWriter
 from .filters import ClientSearchFilter
+from core.permissions import UserPermission
 
 
 class ClientViewset(ModelViewSet):
     queryset = Client.objects.all()
     read_serializer_class = ClientReader
     write_serializer_class = ClientWriter
-    permission_classes = [IsAdmin | IsAgencyMember]
+    permission_classes = [UserPermission]  # IsAdmin | IsAgencyMember,
     filterset_class = ClientSearchFilter
     ordering_fields = ['first_name', 'middle_name', 'last_name', 'dob']
 

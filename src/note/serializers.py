@@ -15,8 +15,6 @@ class NoteWriter(ObjectSerializer):
 
     class SourceWriter(ContentObjectRelatedField):
         def get_queryset(self):
-            # TODO: .....
-            print(('get_qs'))
             return None
     source = SourceWriter()
 

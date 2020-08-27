@@ -51,7 +51,6 @@ class ClientEligibilityViewset(ModelViewSet):
     filterset_class = ClientEligibilityViewsetFilter
 
     def get_queryset(self):
-        print(('qs', list(ClientEligibility.objects.for_user(self.request.user).all())))
         return ClientEligibility.objects.for_user(self.request.user)
 
     def perform_create(self, serializer):
