@@ -8,3 +8,4 @@ ADD Pipfile /code/
 ADD Pipfile.lock /code/
 RUN pipenv install --system
 ADD src/ /code/
+ENTRYPOINT sh container_init.sh && sh -c "exec gunicorn backend.wsgi:application --access-logfile - --bind 0.0.0.0:8000 --workers 4"
