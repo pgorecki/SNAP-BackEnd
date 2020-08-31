@@ -26,6 +26,7 @@ django-simple-history = "*"
 rules = "*"
 drf-nested-routers = "*"
 drf-writable-nested = "*"
+django-cancan = "*"
 
 [dev-packages]
 autopep8 = "*"

@@ -1,34 +1,35 @@
 from rest_framework.permissions import IsAuthenticated
-from ability.ability import Ability
-from backend.ability import declare_abilities
+from cancan.ability import AbilityValidator
+from cancan.middleware import CanCanMiddleware
 
 
-class UserPermission():
+class AbilityPermission():
     def has_permission(self, request, view=None):
-        ability = Ability(request.user)
-        declare_abilities(request.user, ability)
-        actions_map = {
-            'list': 'view',
-            'retrieve': 'view',
-            'create': 'add',
-            'update': 'change',
-            'partial_update': 'change',
-            'destroy': 'delete'
-        }
-        return ability.can(action=actions_map[view.action], model=view.get_queryset().model)
+        validator = request.ability
+        ability = validator.ability
+        ability.set_alias('list', 'view')
+        ability.set_alias('retrieve', 'view')
+        ability.set_alias('create', 'add')
+        ability.set_alias('update', 'change')
+        ability.set_alias('partial_update', 'change')
+        ability.set_alias('destroy', 'delete')
+        print('has_permission?', view.action, view.get_queryset().model)
+        result = validator.can(view.action, view.get_queryset().model)
+        print(result)
+        return result
+
+        return validator.can(view.action, view.get_queryset().model)
 
     def has_object_permission(self, request, view, obj):
-        ability = Ability(request.user)
-        declare_abilities(request.user, ability)
-        actions_map = {
-            'list': 'view',
-            'retrieve': 'view',
-            'create': 'add',
-            'update': 'change',
-            'partial_update': 'change',
-            'destroy': 'delete'
-        }
-        return ability.can(action=actions_map[view.action], model=view.get_queryset().model, instance=obj)
+        validator = request.ability
+        ability = validator.ability
+        ability.set_alias('list', 'view')
+        ability.set_alias('retrieve', 'view')
+        ability.set_alias('create', 'add')
+        ability.set_alias('update', 'change')
+        ability.set_alias('partial_update', 'change')
+        ability.set_alias('destroy', 'delete')
+        return validator.can(view.action, obj)
 
 
 class IsAgencyMemberReadOnly(IsAuthenticated):

@@ -47,6 +47,7 @@ class BaseConfiguration(Configuration):
         'simple_history',
         'drf_yasg',
         'rules.apps.AutodiscoverRulesConfig',
+        'cancan',
         'core',
         'agency',
         'client',
@@ -69,6 +70,7 @@ class BaseConfiguration(Configuration):
         'core.middleware.LoggingMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        'cancan.middleware.CanCanMiddleware',
     ]
 
     ROOT_URLCONF = 'backend.urls'
@@ -160,6 +162,10 @@ class BaseConfiguration(Configuration):
         },
         'LOGIN_URL': '/admin/login/',
         'LOGOUT_URL': '/admin/logout/',
+    }
+
+    CANCAN = {
+        'ABILITIES': 'backend.abilities.declare_abilities'
     }
 
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

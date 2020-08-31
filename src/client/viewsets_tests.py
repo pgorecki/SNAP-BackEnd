@@ -17,7 +17,6 @@ def test_get_clients_by_agency_user(client):
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
     url = '/clients/'
     api_client = APIClient()
-    user1.user_permissions.add(Permission.objects.get(codename='view_client'))
     api_client.force_authenticate(user1)
 
     response = api_client.get(url)

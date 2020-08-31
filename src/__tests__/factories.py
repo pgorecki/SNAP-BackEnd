@@ -32,8 +32,8 @@ def setup_2_agencies():
 
     client1 = Client.objects.create(first_name='John', last_name='Doe',
                                     dob='2000-01-01', created_by=user1)
-    client2 = Client.objects.create(first_name='John', last_name='Doe',
-                                    dob='2000-01-01', created_by=user2)
+    client2 = Client.objects.create(first_name='Bill', last_name='Smith',
+                                    dob='1999-01-01', created_by=user2)
 
     AgencyClient.objects.create(client=client1, agency=agency1)
     AgencyClient.objects.create(client=client2, agency=agency2)
