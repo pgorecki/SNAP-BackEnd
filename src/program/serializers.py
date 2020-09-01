@@ -42,10 +42,12 @@ class EnrollmentReader(ObjectSerializer):
 
     class Meta:
         model = Enrollment
-        fields = ('id', 'object', 'status', 'client', 'program', 'created_at', 'modified_at')
+        fields = ('id', 'object', 'status', 'client', 'program', 'start_date',
+                  'projected_end_date', 'end_date', 'created_at', 'modified_at')
 
 
 class EnrollmentWriter(ObjectSerializer):
     class Meta:
         model = Enrollment
-        fields = ('status', 'client', 'program')
+        fields = ('status', 'client', 'program', 'start_date',
+                  'projected_end_date', 'end_date')
