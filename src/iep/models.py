@@ -10,6 +10,14 @@ from program.models import Enrollment
 from .choices import IEPStatus
 
 
+class JobPlacement(models.Model):
+    class Meta:
+        db_table = 'iep_job_placement'
+        ordering = ['id']
+
+    effective_date = models.DateField(blank=True, null=True)
+
+
 class ClientIEP(ObjectRoot):
     class Meta:
         db_table = 'iep_client'
@@ -29,6 +37,7 @@ class ClientIEP(ObjectRoot):
         default=IEPStatus.AWAITING_APPROVAL
     )
     outcome = models.CharField(max_length=64, default='', blank=True, help_text='Outcome when completed')
+    job_placement = models.OneToOneField(JobPlacement, on_delete=models.SET_NULL, null=True)
 
 
 class ClientIEPEnrollment(ModelValidationMixin, models.Model):

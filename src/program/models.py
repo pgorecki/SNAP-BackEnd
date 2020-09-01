@@ -82,3 +82,21 @@ class ProgramEligibility(ObjectRoot):
     history = HistoricalRecords()
 
     objects = ProgramEligibilityObjectManager()
+
+
+class EnrollmentActivity(models.Model):
+    class Meta:
+        db_table = 'program_enrollment_activity'
+        ordering = ['id']
+
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='activities')
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+
+
+class EnrollmentService(models.Model):
+    class Meta:
+        db_table = 'program_enrollment_service'
+        ordering = ['id']
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='services')
+    effective_date = models.DateField(blank=True, null=True)
