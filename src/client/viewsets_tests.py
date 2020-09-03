@@ -19,6 +19,8 @@ def test_get_clients_by_agency_user(client):
     api_client = APIClient()
     api_client.force_authenticate(user1)
 
+    user1.user_permissions.add(Permission.objects.get(codename='view_client'))
+
     response = api_client.get(url)
     assert response.status_code == 200
     assert len(response.data['results']) == 1

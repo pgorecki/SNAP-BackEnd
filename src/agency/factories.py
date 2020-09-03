@@ -32,4 +32,6 @@ class AgencyFactory(factory.django.DjangoModelFactory):
             assert isinstance(extracted, int)
             profiles_iterator = itertools.cycle(obj.user_profiles.all())
             for i in range(extracted):
-                ClientFactory(created_by=next(profiles_iterator).user)
+                user = next(profiles_iterator).user
+                client = ClientFactory(created_by=user)
+                client.agency_clients.create(agency=user.profile.agency)
