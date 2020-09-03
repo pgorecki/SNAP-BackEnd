@@ -24,6 +24,7 @@ class ClientIEP(ObjectRoot):
         ordering = ['-created_at']
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='ieps')
+    case_number = models.CharField(max_length=36, blank=True, null=True, description='MPR file column: Case Number')   #MPR
     case_manager = models.ForeignKey(User, related_name='iep', on_delete=models.SET_NULL, null=True, blank=True)
     orientation_completed = models.BooleanField(default=False)
     start_date = models.DateField(blank=True, null=True)
@@ -38,6 +39,7 @@ class ClientIEP(ObjectRoot):
     )
     outcome = models.CharField(max_length=64, default='', blank=True, help_text='Outcome when completed')
     job_placement = models.OneToOneField(JobPlacement, on_delete=models.SET_NULL, null=True)
+    abawd = models.CharField(max_length=10, blank=True, null=True,description='MPR file column: ABAWD (Y/N)')  #MPR
 
 
 class ClientIEPEnrollment(ModelValidationMixin, models.Model):
