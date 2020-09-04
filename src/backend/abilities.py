@@ -45,7 +45,7 @@ def declare_abilities(user, ability):
         return
 
     agency = user.profile.agency
-    agency_users = [p.user for p in agency.user_profiles.all()]
+    agency_users = [p.user for p in agency.user_profiles.all()] if agency else []
 
     if user.has_perm('client.add_client'):
         ability.can('add', Client)
