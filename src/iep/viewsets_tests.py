@@ -160,8 +160,9 @@ def test_create_iep_enrollment():
             },
         ],
     }, format='json')
-    print('response data', response.data)
+    import json
     assert response.status_code == 200
+    assert response.data['enrollments'][0]['id'] == str(iep.iep_enrollments.first().enrollment.id)
 
     assert iep.iep_enrollments.count() == 1
 
@@ -242,3 +243,66 @@ def test_cannot_remove_iep_enrollment_if_started():
         'enrollments': [],
     }, format='json')
     assert response.status_code == 400
+
+
+def test_replace_iep_enrollment_with_new_enrollment():
+    agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
+    program = agency.programs.create()
+    user = agency.user_profiles.first().user
+    client = Client.objects.first()
+    iep = ClientIEPFactory(client=client)
+    enrollment = EnrollmentFactory(client=client, program=program, status='PLANNED')
+    iep.iep_enrollments.create(enrollment=enrollment)
+
+    url = f'/iep/{iep.id}/'
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+
+    response = api_client.patch(url, {
+        'enrollments': [
+            {
+                'program': program.id,
+                'status': 'ENROLLED',
+            },
+        ],
+    }, format='json')
+    assert response.status_code == 200
+
+    assert iep.iep_enrollments.count() == 1
+
+    from iep.models import ClientIEPEnrollment
+    from program.models import Enrollment
+    assert ClientIEPEnrollment.objects.count() == 1
+    # TODO: is it the right case?
+    assert Enrollment.objects.count() == 2
+
+
+def test_replace_iep_enrollment_with_existing_enrollment():
+    agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
+    program = agency.programs.create()
+    user = agency.user_profiles.first().user
+    client = Client.objects.first()
+    iep = ClientIEPFactory(client=client)
+    old_enrollment = EnrollmentFactory(client=client, program=program, status='PLANNED')
+    new_enrollment = EnrollmentFactory(client=client, program=program, status='PLANNED')
+    iep.iep_enrollments.create(enrollment=old_enrollment)
+
+    url = f'/iep/{iep.id}/'
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+
+    response = api_client.patch(url, {
+        'enrollments': [
+            {
+                'id': str(new_enrollment.id),
+                'program': program.id,
+                'status': 'ENROLLED',
+            },
+        ],
+    }, format='json')
+    assert response.status_code == 200
+
+    print(response.data)
+
+    assert iep.iep_enrollments.count() == 1
+    assert response.data['enrollments'][0]['id'] == str(new_enrollment.id)

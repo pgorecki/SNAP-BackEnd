@@ -13,9 +13,7 @@ class AbilityPermission():
         ability.set_alias('update', 'change')
         ability.set_alias('partial_update', 'change')
         ability.set_alias('destroy', 'delete')
-        print('has_permission?', view.action, view.get_queryset().model)
         result = validator.can(view.action, view.get_queryset().model)
-        print(result)
         return result
 
         return validator.can(view.action, view.get_queryset().model)
