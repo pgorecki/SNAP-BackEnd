@@ -63,3 +63,19 @@ def test_update_own_client_by_user1():
     }, format='json')
     assert response.status_code == 200
     assert response.data['first_name'] == 'Jane'
+
+
+def test_search_clients_by_agency_user(client):
+    agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    url = f'/clients/?search=aaa'
+    api_client = APIClient()
+    api_client.force_authenticate(user1)
+
+    user1.user_permissions.add(Permission.objects.get(codename='view_client'))
+
+    response = api_client.get(url)
+    assert response.status_code == 200
+    assert len(response.data['results']) == 1
+    assert response.data['results'][0]['object'] == 'Client'
+    assert response.data['results'][0]['first_name'] == 'John'
+    assert response.data['results'][0]['created_by']['id'] == user1.id

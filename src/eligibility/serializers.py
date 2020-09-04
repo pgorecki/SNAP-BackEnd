@@ -30,19 +30,19 @@ class AgencyEligibilityConfigWriter(ObjectSerializer):
 
 
 class ClientEligibilityReader(ObjectSerializer):
-    eligibility = EligibilityReader()
+    # eligibility = EligibilityReader()
     client = ClientReader()
     created_by = CreatedByReader(read_only=True)
 
     class Meta:
         model = ClientEligibility
-        fields = ('id', 'object', 'client', 'eligibility', 'status', 'created_at', 'modified_at', 'created_by')
+        fields = ('id', 'object', 'client', 'status', 'created_at', 'modified_at', 'created_by')
 
 
 class ClientEligibilityWriter(ObjectSerializer):
     class Meta:
         model = ClientEligibility
-        fields = ('client', 'eligibility', 'status')
+        fields = ('client', 'status')
 
 
 class EligibilityQueueReader(ObjectSerializer):
