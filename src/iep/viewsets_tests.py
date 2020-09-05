@@ -302,7 +302,5 @@ def test_replace_iep_enrollment_with_existing_enrollment():
     }, format='json')
     assert response.status_code == 200
 
-    print(response.data)
-
     assert iep.iep_enrollments.count() == 1
     assert response.data['enrollments'][0]['id'] == str(new_enrollment.id)

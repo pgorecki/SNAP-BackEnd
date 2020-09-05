@@ -25,6 +25,8 @@ class ClientIEPViewset(ModelViewSet):
         """
         client = serializer.validated_data['client']
         agency = self.request.user.profile.agency
+        if agency is None:
+            ApplicationValidationError({'user': 'Agency is not set in your user profile'})
         existing_request = EligibilityQueue.objects.filter(client=client, requestor=agency, status=None).first()
 
         serializer.save(

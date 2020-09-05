@@ -319,3 +319,59 @@ def test_update_response(client):
     response.refresh_from_db()
     assert len(response.answers.all()) == 1
     assert response.answers.all()[0].value == 'yes'
+
+
+def test_create_response_with_invalid_context_data(client):
+    agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    survey1 = Survey.objects.create(name='survey1', definition={}, created_by=user1)
+    question1 = Question.objects.create(title='question1', created_by=user1)
+    client = Client.objects.create(first_name='John', last_name='Doe', dob='2000-01-01', created_by=user1)
+
+    url = '/responses/'
+    api_client = APIClient()
+    api_client.force_authenticate(user1)
+    data = {
+        'survey': survey1.id,
+        'client': client1.id,
+        'response_context': {
+            # 'id': survey1.id,
+            # 'type': 'Survey',
+        },
+        'answers': [
+            {
+                'question': question1.id,
+                'value': 'yes',
+            },
+        ],
+    }
+    # check api response
+    response = api_client.post(url, data, format='json')
+    assert response.status_code == 400
+
+
+def test_create_response_with_invalid_context_data2(client):
+    agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    survey1 = Survey.objects.create(name='survey1', definition={}, created_by=user1)
+    question1 = Question.objects.create(title='question1', created_by=user1)
+    client = Client.objects.create(first_name='John', last_name='Doe', dob='2000-01-01', created_by=user1)
+
+    url = '/responses/'
+    api_client = APIClient()
+    api_client.force_authenticate(user1)
+    data = {
+        'survey': survey1.id,
+        'client': client1.id,
+        'response_context': {
+            # 'id': survey1.id,
+            'type': 'FoobarFoobarFoobarFoobarFoobar',
+        },
+        'answers': [
+            {
+                'question': question1.id,
+                'value': 'yes',
+            },
+        ],
+    }
+    # check api response
+    response = api_client.post(url, data, format='json')
+    assert response.status_code == 400
