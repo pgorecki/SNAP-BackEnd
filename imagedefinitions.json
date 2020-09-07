@@ -1,6 +1,6 @@
 [
     {
-        "name": "gsnap-backend",
+        "name": "snap-backend",
         "imageUri": "331247680151.dkr.ecr.us-east-1.amazonaws.com/cta/gsnap-backend"
     }
 ]
