@@ -61,8 +61,8 @@ router.register('iep', iep.viewsets.ClientIEPViewset,
                 basename='iep')
 router.register('programs/enrollments', program.viewsets.EnrollmentViewset,
                 basename='enrollment')
-router.register('programs/eligibility', program.viewsets.ProgramEligibilityViewset,
-                basename='eligibility')
+# router.register('programs/eligibility', program.viewsets.ProgramEligibilityViewset,
+#                 basename='eligibility')
 router.register('programs', program.viewsets.ProgramViewset, basename='program')
 
 

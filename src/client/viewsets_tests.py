@@ -67,11 +67,12 @@ def test_update_own_client_by_user1():
 
 def test_search_clients_by_agency_user(client):
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
-    url = f'/clients/?search=aaa'
+    user1.user_permissions.add(Permission.objects.get(codename='view_client_all'))
+
+    url = f'/clients/?search=John'
+
     api_client = APIClient()
     api_client.force_authenticate(user1)
-
-    user1.user_permissions.add(Permission.objects.get(codename='view_client'))
 
     response = api_client.get(url)
     assert response.status_code == 200

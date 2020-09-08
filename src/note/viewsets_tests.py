@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Permission
 from rest_framework.test import APIClient
 from agency.factories import AgencyFactory
 from program.factories import EnrollmentFactory, AgencyWithProgramsFactory
@@ -9,6 +10,8 @@ def test_create_client_note():
     # create test agency
     agency1 = AgencyFactory(users=1, clients=1)
     user = agency1.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='add_note'))
+
     client = Client.objects.first()
 
     url = '/notes/'
@@ -27,6 +30,8 @@ def test_create_enrollment_note():
     # create test agency
     agency = AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='add_note'))
+
     client = Client.objects.first()
     enrollment = EnrollmentFactory(client=client, program=agency.programs.first())
 
@@ -46,6 +51,8 @@ def test_create_non_existing_enrollment_note():
     # create test agency
     agency = AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='add_note'))
+
     client = Client.objects.first()
     EnrollmentFactory(client=client, program=agency.programs.first())
 
@@ -66,10 +73,12 @@ def test_list_notes_by_type():
     # create test agency
     agency = AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='view_note'))
+
     client = Client.objects.first()
     enrollment = EnrollmentFactory(client=client, program=agency.programs.first())
-    Note.objects.create(source=client, text='client note')
-    Note.objects.create(source=enrollment, text='enrollment note')
+    Note.objects.create(source=client, text='client note', created_by=user)
+    Note.objects.create(source=enrollment, text='enrollment note', created_by=user)
 
     api_client = APIClient()
     api_client.force_authenticate(user)
@@ -93,8 +102,10 @@ def test_update_note_field():
     # create test agency
     agency = AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='change_note'))
+
     client = Client.objects.first()
-    note = Note.objects.create(source=client, text='client note')
+    note = Note.objects.create(source=client, text='client note', created_by=user)
 
     api_client = APIClient()
     api_client.force_authenticate(user)

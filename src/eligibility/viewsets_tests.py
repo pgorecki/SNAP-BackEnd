@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Permission
 from rest_framework.test import APIClient
 from client.models import Client
 from .factories import AgencyWithEligibilityFactory, EligibilityQueueFactory
@@ -7,6 +8,7 @@ from .models import ClientEligibility
 def test_list_client_eligibility():
     agency = AgencyWithEligibilityFactory(users=1, num_eligibility=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='view_clienteligibility'))
 
     url = '/eligibility/clients/'
     api_client = APIClient()
@@ -20,6 +22,7 @@ def test_list_client_eligibility():
 def test_create_client_eligibility():
     agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='add_clienteligibility'))
 
     url = '/eligibility/clients/'
     api_client = APIClient()
@@ -30,7 +33,6 @@ def test_create_client_eligibility():
         'eligibility': agency.eligibility.first().id,
         'status': 'ELIGIBLE',
     }, format='json')
-    print(response.data)
     assert response.status_code == 201
 
 
@@ -38,6 +40,7 @@ def test_create_client_eligibility_for_invalid_client():
     AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
     agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='add_clienteligibility'))
 
     url = '/eligibility/clients/'
     api_client = APIClient()
@@ -53,50 +56,10 @@ def test_create_client_eligibility_for_invalid_client():
     assert response.status_code == 400
 
 
-def test_create_client_eligibility_for_invalid_eligibility():
-    agency1 = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
-    agency2 = AgencyWithEligibilityFactory(users=1, num_eligibility=1)
-    user = agency1.user_profiles.first().user
-
-    url = '/eligibility/clients/'
-    api_client = APIClient()
-    api_client.force_authenticate(user)
-
-    client = Client.objects.exclude(created_by=agency2.user_profiles.first().user).first()
-
-    response = api_client.post(url, {
-        'eligibility': agency2.eligibility.first().id,
-        'client': client.id,
-        'status': 'ELIGIBLE',
-    }, format='json')
-    assert response.status_code == 400
-
-
-def test_update_client_eligibility_runs_validation():
-    agency1 = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
-    agency2 = AgencyWithEligibilityFactory(users=1, num_eligibility=1)
-    user = agency1.user_profiles.first().user
-
-    client = Client.objects.first()
-
-    client_eligibility = ClientEligibility.objects.create(
-        eligibility=agency1.eligibility.first(),
-        client=client,
-    )
-
-    api_client = APIClient()
-    api_client.force_authenticate(user)
-
-    url = f'/eligibility/clients/{client_eligibility.id}/'
-    response = api_client.patch(url, {
-        'eligibility': agency2.eligibility.first().id,
-    }, format='json')
-    assert response.status_code == 400
-
-
 def test_add_client_to_eligibility_queue():
     agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='add_eligibilityqueue'))
 
     client = Client.objects.first()
 
@@ -115,8 +78,9 @@ def test_add_client_to_eligibility_queue():
 
 def test_update_eligibility_queue():
     agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
-    # TODO: make sure that user is from DFCS
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='change_eligibilityqueue'))
+    user.user_permissions.add(Permission.objects.get(codename='view_client'))
 
     client = Client.objects.first()
 
@@ -138,6 +102,8 @@ def test_update_eligibility_queue():
 def test_adding_client_twice_to_eligibility_queue_will_throw_400_error():
     agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='add_eligibilityqueue'))
+    user.user_permissions.add(Permission.objects.get(codename='view_client'))
 
     client = Client.objects.first()
     client.eligibility_queue.create(requestor=agency)
@@ -156,6 +122,8 @@ def test_resolving_eligibility_queue_will_set_resolved_by_field():
     agency1 = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
     agency2 = AgencyWithEligibilityFactory(users=1)
     user = agency2.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='change_eligibilityqueue'))
+    user.user_permissions.add(Permission.objects.get(codename='view_client_all'))
 
     client = Client.objects.first()
     queue_item = client.eligibility_queue.create(requestor=agency1)

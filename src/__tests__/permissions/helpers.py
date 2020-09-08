@@ -38,31 +38,29 @@ def setup_agency_data_for_survey_permissions():
     return agency1, agency2
 
 
-def assertScenario(scenario):
+def assertScenario(action, model, scenario):
     scenario = deque(scenario)
-    header = deque(scenario.popleft())
-    action = header.popleft()
-    model = header.popleft()
-    objects_to_check = header
+    objects_to_check = scenario.popleft()[1:]
 
-    print(action, model)
-
-    for row in scenario:
+    for row, row_idx in zip(scenario, range(len(scenario))):
         row = deque(row)
         user = row.popleft()
-        permission = row.popleft()
+        permissions = row.pop()
         expected_results = row
 
-        assert user.user_permissions.count() == 0
-        if permission:
-            try:
-                perm = Permission.objects.get(codename=permission)
-                user.user_permissions.add(perm)
-            except:
-                assert False, f"permission {permission} not found"
+        # remove permissions and reload user object to reflect the changes
+        user.user_permissions.clear()
+        user = user._meta.model.objects.get(pk=user.id)
+
+        if permissions:
+            if type(permissions) == str:
+                permissions = [permissions]
+            for codename in permissions:
+                user.user_permissions.add(Permission.objects.get(codename=codename))
 
         request = create_fake_request(user)
-        for obj, true_access in zip(objects_to_check, expected_results):
+        for obj, true_access, idx in zip(objects_to_check, expected_results, range(len(objects_to_check))):
+            print('*', user, obj, permissions)
             user_access = request.ability.can(action, obj)
 
             to_text = {
@@ -70,4 +68,8 @@ def assertScenario(scenario):
                 False: "can't"
             }
 
-            assert user_access == true_access, f"{user} {to_text[user_access]} access {obj}, expected {to_text[true_access]}"
+            assert user_access == true_access, "\n".join([
+                f"{user} {to_text[user_access]} access {obj},",
+                f"expected {to_text[true_access]} (row {row_idx}, obj {idx})",
+                f"user permissions: {permissions}"
+            ])

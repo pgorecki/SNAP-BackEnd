@@ -5,6 +5,7 @@ from cancan.middleware import CanCanMiddleware
 
 class AbilityPermission():
     def has_permission(self, request, view=None):
+        print('hp', view.action, view.get_queryset().model)
         validator = request.ability
         ability = validator.ability
         ability.set_alias('list', 'view')
@@ -19,6 +20,7 @@ class AbilityPermission():
         return validator.can(view.action, view.get_queryset().model)
 
     def has_object_permission(self, request, view, obj):
+        print('hop', view.action, obj)
         validator = request.ability
         ability = validator.ability
         ability.set_alias('list', 'view')

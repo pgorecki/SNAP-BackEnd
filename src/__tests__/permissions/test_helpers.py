@@ -12,3 +12,13 @@ def create_fake_request(user):
     request.user = user
     CanCanMiddleware().process_request(request)
     return request
+
+
+def create_view(view_cls, action, user, user_permission=None):
+    if user_permission:
+        user.user_permissions.add(Permission.objects.get(codename=user_permission))
+    request = create_fake_request(user)
+    view = view_cls()
+    view.action = action
+    view.request = request
+    return view
