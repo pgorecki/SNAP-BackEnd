@@ -1,12 +1,18 @@
 from core.viewsets import ModelViewSet
 from core.permissions import AbilityPermission
 from core.validation import validate_fields_with_rules
-from .filters import ProgramViewsetFilter, ProgramEligibilityViewsetFilter, EnrollmentViewsetFilter
-from .models import Program, ProgramEligibility, Enrollment
+from .filters import (
+    ProgramViewsetFilter,
+    ProgramEligibilityViewsetFilter,
+    EnrollmentViewsetFilter,
+    EnrollmentServiceViewsetFilter
+)
+from .models import Program, ProgramEligibility, Enrollment, EnrollmentService
 from .serializers import (
     ProgramReader, ProgramWriter,
     ProgramEligibilityReader, ProgramEligibilityWriter,
     EnrollmentReader, EnrollmentWriter,
+    EnrollmentServiceReader, EnrollmentServiceWriter,
 )
 
 
@@ -53,3 +59,13 @@ class EnrollmentViewset(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
+
+
+class EnrollmentServiceViewset(ModelViewSet):
+    read_serializer_class = EnrollmentServiceReader
+    write_serializer_class = EnrollmentServiceWriter
+    permission_classes = [AbilityPermission]
+    filterset_class = EnrollmentServiceViewsetFilter
+
+    def get_queryset(self):
+        return self.request.ability.queryset_for(self.action, EnrollmentService)

@@ -63,6 +63,7 @@ router.register('programs/enrollments', program.viewsets.EnrollmentViewset,
                 basename='enrollment')
 # router.register('programs/eligibility', program.viewsets.ProgramEligibilityViewset,
 #                 basename='eligibility')
+router.register('programs/services', program.viewsets.EnrollmentServiceViewset, basename='enrollment_service')
 router.register('programs', program.viewsets.ProgramViewset, basename='program')
 
 

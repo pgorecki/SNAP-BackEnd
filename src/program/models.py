@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from simple_history.models import HistoricalRecords
 from core.models import ObjectRoot
 from agency.models import Agency
@@ -141,14 +142,16 @@ class EnrollmentServiceType(models.Model):
         ordering = ['name']
 
     name = models.CharField(max_length=64)
-    service_type = models.CharField(
+    agency = models.ForeignKey(Agency, null=True, blank=True, on_delete=models.CASCADE,
+                               related_name='enrollment_service_types')
+    category = models.CharField(
         max_length=32,
         choices=ServiceType.choices,
         default=ServiceType.DIRECT
     )
 
     def __str__(self):
-        return f"{self.name} ({self.service_type}) [{self.id}]"
+        return f"{self.name} ({self.category}) [{self.id}]"
 
 
 class EnrollmentService(ObjectRoot):
@@ -156,6 +159,8 @@ class EnrollmentService(ObjectRoot):
         db_table = 'program_enrollment_service'
         ordering = ['id']
     enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='services')
+    service_type = models.OneToOneField(EnrollmentServiceType, null=True, blank=True, on_delete=models.SET_NULL)
+
     effective_date = models.DateField(blank=True, null=True)
     offered = models.CharField(max_length=6, blank=True, null=True,
                                help_text='MPR file column:Support Service Offered (Y/N)')  # MPR
@@ -168,3 +173,5 @@ class EnrollmentService(ObjectRoot):
     # MPR Comments column will be stored in Note model
     data_import_id = models.CharField(max_length=36, blank=True, null=True,
                                       help_text='MPR import job run instance')  # MPR
+
+    values = models.JSONField(null=True, blank=True)

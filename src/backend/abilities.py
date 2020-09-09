@@ -3,7 +3,7 @@ from eligibility.models import EligibilityQueue
 from iep.models import ClientIEP, ClientIEPEnrollment
 from note.models import Note
 from eligibility.models import ClientEligibility, EligibilityQueue
-from program.models import Enrollment, Program
+from program.models import Enrollment, Program, EnrollmentService
 from survey.models import Survey, Question, Response
 
 
@@ -275,6 +275,31 @@ def declare_abilities(user, ability):
 
         if user.has_perm('client.view_client_all'):
             ability.can('change', Response)
+
+    if user.has_perm('program.add_enrollmentservice'):
+        ability.can('add', EnrollmentService)
+
+    if user.has_perm('program.view_enrollmentservice'):
+        ability.can('view', EnrollmentService, enrollment__client__created_by__in=[])
+        if user.has_perm('client.view_client'):
+            ability.can('view', EnrollmentService, enrollment__client__created_by=user)
+
+        if user.has_perm('client.view_client_agency'):
+            ability.can('view', EnrollmentService, enrollment__client__agency_clients__agency=agency)
+
+        if user.has_perm('client.view_client_all'):
+            ability.can('view', EnrollmentService)
+
+    if user.has_perm('program.change_enrollmentservice'):
+        ability.can('view', EnrollmentService, enrollment__client__created_by__in=[])
+        if user.has_perm('client.view_client'):
+            ability.can('change', EnrollmentService, enrollment__client__created_by=user)
+
+        if user.has_perm('client.view_client_agency'):
+            ability.can('change', EnrollmentService, enrollment__client__agency_clients__agency=agency)
+
+        if user.has_perm('client.view_client_all'):
+            ability.can('change', EnrollmentService)
 
     # Done!
     print('gained abilities\n', "\n".join([str(x) for x in ability.abilities]), '\n for permissions',
