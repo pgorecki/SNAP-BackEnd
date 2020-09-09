@@ -27,6 +27,10 @@ rules = "*"
 drf-nested-routers = "*"
 drf-writable-nested = "*"
 django-cancan = "*"
+pandas = "*"
+xldr = "*"
+xlrd = "*"
+install = "*"
 
 [dev-packages]
 autopep8 = "*"
