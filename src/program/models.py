@@ -101,9 +101,9 @@ class EnrollmentActivity(ObjectRoot):
     hours_met = models.CharField(max_length=6,blank=True, null=True,help_text='MPR file column:Was ABAWD Work Requirement Met (Y/N)')   #MPR
     performance_met = models.CharField(max_length=6,blank=True, null=True,help_text='MPR file column:Meeting Performance Standards (Y/N)')   #MPR
     # MPR 'If not Meeting Performance Standards, Please Explain' column will be stored in Note model
-    month = models.CharField(max_length=20,blank=True, null=True,default='Service Month:  ',help_text='MPR month or period')   #MPR
+    month = models.CharField(max_length=60,blank=True, null=True,default='Service Month:  ',help_text='MPR month or period')   #MPR
     sheet = models.CharField(max_length=20,blank=True, null=True,default='October 1900',help_text='MPR sheet name')   #MPR
-    provider = models.CharField(max_length=20,blank=True, null=True,default='(Provider Name)',help_text='MPR sheet name')   #MPR
+    provider = models.CharField(max_length=60,blank=True, null=True,default='(Provider Name)',help_text='MPR sheet name')   #MPR
     data_import_id = models.CharField(max_length=36,blank=True, null=True,help_text='MPR import job run instance')   #MPR
     actual_attendance_week = models.CharField(max_length=80,blank=True, null=True,help_text='MPR file column: Actual Attendance Week. Stored as dictionary string')
 
