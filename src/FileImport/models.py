@@ -5,7 +5,7 @@ from django.contrib.auth.models import User    #MPR
 
 import pandas as pd
 import xlrd 
-from program.models import Enrollment, Program, EnrollmentActivity
+from program.models import Enrollment, Program, EnrollmentActivity, EnrollmentService
 from client.models import Client, ClientAddress
 import logging
 logging.basicConfig(filename = 'MPRapp.log', level = logging.INFO)
@@ -15,6 +15,7 @@ from datetime import date
 from agency.models import Agency
 from random import randint
 from note.models import Note
+import datetime
 
 class FileImport(models.Model):                                                                          #MPR
     ftype = models.CharField( max_length=32, blank=False, null=False, help_text='Excel File Type Import:', #MPR
@@ -24,6 +25,9 @@ class FileImport(models.Model):                                                 
     import_parameters = models.CharField(max_length=200,blank=True, null=True,help_text='parameters of the import is a dictionary stored as json.loads string')   #MPR
     period = models.CharField(max_length=36,blank=True, null=True,help_text='file upload period in weeks or months etc..')   #MPR
     agency = models.ForeignKey(Agency, on_delete=models.PROTECT, blank=True, null=True,help_text='Agency for which the import is executed, typically User\'s agency.')  
+    result = models.CharField(max_length=500,blank=True, null=True,help_text='result of import job run stored as dictionary string')
+    run_id = models.IntegerField(blank=True, null=True,help_text='Label of import job run stored as dictionary string')
+    timestamp = models.DateTimeField(auto_now_add= True)
     
     def inspect(self):                                                                             #MPR
         # Inspect the input file for format validation                                             #MPR
@@ -35,12 +39,12 @@ class FileImport(models.Model):                                                 
         ## MPR IMPORT SCRIPT
         ## Reads the input excel file contaning the Monthly Participation Report - MPR (e.g. MPR Provider1 2020Oct Sample.xlsx) 
         ## based on template in https://www.dropbox.com/sh/wklxg28lr3s3id6/AABXyIzSwd9AiFNCr16JdLzaa?dl=0 .
-        ## Inserts each entry into SQL Database thru Django model(participation class).
+        ## Inserts each entry into SQL Database via Django model(that includes classes Client, ClientIEP, ClientIEPEnrollment, Program, Enrollment, EnrollmentActivity, EnrollmentService ).
         ## The MPR data is assumed to be in the second sheet. Any change in the template may result in unpredictable behaviour.
+        ## Throws exceptions if file contains incomplete and\or invalid data.
         ## Provider is assumed to be in cell A3 and month in cell A5.    
         # TODO: Input Parameter: Mapping between file columns and Class fields including the index?
-        # TODO: Add created_date field
-        # TODO: Add exception handling
+        # TODO: Add general error handling and row level exception handling
         # TODO: Return # entries processed
         print('Running MPR Import Script')
         loc = (self.file_path) 
@@ -150,6 +154,17 @@ class FileImport(models.Model):                                                 
                insert_count+=1
             else:
                fail_count+=1
+            #Create EnrollmentService
+            es3=EnrollmentService(enrollment=e3,
+                                  offered=row['Support Service Offered (Y/N)'],
+                                  type_and_amount=row['Support Service Issued (Type & Amount)'],
+                                  if_no_support_services_needed_explain_why=row['If No Support Services Needed, Explain Why'],
+                                  retention_services_type_amount=row['Retention Services Provided (Type & Amount)'],
+                                  data_import_id=str(data_import_batch_id) )
+            es3.save()
+            n2 = Note(source=es3, text='' if pd.isnull(row['Comments']) else row['Comments'])
+            n2.save()
+                    
           else:  # if client data is null, Actual Attendance Week data gathered here (week1, week2 ..)
             if valid_row:
                attendance_hours[row['Actual Attendance Week']]=row['Actual Attendance Week Hours']
@@ -158,9 +173,11 @@ class FileImport(models.Model):                                                 
                   ea3.save()  
                   valid_row=False               
           print('Row procesed')
-        return (attempt_count,insert_count,fail_count)
-
-        
+        self.run_id=data_import_batch_id
+        self.period=month
+        self.save()  
+        return str({'records read':attempt_count,'records inserted':insert_count,'records failed':fail_count})
+       
     def run(self):                                                                  #MPR
         # Run import script
         if self.ftype == FileImportTypes.MPR :
