@@ -5,14 +5,16 @@ from django.contrib.auth.models import User    #MPR
 
 import pandas as pd
 import xlrd 
-from program.models import Enrollment, Program
+from program.models import Enrollment, Program, EnrollmentActivity
 from client.models import Client, ClientAddress
 import logging
 logging.basicConfig(filename = 'MPRapp.log', level = logging.INFO)
 from django.core.exceptions import MultipleObjectsReturned
-from iep.models import ClientIEP
+from iep.models import ClientIEP, ClientIEPEnrollment
 from datetime import date
 from agency.models import Agency
+from random import randint
+from note.models import Note
 
 class FileImport(models.Model):                                                                          #MPR
     ftype = models.CharField( max_length=32, blank=False, null=False, help_text='Excel File Type Import:', #MPR
@@ -51,14 +53,21 @@ class FileImport(models.Model):                                                 
         except IOError as e:
            logging.exception(str(e))
            return (0,0,0,'Error reading excel file!')            
-        a3=Agency.objects.get_or_create(name=provider)
+        a3,acreated=Agency.objects.get_or_create(name=provider)
         df.dropna(how = 'all',inplace=True)
         print(df.columns.values)
         df1=df.iloc[0:18,]   ## TODO use ix first rows to restrict number of records processed
         df1.rename(columns={'Unnamed: 15': 'Actual Attendance Week Hours'}, inplace=True)
         df1[' Client ID'].astype('Int64', copy=False)
         df1['Case Number'].astype('Int64', copy=False)
+        df1['Qualifying Activity (51% or >) Hours'].astype('Int64', copy=False)
+        df1['Non-Qualifying Activity (49% or <) Hours'].astype('Int64', copy=False)
+        df1['Actual Attendance Week Hours'].astype('float', copy=False)
+        df1['Required Number of Participation Hours\n(I+L)'].astype('Int64', copy=False)
         #print(df1)  ## TODO delete later
+        # df1[pd.isnull(df1)]=None  # didn't work
+        df1 = df1.where(pd.notnull(df1), None)
+        print(df1)  ## TODO delete later
         print(df1.info())
         insert_count=0
         fail_count=0
@@ -86,13 +95,13 @@ class FileImport(models.Model):                                                 
             if c3.ieps.count():
                   ciep3=c3.ieps.filter(case_number=row['Case Number']).first()
                   if not ciep3:
-                     ciep3=ClientIEP(client=c3, case_number=row['Case Number'],projected_end_date=row['Projected End Date '].date())
+                     ciep3=ClientIEP(client=c3, case_number=row['Case Number'],projected_end_date=None if pd.isnull(row['Projected End Date ']) else row['Projected End Date '].date())
                      print('Created ClientIEP with case number=' +  str(ciep3.case_number) + ' with pk=' + str(ciep3.id) )   
                   else:
                      print('Found ClientIEP with case_number=' + str(ciep3.case_number) )                  
-                     ciep3.projected_end_date=row['Projected End Date '].date()
+                     ciep3.projected_end_date=None if pd.isnull(row['Projected End Date ']) else row['Projected End Date '].date()
             else:
-                  ciep3=ClientIEP(client=c3, case_number=row['Case Number'],projected_end_date=row['Projected End Date '].date())
+                  ciep3=ClientIEP(client=c3, case_number=row['Case Number'],projected_end_date=None if pd.isnull(row['Projected End Date ']) else row['Projected End Date '].date())
                   print('Created ClientIEP with case number=' +  str(ciep3.case_number) + ' with pk=' + str(ciep3.id) )                
             ciep3.save()                  
             if ciep3.iep_enrollments.count():
@@ -113,36 +122,42 @@ class FileImport(models.Model):                                                 
                      print('Creating program')
                      p3=Program(name=row['Qualifying Activity Enrolled'],agency=a3)
                      p3.save()
-                  e3=Enrollment(client=c3,program=p3,start_date=row['Activity Enrollment Date'].date(), end_date=row['Date Participation Terminated'].date(), end_reason=row['Reason Participation Terminated'],status=EnrollmentStatus.ENROLLED.value)
+                  e3=Enrollment(client=c3,program=p3,start_date=None if pd.isnull(row['Activity Enrollment Date']) else row['Activity Enrollment Date'].date(), end_date=None if pd.isnull(row['Date Participation Terminated']) else row['Date Participation Terminated'].date(), end_reason=row['Reason Participation Terminated'],status=EnrollmentStatus.ENROLLED.value)
                   e3.save()
                   ciep_en3.enrollment=e3
                   ciep_en3.save()
-
-                  
-                         
-                      
-            # try:
-               # ciep3=ClientIEP.objects.get(case_number=row['Case Number'])
-               # print('IEPClient in the DB: with pk=' + str(ciep3.id) )
-            # except ClientIEP.DoesNotExist:
-               # ciep3=ClientIEP(client=c3, case_number=row['Case Number'])
-               # ciep3.save()
-               # print('Created Client' + str(c3.first_name) + ' ' + str(c3.last_name) + ' with pk=' + str(c3.id) )
-            # except MultipleObjectsReturned:
-               # ciep3=ClientIEP.objects.filter(case_number=row['Case Number']).first() 
-               # print('MultipleObjectsReturned for Case Number=' + str(ciep3.case_number) + '. Picking the first one with pk=' + str(ciep3.pk))    
- 
-   #if Case Number does not exist:
-   #   iep1=create ClientIEP(Case Number, Projected End Date,  ABAWD (Y/N) )
-   #else:
-   #   iep1= get ClientIEP(Case Number)
-
-           
+            #Create EnrollmentActivity
+            data_import_batch_id=randint(1, 2000000000)
+            ea3=EnrollmentActivity(enrollment=e3, 
+                                   start_date=None if pd.isnull(row['Activity Enrollment Date']) else row['Activity Enrollment Date'].date(), 
+                                   end_date=None if pd.isnull(row['Date Participation Terminated']) else row['Date Participation Terminated'].date(),
+                                   qualifying_activity_name = row['Qualifying Activity Enrolled'],
+                                   qualifying_activity_hours = row['Qualifying Activity (51% or >) Hours'],
+                                   billable_activity = row['Is Qualifying Activity Billable (Y/N)'], non_qualifying_activity_hours = row['Non-Qualifying Activity (49% or <) Hours'], required_number_of_articipatio_hours = row['Required Number of Participation Hours\n(I+L)'], actual_total_monthly_participation_hours = row['Actual Total Monthly Participation Hours'],
+                                   hours_met = row['Was ABAWD Work Requirement Met (Y/N)'],
+                                   performance_met = row['Meeting Performance Standards (Y/N)'],
+                                   month = month,
+                                   sheet = sheet.name,
+                                   provider = provider,
+                                   data_import_id = str(data_import_batch_id))                                                            
+            ea3.save()
+            n1 = Note(source=ea3, text='' if pd.isnull(row['If not Meeting Performance Standards, Please Explain']) else row['If not Meeting Performance Standards, Please Explain'])
+            n1.save()
+            attendance_hours={row['Actual Attendance Week']:row['Actual Attendance Week Hours']} 
+            valid_row=True  # row with Actual Total Monthly Participation Hours value (Week 1). Others have null values.
             attempt_count+=1
-            if (c3.id):
+            if (ea3.id):
                insert_count+=1
             else:
                fail_count+=1
+          else:  # if client data is null, Actual Attendance Week data gathered here (week1, week2 ..)
+            if valid_row:
+               attendance_hours[row['Actual Attendance Week']]=row['Actual Attendance Week Hours']
+               if row['Actual Attendance Week']=='Week 5':
+                  ea3.actual_attendance_week=str(attendance_hours)   # use eval function to convert string to dictionary
+                  ea3.save()  
+                  valid_row=False               
+          print('Row procesed')
         return (attempt_count,insert_count,fail_count)
 
         
