@@ -10,12 +10,21 @@ from program.models import Enrollment
 from .choices import IEPStatus
 
 
+class JobPlacement(models.Model):
+    class Meta:
+        db_table = 'iep_job_placement'
+        ordering = ['id']
+
+    effective_date = models.DateField(blank=True, null=True)
+
+
 class ClientIEP(ObjectRoot):
     class Meta:
         db_table = 'iep_client'
         ordering = ['-created_at']
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='ieps')
+    case_number = models.CharField(max_length=36, blank=True, null=True, help_text='MPR file column: Case Number')   #MPR
     case_manager = models.ForeignKey(User, related_name='iep', on_delete=models.SET_NULL, null=True, blank=True)
     orientation_completed = models.BooleanField(default=False)
     start_date = models.DateField(blank=True, null=True)
@@ -29,6 +38,8 @@ class ClientIEP(ObjectRoot):
         default=IEPStatus.AWAITING_APPROVAL
     )
     outcome = models.CharField(max_length=64, default='', blank=True, help_text='Outcome when completed')
+    job_placement = models.OneToOneField(JobPlacement, on_delete=models.SET_NULL, null=True)
+    abawd = models.CharField(max_length=10, blank=True, null=True,help_text='MPR file column: ABAWD (Y/N)')  #MPR
 
 
 class ClientIEPEnrollment(ModelValidationMixin, models.Model):
