@@ -33,7 +33,7 @@ class Client(ObjectRoot):
     first_name = models.CharField(max_length=64)
     middle_name = models.CharField(max_length=64, default='', blank=True)
     last_name = models.CharField(max_length=64)
-    dob = models.DateField()
+    dob = models.DateField(null=True)                                     #MPR (MPR file does not contain dob column, therefore null=True)
     ssn = models.CharField(max_length=64, blank=True, default='')
     is_new = models.BooleanField(default=True)
 

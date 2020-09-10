@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ClientIEP, ClientIEPEnrollment
+from .models import ClientIEP, ClientIEPEnrollment, JobPlacement
 
 
 class ClientIEPEnrollmentInline(admin.StackedInline):
@@ -9,3 +9,6 @@ class ClientIEPEnrollmentInline(admin.StackedInline):
 @admin.register(ClientIEP)
 class ClientIEPAdmin(admin.ModelAdmin):
     inlines = (ClientIEPEnrollmentInline, )
+
+
+admin.site.register(JobPlacement)
