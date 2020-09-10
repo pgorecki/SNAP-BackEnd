@@ -45,6 +45,7 @@ class ClientEligibility(ObjectRoot):
     class Meta:
         db_table = 'eligibility_client'
         ordering = ['-created_at']
+        verbose_name_plural = 'Client eligibility'
 
     id = models.UUIDField(
         primary_key=True,
@@ -78,6 +79,7 @@ class EligibilityQueue(ObjectRoot):
             models.UniqueConstraint(fields=['client', 'requestor'], condition=Q(
                 status=None), name='unique_eligilibity_request')
         ]
+        verbose_name_plural = 'Eligibility Queue'
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='eligibility_queue')
     requestor = models.ForeignKey(Agency, on_delete=models.CASCADE)
