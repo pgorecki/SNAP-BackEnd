@@ -16,6 +16,7 @@ from agency.models import Agency
 from random import randint
 from note.models import Note
 import datetime
+from django.db import transaction
 
 class FileImport(models.Model):                                                                          #MPR
     ftype = models.CharField( max_length=32, blank=False, null=False, help_text='Excel File Type Import:', #MPR
@@ -51,9 +52,8 @@ class FileImport(models.Model):                                                 
         ## The MPR data is assumed to be in the second sheet. Any change in the template may result in unpredictable behaviour.
         ## Throws exceptions if file contains incomplete and\or invalid data.
         ## Provider is assumed to be in cell A3 and month in cell A5.    
-        # TODO: Input Parameter: Mapping between file columns and Class fields including the index?
-        # TODO: Add general error handling and row level exception handling
-        # TODO: Return # entries processed
+        ## variable abbreviations\classes: c3=Client, a3=Agency, ciep3=ClientIEP, ciep_en3=ClientIEPEnrollment, e3=ciep_en3.enrollment, ea3=EnrollmentActivity, es3=EnrollmentService, n3=Note
+        
         print('Running MPR Import Script')
         loc = (self.file_path) 
         try:
@@ -100,27 +100,31 @@ class FileImport(models.Model):                                                 
         insert_count=0
         fail_count=0
         attempt_count=0
+        data_import_batch_id=randint(1, 2000000000)
         for i in range(0, df1.shape[0]): # for each row in the excel file data section
           row = df1.iloc[i]
+          ea3=None   #EnrollmentActivity 
           if not(pd.isnull(row['First Name'])) or not(pd.isnull(row['Last Name'])) or not(pd.isnull(row[' Client ID'])):   #if any one of them is non-null
             # par=participation(First_Name=row['First Name'],Last_Name=row['Last Name'],...)
             attempt_count+=1
+            valid_row=True  # row with Actual Total Monthly Participation Hours value (Week 1). Others have null values.
             try:
-                try:
-                   c3=Client.objects.get(snap_id=row[' Client ID'])
+              with transaction.atomic():
+                c3=Client.objects.filter(snap_id=row[' Client ID']).first()
+                if c3:
                    print('Client in the DB:' + str(c3.first_name) + ' ' + str(c3.last_name) + ' with pk=' + str(c3.id) )
                    if c3.address.county!=row['County of Residence']:
                       c3.address.county=row['County of Residence']
                       c3.address.save()
-                except Client.DoesNotExist:
+                else:
                    ca1=ClientAddress(county=row['County of Residence'])
                    c3=Client(first_name=row['First Name'],last_name=row['Last Name'],snap_id=row[' Client ID'],address=ca1)
                    ca1.save()
                    c3.save()
-                   print('Created Client' + str(c3.first_name) + ' ' + str(c3.last_name) + ' with pk=' + str(c3.id) )
-                except MultipleObjectsReturned:
-                   c3=Client.objects.filter(snap_id=row[' Client ID']).first() 
-                   print('MultipleObjectsReturned for gsnap_id=' + str(c3.snap_id) + '. Picking the first one with pk=' + str(c3.pk))     
+                   print('Created Client ' + str(c3.first_name) + ' ' + str(c3.last_name) + ' with pk=' + str(c3.id) )
+                if Client.objects.filter(snap_id=row[' Client ID']).count()>1:
+                   print('MultipleObjectsReturned for gsnap_id=' + str(c3.snap_id) + '. Picking the first one with pk=' + str(c3.pk))   
+                   logging.exception('MultipleObjectsReturned for gsnap_id=' + str(c3.snap_id) + '. Picking the first one with pk=' + str(c3.pk))                   
                 ## TODO: Do we update c3.address.county?             
                 if c3.ieps.count():
                       ciep3=c3.ieps.filter(case_number=row['Case Number']).first()
@@ -157,7 +161,6 @@ class FileImport(models.Model):                                                 
                       ciep_en3.enrollment=e3
                       ciep_en3.save()
                 #Create EnrollmentActivity
-                data_import_batch_id=randint(1, 2000000000)
                 ea3=EnrollmentActivity(enrollment=e3, 
                                        start_date=None if pd.isnull(row['Activity Enrollment Date']) else row['Activity Enrollment Date'].date(), 
                                        end_date=None if pd.isnull(row['Date Participation Terminated']) else row['Date Participation Terminated'].date(),
@@ -175,7 +178,6 @@ class FileImport(models.Model):                                                 
                 n1 = Note(source=ea3, text='' if pd.isnull(row['If not Meeting Performance Standards, Please Explain']) else row['If not Meeting Performance Standards, Please Explain'])
                 n1.save()
                 attendance_hours={row['Actual Attendance Week']:row['Actual Attendance Week Hours']} 
-                valid_row=True  # row with Actual Total Monthly Participation Hours value (Week 1). Others have null values.
                 if (ea3.id):
                    insert_count+=1
                    df1.at[i,'result']='Processed.'  
@@ -191,17 +193,17 @@ class FileImport(models.Model):                                                 
                                       data_import_id=str(data_import_batch_id) )
                 es3.save()
                 n2 = Note(source=es3, text='' if pd.isnull(row['Comments']) else row['Comments'])
-                n2.save()
+                n2.save()  
             except Exception as e:
                fail_count+=1
                print('Error at excel row number ' + str(row['row_number']) + ': ' + str(e))          
                df1.at[i,'result']='Error at excel row number ' + str(row['row_number']) + ': ' + str(e)
           else:  # if client data is null, Actual Attendance Week data gathered here (week1, week2 ..)
             try:
-                if valid_row:
+                if valid_row and ea3:
                    attendance_hours[row['Actual Attendance Week']]=row['Actual Attendance Week Hours']
                    if row['Actual Attendance Week']=='Week 5':
-                      ea3.actual_attendance_week=str(attendance_hours)   # use eval function to convert string to dictionary
+                      ea3.actual_attendance_week=str(attendance_hours)   # use eval function to convert string back to dictionary
                       ea3.save()  
                       valid_row=False  
             except Exception as e:
