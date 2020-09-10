@@ -3,7 +3,7 @@ from eligibility.models import EligibilityQueue
 from iep.models import ClientIEP, ClientIEPEnrollment
 from note.models import Note
 from eligibility.models import ClientEligibility, EligibilityQueue
-from program.models import Enrollment, Program, EnrollmentService
+from program.models import Enrollment, Program, EnrollmentService, EnrollmentServiceType
 from survey.models import Survey, Question, Response
 
 
@@ -300,6 +300,9 @@ def declare_abilities(user, ability):
 
         if user.has_perm('client.view_client_all'):
             ability.can('change', EnrollmentService)
+
+    # enrollment service types - dictionary data
+    ability.can('view', EnrollmentServiceType, agency=agency)
 
     # Done!
     print('gained abilities\n', "\n".join([str(x) for x in ability.abilities]), '\n for permissions',

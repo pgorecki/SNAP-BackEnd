@@ -1,8 +1,14 @@
-from core.serializers import ObjectSerializer
+from core.serializers import ObjectSerializer, CreatedByReader
 from agency.serializers import AgencyReader
 from client.serializers import ClientReader
 from survey.serializers import SurveyMiniReader
-from .models import Program, Enrollment, ProgramEligibility, EnrollmentService, EnrollmentServiceType
+from .models import (
+    Program,
+    Enrollment,
+    ProgramEligibility,
+    EnrollmentService,
+    EnrollmentServiceType
+)
 
 
 class ProgramReader(ObjectSerializer):
@@ -65,6 +71,7 @@ class EnrollmentServiceReader(ObjectSerializer):
 
     enrollment = EnrollmentServiceEnrollmentReader()
     service_type = EnrollmentServiceEnrollmentServiceTypeReader()
+    created_by = CreatedByReader()
 
     class Meta:
         model = EnrollmentService
@@ -77,3 +84,15 @@ class EnrollmentServiceWriter(ObjectSerializer):
         model = EnrollmentService
         fields = ('id', 'enrollment', 'service_type', 'effective_date',
                   'values')
+
+
+class EnrollmentServiceTypeReader(ObjectSerializer):
+    class Meta:
+        model = EnrollmentServiceType
+        fields = ('id', 'object', 'name', 'category', 'agency')
+
+
+class EnrollmentServiceTypeWriter(ObjectSerializer):
+    class Meta:
+        model = EnrollmentServiceType
+        fields = ('name', 'category', 'agency')

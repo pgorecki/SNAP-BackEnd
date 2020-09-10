@@ -5,14 +5,22 @@ from .filters import (
     ProgramViewsetFilter,
     ProgramEligibilityViewsetFilter,
     EnrollmentViewsetFilter,
-    EnrollmentServiceViewsetFilter
+    EnrollmentServiceViewsetFilter,
+    EnrollmentServiceTypeViewsetFilter
 )
-from .models import Program, ProgramEligibility, Enrollment, EnrollmentService
+from .models import (
+    Program,
+    ProgramEligibility,
+    Enrollment,
+    EnrollmentService,
+    EnrollmentServiceType,
+)
 from .serializers import (
     ProgramReader, ProgramWriter,
     ProgramEligibilityReader, ProgramEligibilityWriter,
     EnrollmentReader, EnrollmentWriter,
     EnrollmentServiceReader, EnrollmentServiceWriter,
+    EnrollmentServiceTypeReader, EnrollmentServiceTypeWriter,
 )
 
 
@@ -59,6 +67,16 @@ class EnrollmentViewset(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
+
+
+class EnrollmentServiceTypeViewset(ModelViewSet):
+    read_serializer_class = EnrollmentServiceTypeReader
+    write_serializer_class = EnrollmentServiceTypeWriter
+    permission_classes = [AbilityPermission]
+    filterset_class = EnrollmentServiceTypeViewsetFilter
+
+    def get_queryset(self):
+        return self.request.ability.queryset_for(self.action, EnrollmentServiceType)
 
 
 class EnrollmentServiceViewset(ModelViewSet):
