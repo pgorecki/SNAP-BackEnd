@@ -1,6 +1,5 @@
 import uuid
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
 from simple_history.models import HistoricalRecords
 from core.models import ObjectRoot
 from agency.models import Agency
@@ -107,22 +106,24 @@ class EnrollmentActivity(ObjectRoot):
     required_number_of_articipatio_hours = models.IntegerField(
         blank=True, null=True, help_text='MPR file column:Required Number of Participation Hours')  # MPR
     actual_total_monthly_participation_hours = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, help_text='MPR file column:Actual Total Monthly Participation Hours')  # MPR
+        max_digits=5, decimal_places=2, null=True,
+        help_text='MPR file column:Actual Total Monthly Participation Hours')  # MPR
     hours_met = models.CharField(max_length=6, blank=True, null=True,
                                  help_text='MPR file column:Was ABAWD Work Requirement Met (Y/N)')  # MPR
     performance_met = models.CharField(max_length=6, blank=True, null=True,
                                        help_text='MPR file column:Meeting Performance Standards (Y/N)')  # MPR
     # MPR 'If not Meeting Performance Standards, Please Explain' column will be stored in Note model
-    month = models.CharField(max_length=20, blank=True, null=True, default='Service Month:  ',
+    month = models.CharField(max_length=60, blank=True, null=True, default='Service Month:  ',
                              help_text='MPR month or period')  # MPR
     sheet = models.CharField(max_length=20, blank=True, null=True,
                              default='October 1900', help_text='MPR sheet name')  # MPR
-    provider = models.CharField(max_length=20, blank=True, null=True,
+    provider = models.CharField(max_length=60, blank=True, null=True,
                                 default='(Provider Name)', help_text='MPR sheet name')  # MPR
-    data_import_id = models.CharField(max_length=36, blank=True, null=True,
+    data_import_id = models.CharField(max_length=80, blank=True, null=True,
                                       help_text='MPR import job run instance')  # MPR
     actual_attendance_week = models.CharField(
-        max_length=80, blank=True, null=True, help_text='MPR file column: Actual Attendance Week. Stored as dictionary string')
+        max_length=80, blank=True, null=True,
+        help_text='MPR file column: Actual Attendance Week. Stored as dictionary string')
 
 
 class AttendanceWeek(models.Model):  # MPR
@@ -167,9 +168,11 @@ class EnrollmentService(ObjectRoot):
     type_and_amount = models.CharField(max_length=64, blank=True, null=True,
                                        help_text='MPR file column:Support Service Issued (Type & Amount)')  # MPR
     if_no_support_services_needed_explain_why = models.CharField(
-        max_length=200, blank=True, null=True, help_text='MPR file column:If No Support Services Needed, Explain Why')  # MPR
+        max_length=200, blank=True, null=True,
+        help_text='MPR file column:If No Support Services Needed, Explain Why')  # MPR
     retention_services_type_amount = models.CharField(
-        max_length=64, blank=True, null=True, help_text='MPR file column:Retention Services Provided (Type & Amount)')  # MPR
+        max_length=64, blank=True, null=True,
+        help_text='MPR file column:Retention Services Provided (Type & Amount)')  # MPR
     # MPR Comments column will be stored in Note model
     data_import_id = models.CharField(max_length=36, blank=True, null=True,
                                       help_text='MPR import job run instance')  # MPR
