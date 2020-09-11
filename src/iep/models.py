@@ -27,6 +27,7 @@ class ClientIEP(ObjectRoot):
     case_number = models.CharField(max_length=36, blank=True, null=True, help_text='MPR file column: Case Number')   #MPR
     case_manager = models.ForeignKey(User, related_name='iep', on_delete=models.SET_NULL, null=True, blank=True)
     orientation_completed = models.BooleanField(default=False)
+    assessment_completed = models.BooleanField(default=False)   #MPR
     start_date = models.DateField(blank=True, null=True)
     eligibility_request = models.ForeignKey(
         EligibilityQueue, on_delete=models.SET_NULL, related_name='ieps', blank=True, null=True)
