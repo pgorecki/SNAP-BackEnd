@@ -308,12 +308,12 @@ class FileImport(models.Model):                                                 
                       #c3.state?
                       c3.address.save()
                    else:
-                      ca1=ClientAddress(street=row['Address'],city=row['City'],zip=str(int(row['Zip Code'])),county=row['County of Residence'])
+                      ca1=ClientAddress(street='' if pd.isnull(row['Address']) else row['Address'],city='' if pd.isnull(row['City']) else row['City'],zip='' if pd.isnull(row['Zip Code']) else str(int(row['Zip Code'])),county='' if pd.isnull(row['County of Residence']) else row['County of Residence'])
                       c3.address=ca1
                    c3.save()                      
                 else:
                    # Create Client   
-                   ca1=ClientAddress(street=row['Address'],city=row['City'],zip=str(int(row['Zip Code'])),county=row['County of Residence'])
+                   ca1=ClientAddress(street='' if pd.isnull(row['Address']) else row['Address'],city='' if pd.isnull(row['City']) else row['City'],zip='' if pd.isnull(row['Zip Code']) else str(int(row['Zip Code'])),county='' if pd.isnull(row['County of Residence']) else row['County of Residence'])
                    c3=Client(first_name=row['First Name'],last_name=row['Last Name'],snap_id=row[' Client ID'],ssn=row['SSN '],dob=row['Date of Birth'].date(),address=ca1)
                    ca1.save()
                    c3.save()
