@@ -1,7 +1,7 @@
 import django.db.utils
 from core.exceptions import ApplicationValidationError
 from core.viewsets import ModelViewSet
-from core.permissions import IsAdmin, IsAgencyMember
+from core.permissions import AbilityPermission
 from core.validation import validate_fields_with_rules
 from eligibility.models import EligibilityQueue
 from .models import ClientIEP
@@ -15,8 +15,11 @@ class ClientIEPViewset(ModelViewSet):
     queryset = ClientIEP.objects.all()
     read_serializer_class = ClientIEPReader
     write_serializer_class = ClientIEPWriter
-    permission_classes = [IsAdmin | IsAgencyMember]
+    permission_classes = [AbilityPermission]
     filterset_class = ClientIEPViewsetFilter
+
+    def get_queryset(self):
+        return self.request.ability.queryset_for(self.action, ClientIEP)
 
     def perform_create(self, serializer):
         """
@@ -25,6 +28,8 @@ class ClientIEPViewset(ModelViewSet):
         """
         client = serializer.validated_data['client']
         agency = self.request.user.profile.agency
+        if agency is None:
+            ApplicationValidationError({'user': 'Agency is not set in your user profile'})
         existing_request = EligibilityQueue.objects.filter(client=client, requestor=agency, status=None).first()
 
         serializer.save(

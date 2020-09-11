@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Permission
 from rest_framework.test import APIClient
 from .factories import AgencyWithProgramsFactory
 from client.models import Client
@@ -7,6 +8,8 @@ from .models import Enrollment
 def test_list_enrollments():
     agency = AgencyWithProgramsFactory(users=1, num_programs=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='view_enrollment'))
+    user.user_permissions.add(Permission.objects.get(codename='view_client'))
 
     url = '/programs/enrollments/'
     api_client = APIClient()
@@ -20,6 +23,7 @@ def test_list_enrollments():
 def test_create_enrollment():
     agency = AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='add_enrollment'))
 
     url = '/programs/enrollments/'
     api_client = APIClient()
@@ -37,6 +41,7 @@ def test_create_enrollment_for_invalid_client():
     AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)
     agency = AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='add_enrollment'))
 
     url = '/programs/enrollments/'
     api_client = APIClient()
@@ -56,6 +61,7 @@ def test_create_enrollment_for_invalid_program():
     agency1 = AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)
     agency2 = AgencyWithProgramsFactory(users=1, num_programs=1)
     user = agency1.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='add_enrollment'))
 
     url = '/programs/enrollments/'
     api_client = APIClient()
@@ -75,6 +81,8 @@ def test_update_enerollment_runs_validation():
     agency1 = AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)
     agency2 = AgencyWithProgramsFactory(users=1, num_programs=1)
     user = agency1.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='change_enrollment'))
+    user.user_permissions.add(Permission.objects.get(codename='view_client'))
 
     client = Client.objects.first()
 

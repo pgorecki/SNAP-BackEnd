@@ -10,9 +10,26 @@ from .models import ClientIEP, ClientIEPEnrollment
 
 
 class ClientIEPEnrollmentReader(ObjectSerializer):
+    id = serializers.SerializerMethodField()
+    object = serializers.SerializerMethodField()
+    program = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
+    def get_id(self, obj):
+        return str(obj.enrollment.id)
+
+    def get_object(self, obj):
+        return obj.enrollment._meta.object_name
+
+    def get_program(self, obj):
+        return str(obj.enrollment.program.id)
+
+    def get_status(self, obj):
+        return obj.enrollment.status
+
     class Meta:
         model = Enrollment
-        fields = ('id', 'object')
+        fields = ('id', 'object', 'program', 'status')
 
 
 class ClientIEPEnrollmentWriter(ObjectSerializer):

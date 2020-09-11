@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Permission
 from rest_framework.test import APIClient
 from __tests__.factories import setup_2_agencies
 from survey.models import Survey, Question, Response, Answer
@@ -62,6 +63,7 @@ def test_get_questions_by_agency_user(client):
 
 def test_create_survey_by_user1():
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='add_survey'))
     url = '/surveys/'
     api_client = APIClient()
     api_client.force_authenticate(user1)
@@ -76,6 +78,7 @@ def test_create_survey_by_user1():
 
 def test_create_survey_with_invalid_definition_by_user1():
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='add_survey'))
     url = '/surveys/'
     api_client = APIClient()
     api_client.force_authenticate(user1)
@@ -91,6 +94,7 @@ def test_create_survey_with_invalid_definition_by_user1():
 
 def test_update_own_survey_by_user1():
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='change_survey'))
     survey = Survey.objects.create(name='Survey A', definition={'items': []}, created_by=user1)
 
     api_client = APIClient()
@@ -105,6 +109,7 @@ def test_update_own_survey_by_user1():
 
 def test_delete_own_survey():
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='delete_survey'))
     survey = Survey.objects.create(name='Survey A', definition={'items': []}, created_by=user1)
 
     api_client = APIClient()
@@ -117,6 +122,7 @@ def test_delete_own_survey():
 
 def test_delete_other_survey():
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user2.user_permissions.add(Permission.objects.get(codename='delete_survey'))
     survey = Survey.objects.create(name='Survey A', definition={'items': []}, created_by=user1)
 
     api_client = APIClient()
@@ -127,6 +133,7 @@ def test_delete_other_survey():
 
 def test_create_question_by_user1():
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='add_question'))
     url = '/questions/'
     api_client = APIClient()
     api_client.force_authenticate(user1)
@@ -140,6 +147,7 @@ def test_create_question_by_user1():
 
 def test_update_own_question_by_user1():
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='change_question'))
     question = Question.objects.create(title='Question A', created_by=user1)
 
     api_client = APIClient()
@@ -153,6 +161,7 @@ def test_update_own_question_by_user1():
 
 def test_save_question_to_database():
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='add_question'))
     url = '/questions/'
     api_client = APIClient()
     api_client.force_authenticate(user1)
@@ -183,6 +192,8 @@ def test_get_responses_by_anonymous():
 
 def test_get_responses_by_agency_user(client):
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='view_response'))
+    user1.user_permissions.add(Permission.objects.get(codename='view_client'))
     survey1 = Survey.objects.create(name='survey1', definition={}, created_by=user1)
     question1 = Question.objects.create(title='question1', created_by=user1)
     response1 = Response.objects.create(survey=survey1, client=client1, created_by=user1)
@@ -201,9 +212,10 @@ def test_get_responses_by_agency_user(client):
 
 def test_create_response(client):
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='add_response'))
     survey1 = Survey.objects.create(name='survey1', definition={}, created_by=user1)
     question1 = Question.objects.create(title='question1', created_by=user1)
-    client = Client.objects.create(first_name='John', last_name='Doe', dob='2000-01-01', created_by=user1)
+    # client = Client.objects.create(first_name='John', last_name='Doe', dob='2000-01-01', created_by=user1)
 
     url = '/responses/'
     api_client = APIClient()
@@ -220,7 +232,6 @@ def test_create_response(client):
     }
     # check api response
     response = api_client.post(url, data, format='json')
-    print(response.data)
     assert response.status_code == 201
 
     # check model
@@ -237,9 +248,10 @@ def test_create_response(client):
 
 def test_create_response_with_context(client):
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='add_response'))
     survey1 = Survey.objects.create(name='survey1', definition={}, created_by=user1)
     question1 = Question.objects.create(title='question1', created_by=user1)
-    client = Client.objects.create(first_name='John', last_name='Doe', dob='2000-01-01', created_by=user1)
+    # client = Client.objects.create(first_name='John', last_name='Doe', dob='2000-01-01', created_by=user1)
 
     url = '/responses/'
     api_client = APIClient()
@@ -260,7 +272,6 @@ def test_create_response_with_context(client):
     }
     # check api response
     response = api_client.post(url, data, format='json')
-    print(response.data)
     assert response.status_code == 201
     # check model
     r = Response.objects.first()
@@ -269,6 +280,7 @@ def test_create_response_with_context(client):
 
 def test_create_response_invalid_survey(client):
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='add_response'))
     survey2 = Survey.objects.create(name='survey2', definition={}, created_by=user2)
     question1 = Question.objects.create(title='question1', created_by=user1)
     client = Client.objects.create(first_name='John', last_name='Doe', dob='2000-01-01', created_by=user1)
@@ -293,6 +305,8 @@ def test_create_response_invalid_survey(client):
 
 def test_update_response(client):
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='change_response'))
+    user1.user_permissions.add(Permission.objects.get(codename='view_client'))
     survey1 = Survey.objects.create(name='survey1', definition={}, created_by=user1)
     question1 = Question.objects.create(title='question1', created_by=user1)
     question2 = Question.objects.create(title='question2', created_by=user1)
@@ -319,3 +333,61 @@ def test_update_response(client):
     response.refresh_from_db()
     assert len(response.answers.all()) == 1
     assert response.answers.all()[0].value == 'yes'
+
+
+def test_create_response_with_invalid_context_data(client):
+    agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='add_response'))
+    survey1 = Survey.objects.create(name='survey1', definition={}, created_by=user1)
+    question1 = Question.objects.create(title='question1', created_by=user1)
+    client = Client.objects.create(first_name='John', last_name='Doe', dob='2000-01-01', created_by=user1)
+
+    url = '/responses/'
+    api_client = APIClient()
+    api_client.force_authenticate(user1)
+    data = {
+        'survey': survey1.id,
+        'client': client1.id,
+        'response_context': {
+            # 'id': survey1.id,
+            # 'type': 'Survey',
+        },
+        'answers': [
+            {
+                'question': question1.id,
+                'value': 'yes',
+            },
+        ],
+    }
+    # check api response
+    response = api_client.post(url, data, format='json')
+    assert response.status_code == 400
+
+
+def test_create_response_with_invalid_context_data2(client):
+    agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='add_response'))
+    survey1 = Survey.objects.create(name='survey1', definition={}, created_by=user1)
+    question1 = Question.objects.create(title='question1', created_by=user1)
+    client = Client.objects.create(first_name='John', last_name='Doe', dob='2000-01-01', created_by=user1)
+
+    url = '/responses/'
+    api_client = APIClient()
+    api_client.force_authenticate(user1)
+    data = {
+        'survey': survey1.id,
+        'client': client1.id,
+        'response_context': {
+            # 'id': survey1.id,
+            'type': 'FoobarFoobarFoobarFoobarFoobar',
+        },
+        'answers': [
+            {
+                'question': question1.id,
+                'value': 'yes',
+            },
+        ],
+    }
+    # check api response
+    response = api_client.post(url, data, format='json')
+    assert response.status_code == 400

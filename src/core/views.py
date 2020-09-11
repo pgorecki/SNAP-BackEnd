@@ -2,7 +2,6 @@ import json
 from django.conf import settings
 from django.http import HttpResponseNotFound
 from django.views import defaults
-from rest_framework import routers, serializers, viewsets
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response

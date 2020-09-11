@@ -21,9 +21,15 @@ class Client(ObjectRoot):
     class Meta:
         db_table = 'client'
         ordering = ['-created_at']
-        # permissions = [
-        #     ("view", "Can change the status of tasks"),
-        # ]
+        permissions = (
+            ('view_client_agency', 'Can view client - agency'),
+            ('change_client_agency', 'Can change client - agency'),
+            ('delete_client_agency', 'Can delete client - agency'),
+            ('view_client_all', 'Can view client - globally'),
+            ('change_client_all', 'Can change client - globally'),
+            ('delete_client_all', 'Can delete client - globally'),
+        )
+
     first_name = models.CharField(max_length=64)
     middle_name = models.CharField(max_length=64, default='', blank=True)
     last_name = models.CharField(max_length=64)

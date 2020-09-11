@@ -1,6 +1,6 @@
 from core.exceptions import ApplicationValidationError
 from core.viewsets import ModelViewSet
-from core.permissions import IsAdmin, IsAgencyMember, IsAgencyMemberReadOnly
+from core.permissions import AbilityPermission
 from core.validation import validate_fields_with_rules
 from .models import Eligibility, AgencyEligibilityConfig, ClientEligibility, EligibilityQueue
 from .serializers import (
@@ -20,10 +20,10 @@ class EligibilityViewset(ModelViewSet):
     queryset = Eligibility.objects.all()
     read_serializer_class = EligibilityReader
     write_serializer_class = EligibilityWriter
-    permission_classes = [IsAdmin | IsAgencyMemberReadOnly]
+    permission_classes = [AbilityPermission]
 
     def get_queryset(self):
-        return Eligibility.objects.for_user(self.request.user)
+        return self.request.ability.queryset_for(self.action, Eligibility)
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
@@ -33,11 +33,11 @@ class AgencyEligibilityConfigViewset(ModelViewSet):
     queryset = AgencyEligibilityConfig.objects.all()
     read_serializer_class = AgencyEligibilityConfigReader
     write_serializer_class = AgencyEligibilityConfigWriter
-    permission_classes = [IsAdmin | IsAgencyMemberReadOnly]
+    permission_classes = [AbilityPermission]
     filterset_class = AgencyEligibilityConfigViewsetFilter
 
     def get_queryset(self):
-        return AgencyEligibilityConfig.objects.for_user(self.request.user)
+        return self.request.ability.queryset_for(self.action, AgencyEligibilityConfig)
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
@@ -47,14 +47,14 @@ class ClientEligibilityViewset(ModelViewSet):
     queryset = ClientEligibility.objects.all()
     read_serializer_class = ClientEligibilityReader
     write_serializer_class = ClientEligibilityWriter
-    permission_classes = [IsAdmin | IsAgencyMember]
+    permission_classes = [AbilityPermission]
     filterset_class = ClientEligibilityViewsetFilter
 
     def get_queryset(self):
-        return ClientEligibility.objects.for_user(self.request.user)
+        return self.request.ability.queryset_for(self.action, ClientEligibility)
 
     def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+        serializer.save(created_by=self.request.user, eligibility=Eligibility.objects.first())
 
     def validate(self, request, data, action):
         validate_fields_with_rules(request.user, data, client='can_read_client', eligibility='can_read_eligibility')
@@ -64,7 +64,7 @@ class EligibilityQueueViewset(ModelViewSet):
     queryset = EligibilityQueue.objects.all()
     read_serializer_class = EligibilityQueueReader
     write_serializer_class = EligibilityQueueWriter
-    permission_classes = [IsAdmin | IsAgencyMember]
+    permission_classes = [AbilityPermission]
     filterset_class = EligibilityQueueViewsetFilter
 
     def validate(self, request, data, action):

@@ -46,6 +46,10 @@ class ContentObjectRelatedField(serializers.RelatedField):
         return data
 
     def to_internal_value(self, data):
+        if 'type' not in data:
+            raise ApplicationValidationError({'type': ["Field is required"]})
+        model_type = data['type']
+
         app_name, model_name = self.MODELS.get(data['type'], (None, data['type']))
         if app_name is None:
             for model in apps.get_models():
