@@ -16,7 +16,18 @@ class JobPlacement(models.Model):
         ordering = ['id']
 
     effective_date = models.DateField(blank=True, null=True)
-
+    hire_date= models.DateField(blank=True, null=True,help_text='Participant\'s Hire Date') 
+    Company= models.CharField(max_length=64, null=True, blank=True, 
+                              help_text='Company Participant Employed With')
+    weekly_hours= models.DecimalField(max_digits=5, decimal_places=2, null=True,
+                                      help_text='Disenrollment&JobPlacement file column:Participant\'s Weekly Hours')  
+    hourly_wage= models.DecimalField(max_digits=5, decimal_places=2, null=True,
+                                      help_text='Disenrollment&JobPlacement file column:Participant\'s hourly Wage') 
+    total_weekly_income= models.DecimalField(max_digits=6, decimal_places=2, null=True,
+                                      help_text='Disenrollment&JobPlacement file column:Total income weekly')                                        
+    total_monthly_income= models.DecimalField(max_digits=6, decimal_places=2, null=True,
+                                      help_text='Disenrollment&JobPlacement file column:Total income monthly') 
+    how_was_job_placement_verified=models.CharField(max_length=64, null=True, blank=True)
 
 class ClientIEP(ObjectRoot):
     class Meta:

@@ -10,7 +10,7 @@ from client.models import Client, ClientAddress
 import logging
 logging.basicConfig(filename = 'MPRapp.log', level = logging.INFO)
 from django.core.exceptions import MultipleObjectsReturned
-from iep.models import ClientIEP, ClientIEPEnrollment
+from iep.models import ClientIEP, ClientIEPEnrollment, JobPlacement
 from datetime import date
 from agency.models import Agency
 from random import randint
@@ -221,11 +221,13 @@ class FileImport(models.Model):                                                 
         return (run_result, df1['row_number'].tolist(), df1['result'].tolist())
        
     def run(self):                                                                  #MPR
-        # Run import script
+        # RUN IMPORT SCRIPT , by calling individual method for individual file type.
         if self.ftype == FileImportTypes.MPR :
            (run_report, row_numbers, results) = self.run_MPR()
         elif self.ftype == FileImportTypes.RRIEP :
            (run_report, row_numbers, results) = self.run_RRIEP()
+        elif self.ftype == FileImportTypes.DISENROLL :
+           (run_report, row_numbers, results) = self.run_Disenrollment_Placement()
         self.save()
         logging.info(str(self.ftype) + ' ' + str(self.timestamp) + ' ' + str(self.run_id) + ':' + str(self.result))
         return run_report, row_numbers, results           
@@ -237,7 +239,7 @@ class FileImport(models.Model):                                                 
         ## Inserts each entry into SQL Database via Django model(that includes classes Client, ClientIEP, ClientIEPEnrollment, ClientEligibility, Program, Enrollment, EnrollmentActivity, EnrollmentService ).
         ## The RRIEP data for the latest week is assumed to be in the second sheet. Any change in the template may result in unpredictable behaviour.
         ## Throws exceptions if file contains incomplete and\or invalid data.
-        ## Provider is identified by the imporing user's agency.    
+        ## Provider is identified by the importing user's agency.    
         ## variable abbreviations\classes: c3=Client, a3=Agency, ciep3=ClientIEP, ciep_en3=ClientIEPEnrollment, e3=ciep_en3.enrollment, ea3=EnrollmentActivity, es3=EnrollmentService, n3=Note, ce3=ClientEligibility
         ## TODO: If there is a cell with value "no participants" then there is nothing to import.
         
@@ -263,7 +265,7 @@ class FileImport(models.Model):                                                 
             df['row_number'] = df.index + 8
             df['result'] = ''
             df.dropna(how = 'all',inplace=True)
-            df1=df.iloc[0:5,]   ## TODO use to restrict number of records processed
+            #df1=df.iloc[0:5,]   ## TODO use to restrict number of records processed
             df1=df
         except Exception as ve:
             print(str(ve))
@@ -275,7 +277,6 @@ class FileImport(models.Model):                                                 
         fail_count=0
         attempt_count=0
         data_import_batch_id=randint(1, 2000000000)           
-        ##TODO: Import each row
         for i in range(0, df1.shape[0]): # for each row in the RRIEP excel file data section
           row = df1.iloc[i]
           if not(pd.isnull(row['First Name'])) or not(pd.isnull(row['Last Name'])) or not(pd.isnull(row[' Client ID'])) or not(pd.isnull(row['SSN '])):   #if any one of them is non-null
@@ -383,8 +384,108 @@ class FileImport(models.Model):                                                 
                fail_count+=1
                print('Error at excel row number ' + str(row['row_number']) + ': ' + str(e))          
                df1.at[i,'result']='Error at excel row number ' + str(row['row_number']) + ': ' + str(e)                
+          #TODO: else (SSN and Name and dob are all null) then df1.at[i,'result']='Not enough data to ingest'
+        
         self.run_id=data_import_batch_id
         self.period=sheet.name
         run_result={'records read':attempt_count,'records successfuly processed':insert_count,'records failed':fail_count}
         self.result=str(run_result)
         return (run_result, df1['row_number'].tolist(), df1['result'].tolist())        
+
+
+    def run_Disenrollment_Placement(self):                                                                  
+        ## DISENROLLMENT & PLACEMENT IMPORT SCRIPT
+        ## Reads the input excel file contaning the Disenrollment and Placement Report -  (e.g. Provider Disenrollment-Job Placement Report 9.25.19.mb_Sample1.xlsx) 
+        ## based on template in https://www.dropbox.com/s/e5vr75ol10uo5xz/Provider%20Disenrollment-Job%20Placement%20Report%209.25.19.mb.xlsx?dl=0 .
+        ## Inserts each entry into SQL Database via Django model Placement and updates ClientIEP .
+        ## The data for the latest week is assumed to be in the second sheet. Any change in the template may result in unpredictable behaviour.
+        ## Throws exceptions if file contains incomplete and\or invalid data.
+        ## variable abbreviations\classes: pla3=Placement, c3=Client, a3=Agency, ciep3=ClientIEP, ciep_en3=ClientIEPEnrollment, n3=Note
+        ## If there is a cell with value "no participants" then there is nothing to import.
+        
+        print('Running Provider Disenrollment-Job Placement Import Script')
+        loc = (self.file_path) 
+        try:
+           wb = xlrd.open_workbook(loc) 
+           sheet = wb.sheet_by_index(1) 
+           if not self.period: 
+               self.period=sheet.name
+           df = pd.read_excel(self.file_path, sheet_name=1)
+           if not df[df.eq('no participants').any(1)].empty:
+              return ({'records read':0,'records successfuly processed':0,'records failed':0,'error':'', 'info':'no participants!'}, None, None)              
+           df = pd.read_excel(self.file_path, sheet_name=1, header=7)
+        except IOError as e:
+           logging.exception(str(e))
+           return ({'records read':0,'records successfuly processed':0,'records failed':0,'error':'Error reading Excel file!'+str(e)}, None, None)
+        try:
+            df['row_number'] = df.index + 9
+            df['result'] = ''
+            df.dropna(how = 'all',inplace=True)
+            df1=df.iloc[0:5,]   ## TODO use to restrict number of records processed
+            df1=df
+        except Exception as ve:
+            print(str(ve))
+            return ({'records read':0,'records successfuly processed':0,'records failed':0,'error':str(ve) + err3}, None, None)        
+        df1 = df1.where(pd.notnull(df1), None)  #Replace NaN\NaT with None
+        print(df1.iloc[0])  ## TODO delete later
+        print(df1.info())
+        insert_count=0
+        fail_count=0
+        attempt_count=0
+        data_import_batch_id=randint(1, 2000000000)      
+
+        for i in range(0, df1.shape[0]): # for each row in the excel file data section
+          row = df1.iloc[i]
+          try: 
+              data_available=not(pd.isnull(row['First Name'])) or not(pd.isnull(row['Last Name'])) or not(pd.isnull(row['Client ID'])) or not(pd.isnull(row['Case Number']))
+              if data_available:  
+                attempt_count+=1
+                c3=None
+                ciep3=None
+                with transaction.atomic():
+                    c3=Client.objects.filter(Q(snap_id='333333333' if pd.isnull(row['Client ID']) else row['Client ID'])).first()
+                    if c3:
+                       ciep3=c3.ieps.filter(case_number=row['Case Number']).first()
+                       if not ciep3:
+                          ciep3=ClientIEP.objects.filter(case_number=row['Case Number']).first()
+                    else:
+                       ciep3=ClientIEP.objects.filter(case_number=row['Case Number']).first()
+                    print('Client ID=' + str(row['Client ID']))
+                    #TODO:Second attempt to locate client by name?
+                    #TODO:Do we update Name and county of the client? Or the Case# or the Client ID?
+                    if not ciep3:
+                       fail_count+=1
+                       print('Error at excel row number ' + str(row['row_number']) + ': Could not locate IEP Client record.')          
+                       df1.at[i,'result']='Error at excel row number ' + str(row['row_number']) + ': Could not locate IEP Client record with Case#' + ('' if pd.isnull(row['Case Number']) else str(row['Case Number']) + ' and Client ID')                         
+                    else:  ## Ciep located
+                       ciep3.end_date=None if pd.isnull(row['Disenrolled Date']) else row['Disenrolled Date'].date()
+                       ciep3.outcome= '' if pd.isnull(row['Disenrolled Reason']) else row['Disenrolled Reason']                      
+                       ciep3.save()
+                       insert_count+=1
+                       print('Found IEP Client under client ' + str(ciep3.client.first_name))
+                       
+                       pla3=JobPlacement(hire_date= None if pd.isnull(row['Hire Date']) else row['Hire Date'].date(),   
+                                         Company= row['Company'],   
+                                         weekly_hours= None if pd.isnull(row['Weekly Hours']) else float(row['Weekly Hours']),   
+                                         hourly_wage= None if pd.isnull(row['Hourly Wage']) else float(row['Hourly Wage']),    
+                                         total_weekly_income= None if pd.isnull(row['Total Weekly Income ']) else float(row['Total Weekly Income ']),    
+                                         total_monthly_income= None if pd.isnull(row['Total Monthly Income']) else  float(row['Total Monthly Income']),    
+                                         how_was_job_placement_verified= row['How was Job Placement Verified?'] )
+                       ciep3.job_placement=pla3
+                       pla3.save()
+                       ciep3.save()                       
+                       if row['Job Placement Comments']:
+                          n3=Note(source=pla3,text='' if pd.isnull(row['Job Placement Comments']) else row['Job Placement Comments'])
+                          n3.save()
+
+          except Exception as e:
+               fail_count+=1
+               print('Error at excel row number ' + str(row['row_number']) + ': ' + str(e))          
+               df1.at[i,'result']='Error at excel row number ' + str(row['row_number']) + ': ' + str(e)  
+               raise(e)               
+
+        self.run_id=data_import_batch_id
+        self.period=sheet.name
+        run_result={'records read':attempt_count,'records successfuly processed':insert_count,'records failed':fail_count}
+        self.result=str(run_result)
+        return (run_result, df1['row_number'].tolist(), df1['result'].tolist())         
