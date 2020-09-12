@@ -481,8 +481,7 @@ class FileImport(models.Model):                                                 
           except Exception as e:
                fail_count+=1
                print('Error at excel row number ' + str(row['row_number']) + ': ' + str(e))          
-               df1.at[i,'result']='Error at excel row number ' + str(row['row_number']) + ': ' + str(e)  
-               raise(e)               
+               df1.at[i,'result']='Error at excel row number ' + str(row['row_number']) + ': ' + str(e)              
 
         self.run_id=data_import_batch_id
         self.period=sheet.name
