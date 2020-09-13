@@ -80,3 +80,16 @@ def test_search_clients_by_agency_user(client):
     assert response.data['results'][0]['object'] == 'Client'
     assert response.data['results'][0]['first_name'] == 'John'
     assert response.data['results'][0]['created_by']['id'] == user1.id
+
+
+def test_search_clients_issue_1888198111(client):
+    agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='view_client_all'))
+
+    url = '/clients/?search=bob ru'
+
+    api_client = APIClient()
+    api_client.force_authenticate(user1)
+
+    response = api_client.get(url)
+    assert response.status_code == 200
