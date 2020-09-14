@@ -313,6 +313,20 @@ def declare_abilities(user, ability):
     # enrollment service types - dictionary data
     ability.can('view', EnrollmentServiceType, agency=agency)
 
+    if user.is_superuser:
+        ability.can('add', Survey)
+        ability.can('view', Survey)
+        ability.can('change', Survey)
+        ability.can('delete', Survey)
+        ability.can('add', Question)
+        ability.can('view', Question)
+        ability.can('change', Question)
+        ability.can('delete', Question)
+        ability.can('add', Response)
+        ability.can('view', Response)
+        ability.can('change', Response)
+        ability.can('delete', Response)
+
     # Done!
     print('gained abilities\n', "\n".join([str(x) for x in ability.abilities]), '\n for permissions',
           [x.codename for x in user.user_permissions.all()]
