@@ -133,13 +133,13 @@ class FileImport(models.Model):                                                 
                 if c3.ieps.count():
                       ciep3=c3.ieps.filter(case_number=row['Case Number']).first()
                       if not ciep3:
-                         ciep3=ClientIEP(client=c3, case_number=row['Case Number'],projected_end_date=None if pd.isnull(row['Projected End Date ']) else row['Projected End Date '].date())
+                         ciep3=ClientIEP(client=c3, case_number=row['Case Number'],projected_end_date=None if pd.isnull(row['Projected End Date ']) else pd.to_datetime(row['Projected End Date ']).date())
                          print('Created ClientIEP with case number=' +  str(ciep3.case_number) + ' with pk=' + str(ciep3.id) )   
                       else:
                          print('Found ClientIEP with case_number=' + str(ciep3.case_number) )                  
-                         ciep3.projected_end_date=None if pd.isnull(row['Projected End Date ']) else row['Projected End Date '].date()
+                         ciep3.projected_end_date=None if pd.isnull(row['Projected End Date ']) else pd.to_datetime(row['Projected End Date ']).date()
                 else:
-                      ciep3=ClientIEP(client=c3, case_number=row['Case Number'],projected_end_date=None if pd.isnull(row['Projected End Date ']) else row['Projected End Date '].date())
+                      ciep3=ClientIEP(client=c3, case_number=row['Case Number'],projected_end_date=None if pd.isnull(row['Projected End Date ']) else pd.to_datetime(row['Projected End Date ']).date())
                       print('Created ClientIEP with case number=' +  str(ciep3.case_number) + ' with pk=' + str(ciep3.id) )                
                 ciep3.save()                  
                 if ciep3.iep_enrollments.count():
@@ -147,10 +147,10 @@ class FileImport(models.Model):                                                 
                 else:
                       ciep_en3=ClientIEPEnrollment(iep=ciep3)
                       ciep_en3.save()
-                if ciep_en3.enrollment and ciep_en3.enrollment.start_date == row['Activity Enrollment Date'].date():
+                if ciep_en3.enrollment and ciep_en3.enrollment.start_date == pd.to_datetime(row['Activity Enrollment Date']).date():
                       print('Enrollment exists')
                       e3=ciep_en3.enrollment
-                      e3.end_date=row['Date Participation Terminated'].date()
+                      e3.end_date=pd.to_datetime(row['Date Participation Terminated']).date()
                       e3.end_reason=row['Reason Participation Terminated']
                       e3.save()
                 else:
@@ -160,14 +160,14 @@ class FileImport(models.Model):                                                 
                          print('Creating program')
                          p3=Program(name=row['Qualifying Activity Enrolled'],agency=a3)
                          p3.save()
-                      e3=Enrollment(client=c3,program=p3,start_date=None if pd.isnull(row['Activity Enrollment Date']) else row['Activity Enrollment Date'].date(), end_date=None if pd.isnull(row['Date Participation Terminated']) else row['Date Participation Terminated'].date(), end_reason=row['Reason Participation Terminated'],status=EnrollmentStatus.ENROLLED.value)
+                      e3=Enrollment(client=c3,program=p3,start_date=None if pd.isnull(row['Activity Enrollment Date']) else pd.to_datetime(row['Activity Enrollment Date']).date(), end_date=None if pd.isnull(row['Date Participation Terminated']) else pd.to_datetime(row['Date Participation Terminated']).date(), end_reason=row['Reason Participation Terminated'],status=EnrollmentStatus.ENROLLED.value)
                       e3.save()
                       ciep_en3.enrollment=e3
                       ciep_en3.save()
                 #Create EnrollmentActivity
                 ea3=EnrollmentActivity(enrollment=e3, 
-                                       start_date=None if pd.isnull(row['Activity Enrollment Date']) else row['Activity Enrollment Date'].date(), 
-                                       end_date=None if pd.isnull(row['Date Participation Terminated']) else row['Date Participation Terminated'].date(),
+                                       start_date=None if pd.isnull(row['Activity Enrollment Date']) else pd.to_datetime(row['Activity Enrollment Date']).date(), 
+                                       end_date=None if pd.isnull(row['Date Participation Terminated']) else pd.to_datetime(row['Date Participation Terminated']).date(),
                                        qualifying_activity_name = row['Qualifying Activity Enrolled'],
                                        qualifying_activity_hours = row['Qualifying Activity (51% or >) Hours'],
                                        billable_activity = row['Is Qualifying Activity Billable (Y/N)'], non_qualifying_activity_hours = row['Non-Qualifying Activity (49% or <) Hours'], required_number_of_articipatio_hours = row['Required Number of Participation Hours\n(I+L)'], actual_total_monthly_participation_hours = row['Actual Total Monthly Participation Hours'],
@@ -283,7 +283,7 @@ class FileImport(models.Model):                                                 
             attempt_count+=1
             try:
               with transaction.atomic():
-                c3=Client.objects.filter(Q(snap_id='333333333' if pd.isnull(row[' Client ID']) else row[' Client ID']) | Q(ssn='333333333' if pd.isnull(row['SSN ']) else row['SSN ']) | Q(first_name=row['First Name'],last_name=row['Last Name'],dob=date(1900,1,1) if pd.isnull(row['Date of Birth']) else row['Date of Birth'].date())).first()
+                c3=Client.objects.filter(Q(snap_id='333333333' if pd.isnull(row[' Client ID']) else row[' Client ID']) | Q(ssn='333333333' if pd.isnull(row['SSN ']) else row['SSN ']) | Q(first_name=row['First Name'],last_name=row['Last Name'],dob=date(1900,1,1) if pd.isnull(row['Date of Birth']) else pd.to_datetime(row['Date of Birth']).date())).first()
                 if c3:
                    #Update Client Fields
                    print('Client in the DB:' + str(c3.first_name) + ' ' + str(c3.last_name) + ' with pk=' + str(c3.id) )
@@ -291,8 +291,8 @@ class FileImport(models.Model):                                                 
                       c3.first_name=row['First Name']
                    if row['Last Name'] and c3.last_name!=row['Last Name']:
                       c3.first_name=row['Last Name']
-                   if row['Date of Birth'] and c3.dob!=row['Date of Birth'].date():
-                      c3.dob=row['Date of Birth'].date()                      
+                   if row['Date of Birth'] and c3.dob!=pd.to_datetime(row['Date of Birth']).date():
+                      c3.dob=pd.to_datetime(row['Date of Birth']).date()                      
                    # if row['SSN '] and c3.ssn!=row['SSN ']:  ## QUESTION: Do we update Client .SSN?
                       # c3.ssn=row['SSN ']        
                    if row[' Client ID'] and c3.snap_id!=row[' Client ID']:
@@ -315,7 +315,7 @@ class FileImport(models.Model):                                                 
                 else:
                    # Create Client   
                    ca1=ClientAddress(street='' if pd.isnull(row['Address']) else row['Address'],city='' if pd.isnull(row['City']) else row['City'],zip='' if pd.isnull(row['Zip Code']) else str(int(row['Zip Code'])),county='' if pd.isnull(row['County of Residence']) else row['County of Residence'])
-                   c3=Client(first_name=row['First Name'],last_name=row['Last Name'],snap_id=row[' Client ID'],ssn=row['SSN '],dob=row['Date of Birth'].date(),address=ca1)
+                   c3=Client(first_name=row['First Name'],last_name=row['Last Name'],snap_id=row[' Client ID'],ssn=row['SSN '],dob=pd.to_datetime(row['Date of Birth']).date(),address=ca1)
                    ca1.save()
                    c3.save()
                    print('Created Client ' + str(c3.first_name) + ' ' + str(c3.last_name) + ' with pk=' + str(c3.id) )
@@ -325,17 +325,17 @@ class FileImport(models.Model):                                                 
                 if c3.ieps.count():
                       ciep3=c3.ieps.filter(case_number=row['Case #']).first()
                       if not ciep3:
-                         ciep3=ClientIEP(client=c3, case_number=row['Case #'],start_date=None if pd.isnull(row['Reverse Referral Request Date']) else row['Reverse Referral Request Date'].date(),projected_end_date=None if pd.isnull(row['Projected End Date ']) else row['Projected End Date '].date(),abawd=row['ABAWD (Y/N)'],assessment_completed=str(row['Assessment Completed (Y/N)']).lower().__eq__('y'),orientation_completed=str(row['Orientation Completed (Y/N)']).lower().__eq__('y'))
+                         ciep3=ClientIEP(client=c3, case_number=row['Case #'],start_date=None if pd.isnull(row['Reverse Referral Request Date']) else pd.to_datetime(row['Reverse Referral Request Date']).date(),projected_end_date=None if pd.isnull(row['Projected End Date ']) else pd.to_datetime(row['Projected End Date ']).date(),abawd=row['ABAWD (Y/N)'],assessment_completed=str(row['Assessment Completed (Y/N)']).lower().__eq__('y'),orientation_completed=str(row['Orientation Completed (Y/N)']).lower().__eq__('y'))
                          print('Created ClientIEP with case number=' +  str(ciep3.case_number) + ' with pk=' + str(ciep3.id) )   
                       else:
                          print('Found ClientIEP with case_number=' + str(ciep3.case_number) )                  
-                         ciep3.projected_end_date=None if pd.isnull(row['Projected End Date ']) else row['Projected End Date '].date()
+                         ciep3.projected_end_date=None if pd.isnull(row['Projected End Date ']) else pd.to_datetime(row['Projected End Date ']).date()
                          ciep3.abawd=row['ABAWD (Y/N)']
                          ciep3.assessment_completed=str(row['Assessment Completed (Y/N)']).lower().__eq__('y')
                          ciep3.orientation_completed=str(row['Orientation Completed (Y/N)']).lower().__eq__('y')
-                         ciep3.start_date=None if pd.isnull(row['Reverse Referral Request Date']) else row['Reverse Referral Request Date'].date()
+                         ciep3.start_date=None if pd.isnull(row['Reverse Referral Request Date']) else pd.to_datetime(row['Reverse Referral Request Date']).date()
                 else:
-                      ciep3=ClientIEP(client=c3, case_number=row['Case #'],projected_end_date=None if pd.isnull(row['Projected End Date ']) else row['Projected End Date '].date(),abawd=row['ABAWD (Y/N)'],assessment_completed=str(row['Assessment Completed (Y/N)']).lower().__eq__('y'),orientation_completed=str(row['Orientation Completed (Y/N)']).lower().__eq__('y'))
+                      ciep3=ClientIEP(client=c3, case_number=row['Case #'],projected_end_date=None if pd.isnull(row['Projected End Date ']) else pd.to_datetime(row['Projected End Date ']).date(),abawd=row['ABAWD (Y/N)'],assessment_completed=str(row['Assessment Completed (Y/N)']).lower().__eq__('y'),orientation_completed=str(row['Orientation Completed (Y/N)']).lower().__eq__('y'))
                       print('Created ClientIEP with case number=' +  str(ciep3.case_number) + ' with pk=' + str(ciep3.id) )                
                 ciep3.save() 
                 insert_count+=1
@@ -345,7 +345,7 @@ class FileImport(models.Model):                                                 
                 else:
                       ciep_en3=ClientIEPEnrollment(iep=ciep3)
                       ciep_en3.save()
-                if ciep_en3.enrollment and ciep_en3.enrollment.start_date == row['Activity Enrollment Date'].date():
+                if ciep_en3.enrollment and ciep_en3.enrollment.start_date == pd.to_datetime(row['Activity Enrollment Date']).date():
                       print('Enrollment exists')
                       e3=ciep_en3.enrollment
                 else:
@@ -355,7 +355,7 @@ class FileImport(models.Model):                                                 
                          print('Creating program')
                          p3=Program(name=row['IEP Qualifying  Activity'],agency=a3)
                          p3.save()
-                      e3=Enrollment(client=c3,program=p3,start_date=None if pd.isnull(row['Activity Enrollment Date']) else row['Activity Enrollment Date'].date(), status= EnrollmentStatus.PLANNED.value if (pd.isnull(row[' Client ID']) and pd.isnull(row['Case #'])) else EnrollmentStatus.ENROLLED.value )
+                      e3=Enrollment(client=c3,program=p3,start_date=None if pd.isnull(row['Activity Enrollment Date']) else pd.to_datetime(row['Activity Enrollment Date']).date(), status= EnrollmentStatus.PLANNED.value if (pd.isnull(row[' Client ID']) and pd.isnull(row['Case #'])) else EnrollmentStatus.ENROLLED.value )
                       e3.save()
                       ciep_en3.enrollment=e3
                       ciep_en3.save()                
@@ -368,10 +368,10 @@ class FileImport(models.Model):                                                 
                       celig3.status=EligibilityStatus.ELIGIBLE
                    else:
                       celig3.status=EligibilityStatus.NOT_ELIGIBLE
-                   celig3.effective_date=None if pd.isnull(row['Date Eligibility Screening Completed']) else row['Date Eligibility Screening Completed'].date()
+                   celig3.effective_date=None if pd.isnull(row['Date Eligibility Screening Completed']) else pd.to_datetime(row['Date Eligibility Screening Completed']).date()
                 else:
                    celig3= ClientEligibility(status=EligibilityStatus.ELIGIBLE if row['SNAP E&T Eligible (Y/N)']=='Y' else EligibilityStatus.NOT_ELIGIBLE,
-                                             effective_date=None if pd.isnull(row['Date Eligibility Screening Completed']) else row['Date Eligibility Screening Completed'].date(),
+                                             effective_date=None if pd.isnull(row['Date Eligibility Screening Completed']) else pd.to_datetime(row['Date Eligibility Screening Completed']).date(),
                                              client=c3,
                                              eligibility=elig3)               
                 celig3.save()
@@ -421,7 +421,7 @@ class FileImport(models.Model):                                                 
             df['row_number'] = df.index + 9
             df['result'] = ''
             df.dropna(how = 'all',inplace=True)
-            df1=df.iloc[0:5,]   ## TODO use to restrict number of records processed
+            #df1=df.iloc[0:5,]   ## TODO use to restrict number of records processed
             df1=df
         except Exception as ve:
             print(str(ve))
@@ -458,13 +458,13 @@ class FileImport(models.Model):                                                 
                        print('Error at excel row number ' + str(row['row_number']) + ': Could not locate IEP Client record.')          
                        df1.at[i,'result']='Error at excel row number ' + str(row['row_number']) + ': Could not locate IEP Client record with Case#' + ('' if pd.isnull(row['Case Number']) else str(row['Case Number']) + ' and Client ID')                         
                     else:  ## Ciep located
-                       ciep3.end_date=None if pd.isnull(row['Disenrolled Date']) else row['Disenrolled Date'].date()
+                       ciep3.end_date=None if pd.isnull(row['Disenrolled Date']) else pd.to_datetime(row['Disenrolled Date']).date()
                        ciep3.outcome= '' if pd.isnull(row['Disenrolled Reason']) else row['Disenrolled Reason']                      
                        ciep3.save()
                        insert_count+=1
                        print('Found IEP Client under client ' + str(ciep3.client.first_name))
                        
-                       pla3=JobPlacement(hire_date= None if pd.isnull(row['Hire Date']) else row['Hire Date'].date(),   
+                       pla3=JobPlacement(hire_date= None if pd.isnull(row['Hire Date']) else pd.to_datetime(row['Hire Date']).date(),   
                                          Company= row['Company'],   
                                          weekly_hours= None if pd.isnull(row['Weekly Hours']) else float(row['Weekly Hours']),   
                                          hourly_wage= None if pd.isnull(row['Hourly Wage']) else float(row['Hourly Wage']),    
