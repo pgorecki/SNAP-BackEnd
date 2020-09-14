@@ -14,6 +14,7 @@ class JobPlacement(models.Model):
     class Meta:
         db_table = 'iep_job_placement'
         ordering = ['id']
+        verbose_name_plural = 'Job Placements'
 
     effective_date = models.DateField(blank=True, null=True)
     hire_date= models.DateField(blank=True, null=True,help_text='Participant\'s Hire Date') 
@@ -33,6 +34,7 @@ class ClientIEP(ObjectRoot):
     class Meta:
         db_table = 'iep_client'
         ordering = ['-created_at']
+        verbose_name_plural = 'Client IEPs'
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='ieps')
     case_number = models.CharField(max_length=36, blank=True, null=True, help_text='MPR file column: Case Number')   #MPR

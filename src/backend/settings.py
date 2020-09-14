@@ -94,7 +94,7 @@ class BaseConfiguration(Configuration):
 
     WSGI_APPLICATION = 'backend.wsgi.application'
 
-    DATABASES = values.DatabaseURLValue('postgresql://devuser:devuser@localhost:7878/gsnapdb1', environ=True)
+    DATABASES = values.DatabaseURLValue('postgresql://devuser:devuser@localhost:5432/gsnapdb1', environ=True)
 
     # Password validation
     # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

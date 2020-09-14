@@ -7,6 +7,7 @@ class SecurityGroup(models.Model):
     class Meta:
         db_table = 'security_group'
         ordering = ['name']
+        verbose_name_plural = 'Security Groups'
 
     name = models.CharField(max_length=64)
 
