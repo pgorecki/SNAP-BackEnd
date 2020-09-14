@@ -23,7 +23,7 @@ class ClientReader(ObjectSerializer):
     class Meta:
         model = Client
         fields = ('id', 'object', 'first_name', 'middle_name', 'last_name',
-                  'dob', 'ssn', 'address', 'created_at', 'modified_at', 'created_by')
+                  'dob', 'ssn', 'snap_id', 'address', 'created_at', 'modified_at', 'created_by')
 
 
 class ClientWriter(NestedCreateMixin, NestedUpdateMixin, ObjectSerializer):
@@ -31,4 +31,4 @@ class ClientWriter(NestedCreateMixin, NestedUpdateMixin, ObjectSerializer):
 
     class Meta:
         model = Client
-        fields = ('first_name', 'middle_name', 'last_name', 'dob', 'ssn', 'address')
+        fields = ('first_name', 'middle_name', 'last_name', 'dob', 'ssn', 'snap_id', 'address')
