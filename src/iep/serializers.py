@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.utils import model_meta
-from core.serializers import ObjectSerializer, CreatedByReader
+from core.serializers import ObjectSerializer, CreatedByReader, UserReader
 from core.exceptions import ApplicationValidationError
 from client.serializers import ClientReader
 from program.models import Enrollment
@@ -45,11 +45,19 @@ class ClientIEPReader(ObjectSerializer):
     client = ClientReader()
     enrollments = ClientIEPEnrollmentReader(many=True, source='iep_enrollments')
     client_is_eligible = serializers.SerializerMethodField()
+    resolved_by = serializers.SerializerMethodField()
+
+    def get_resolved_by(self, obj):
+        user = None
+        if obj.eligibility_request:
+            user = obj.eligibility_request.resolved_by
+
+        return UserReader(instance=user).data if user else None
 
     class Meta:
         model = ClientIEP
         fields = ('id', 'object', 'client', 'orientation_completed', 'status',
-                  'client_is_eligible',
+                  'resolved_by', 'client_is_eligible',
                   'enrollments', 'start_date', 'end_date', 'projected_end_date',
                   'outcome', 'created_by', 'created_at', 'modified_at')
 

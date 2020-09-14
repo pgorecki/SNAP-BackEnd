@@ -309,6 +309,41 @@ def test_replace_iep_enrollment_with_new_enrollment():
     assert Enrollment.objects.count() == 2
 
 
+def test_add_another_enrollment_to_iep():
+    agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
+    program1 = agency.programs.create()
+    program2 = agency.programs.create()
+    user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='view_clientiep'))
+    user.user_permissions.add(Permission.objects.get(codename='change_clientiep'))
+    user.user_permissions.add(Permission.objects.get(codename='view_client'))
+
+    client = Client.objects.first()
+    iep = ClientIEPFactory(client=client)
+    enrollment = EnrollmentFactory(client=client, program=program1, status='PLANNED')
+    first_iep_enrollment = iep.iep_enrollments.create(enrollment=enrollment)
+
+    url = f'/iep/{iep.id}/'
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+
+    response = api_client.get(url)
+    existing_enrollments = response.data['enrollments']
+
+    response = api_client.patch(url, {
+        'enrollments': existing_enrollments + [
+            {
+                'program': program2.id,
+                'status': 'ENROLLED',
+            },
+        ],
+    }, format='json')
+    assert response.status_code == 200
+
+    assert iep.iep_enrollments.count() == 2
+    assert iep.iep_enrollments.first() == first_iep_enrollment
+
+
 def test_replace_iep_enrollment_with_existing_enrollment():
     agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
     program = agency.programs.create()
