@@ -20,7 +20,7 @@ class ClientViewset(ModelViewSet):
     ordering_fields = ['first_name', 'middle_name', 'last_name', 'dob']
 
     def get_queryset(self):
-        return self.request.ability.queryset_for(self.action, Client)
+        return self.request.ability.queryset_for(self.action, Client).distinct()
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)

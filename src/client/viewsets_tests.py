@@ -1,6 +1,7 @@
 from rest_framework.test import APIClient
 from __tests__.factories import setup_2_agencies
 from client.models import Client
+from agency.models import AgencyClient
 from django.contrib.auth.models import Permission
 # e2e tests
 
@@ -92,4 +93,22 @@ def test_search_clients_issue_1888198111(client):
     api_client.force_authenticate(user1)
 
     response = api_client.get(url)
+    assert response.status_code == 200
+
+
+def test_multiple_client_with_agency_clients():
+    agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    # user1.user_permissions.add(Permission.objects.get(codename='view_client_agency'))
+    user1.is_superuser = True
+    user1.save()
+
+    client = Client.objects.first()
+    ac = AgencyClient.objects.create(client=client, agency=agency2)
+    client.agency_clients.add(ac)
+
+    assert client.agency_clients.count() == 2
+
+    api_client = APIClient()
+    api_client.force_authenticate(user1)
+    response = api_client.get(f'/clients/{client.id}/')
     assert response.status_code == 200
