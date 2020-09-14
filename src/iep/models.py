@@ -56,7 +56,7 @@ class ClientIEP(ObjectRoot):
         default=IEPStatus.AWAITING_APPROVAL
     )
     outcome = models.CharField(max_length=64, default='', blank=True, help_text='Outcome when completed')
-    job_placement = models.OneToOneField(JobPlacement, on_delete=models.SET_NULL, null=True)
+    job_placement = models.OneToOneField(JobPlacement, on_delete=models.SET_NULL, null=True, blank=True)
     abawd = models.CharField(max_length=10, blank=True, null=True, help_text='MPR file column: ABAWD (Y/N)')  # MPR
 
 
