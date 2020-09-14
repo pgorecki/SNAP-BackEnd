@@ -57,7 +57,7 @@ class BaseConfiguration(Configuration):
         'iep',
         'security',
         'note',
-        'FileImport',   #MPR
+        'FileImport',  # MPR
     ]
 
     MIDDLEWARE = [
@@ -79,7 +79,7 @@ class BaseConfiguration(Configuration):
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [],
+            'DIRS': ['templates'],
             'APP_DIRS': True,
             'OPTIONS': {
                 'context_processors': [
