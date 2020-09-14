@@ -57,7 +57,7 @@ class BaseConfiguration(Configuration):
         'iep',
         'security',
         'note',
-        'FileImport',   #MPR
+        'FileImport',  # MPR
     ]
 
     MIDDLEWARE = [
@@ -79,7 +79,7 @@ class BaseConfiguration(Configuration):
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [],
+            'DIRS': ['templates'],
             'APP_DIRS': True,
             'OPTIONS': {
                 'context_processors': [
@@ -125,6 +125,8 @@ class BaseConfiguration(Configuration):
     # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
     STATIC_URL = '/static/'
+
+    MEDIA_ROOT = "../uploads/"
 
     REST_FRAMEWORK = {
         # Use Django's standard `django.contrib.auth` permissions,
