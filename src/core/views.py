@@ -7,8 +7,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from agency.serializers import AgencyReader
 from core.logging import logger
-import survey.models
-import client.models
+from survey.models import Survey, Question, Response as SurveyResponse
+from client.models import Client
 
 
 class HealthViewSet(APIView):
@@ -52,10 +52,10 @@ class DashboardSummary(APIView):
 
     def get(self, request):
         content = {
-            'clients': client.models.Client.objects.for_user(self.request.user).count(),
-            'surveys': survey.models.Survey.objects.for_user(self.request.user).count(),
-            'responses': survey.models.Response.objects.for_user(self.request.user).count(),
-            'questions': survey.models.Question.objects.for_user(self.request.user).count(),
+            'clients': request.ability.queryset_for('view', Client).distinct().count(),
+            'surveys': request.ability.queryset_for('view', Survey).count(),
+            'responses': request.ability.queryset_for('view', SurveyResponse).count(),
+            'questions': request.ability.queryset_for('view', Question).count(),
         }
         return Response(content)
 
