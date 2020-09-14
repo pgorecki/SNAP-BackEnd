@@ -76,6 +76,44 @@ def test_create_survey_by_user1():
     assert response.data['created_by']['id'] == user1.id
 
 
+def test_create_survey_issue_1891238373():
+    agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
+    user1.user_permissions.add(Permission.objects.get(codename='add_survey'))
+    url = '/surveys/'
+    api_client = APIClient()
+    api_client.force_authenticate(user1)
+    q1 = Question.objects.create()
+    response = api_client.post(url, {
+        "definition": {
+            "items": [
+                {
+                    "id": "question1",
+                    "questionId": str(q1.id),
+                    "title": "Questions 1",
+                    "type": "question"
+                },
+                # {
+                #     "id": "question2",
+                #     "questionId": "71fe2baa-6033-488c-8f8a-c510a164e1f7"
+                # },
+                # {
+                #     "id": "question3",
+                #     "questionId": "eb3c5cba-348e-4440-a75e-bc4bc7437a5c"
+                # },
+                # {
+                #     "id": "question4",
+                #     "questionId": "77c52f87-301b-4fc7-aa0e-6d3b5941cd40"
+                # }
+            ]
+        },
+        "name": "Orientation & Assessment"
+    }, format='json')
+    assert response.status_code == 201
+    survey = Survey.objects.first()
+    assert survey.questions.count() == 1
+    assert survey.questions.first() == q1
+
+
 def test_create_survey_with_invalid_definition_by_user1():
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
     user1.user_permissions.add(Permission.objects.get(codename='add_survey'))

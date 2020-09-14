@@ -23,8 +23,11 @@ class ProgramReader(ObjectSerializer):
                   'enrollment_entry_survey', 'enrollment_update_survey', 'enrollment_exit_survey')
 
 
-class ProgramWriter(ProgramReader):
-    pass
+class ProgramWriter(ObjectSerializer):
+    class Meta:
+        model = Program
+        fields = ('name', 'agency', 'description',
+                  'enrollment_entry_survey', 'enrollment_update_survey', 'enrollment_exit_survey')
 
 
 class ProgramEligibilityReader(ObjectSerializer):

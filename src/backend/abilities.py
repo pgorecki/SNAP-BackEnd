@@ -217,12 +217,21 @@ def declare_abilities(user, ability):
         ability.can('add', Program)
 
     ability.can('view', Program, agency=agency)
+    if user.is_superuser:
+        ability.can('view', Program)
+
+    if user.has_perm('program.add_program'):
+        ability.can('add', Program)
 
     if user.has_perm('program.change_program'):
         ability.can('change', Program, agency=agency)
+        if user.is_superuser:
+            ability.can('change', Program)
 
     if user.has_perm('program.delete_program'):
         ability.can('delete', Program, agency=agency)
+        if user.is_superuser:
+            ability.can('delete', Program)
 
     # survey
     if user.has_perm('survey.add_survey'):
