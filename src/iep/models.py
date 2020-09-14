@@ -14,6 +14,7 @@ class JobPlacement(models.Model):
     class Meta:
         db_table = 'iep_job_placement'
         ordering = ['id']
+        verbose_name='Job Placement'
         verbose_name_plural = 'Job Placements'
 
     effective_date = models.DateField(blank=True, null=True)
@@ -34,6 +35,7 @@ class ClientIEP(ObjectRoot):
     class Meta:
         db_table = 'iep_client'
         ordering = ['-created_at']
+        verbose_name='Client IEP'
         verbose_name_plural = 'Client IEPs'
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='ieps')
@@ -60,6 +62,7 @@ class ClientIEPEnrollment(ModelValidationMixin, models.Model):
     class Meta:
         db_table = 'iep_enrollment'
         ordering = ['id']
+        verbose_name='Client IEP Enrollment'
 
     iep = models.ForeignKey(ClientIEP, on_delete=models.CASCADE, related_name='iep_enrollments')
     enrollment = models.OneToOneField(Enrollment, on_delete=models.CASCADE, blank=True, null=True)
@@ -75,7 +78,7 @@ class ClientIEPEnrollment(ModelValidationMixin, models.Model):
 @receiver(model_validation, sender=Enrollment)
 def validate_iep_Enrollment(sender, instance, *args, **kwargs):
     """
-    When enrollment is save, check if it is an IEP enrollment and if the programs are the same
+    When enrollment is saved, check if it is an IEP enrollment and if the programs are the same
     """
     iep_enrollment = ClientIEPEnrollment.objects.filter(enrollment=instance).first()
     if iep_enrollment is None or iep_enrollment.iep is None:

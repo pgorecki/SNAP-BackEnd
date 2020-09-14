@@ -34,6 +34,7 @@ class AgencyEligibilityConfig(ObjectRoot):
     class Meta:
         db_table = 'eligibility_agency_config'
         ordering = ['-created_at']
+        verbose_name='Agency Eligibility Config'
         verbose_name_plural = 'Agency Eligibility Config'
 
     agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
@@ -46,6 +47,7 @@ class ClientEligibility(ObjectRoot):
     class Meta:
         db_table = 'eligibility_client'
         ordering = ['-created_at']
+        verbose_name='Client Eligibility'
         verbose_name_plural = 'Client Eligibility'
 
     id = models.UUIDField(

@@ -68,6 +68,7 @@ class Enrollment(ObjectRoot):
 # TODO remove, not used
 class ProgramEligibility(ObjectRoot):
     class Meta:
+        verbose_name='Program Eligibility'
         verbose_name_plural = 'Program Eligibility'
         ordering = ['-created_at']
 
@@ -91,6 +92,7 @@ class EnrollmentActivity(ObjectRoot):
     class Meta:
         db_table = 'program_enrollment_activity'
         ordering = ['id']
+        verbose_name='Program Activity'
         verbose_name_plural = 'Program Activities'
 
     enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='activities')
@@ -142,6 +144,7 @@ class EnrollmentServiceType(models.Model):
     class Meta:
         db_table = 'program_enrollment_service_type'
         ordering = ['name']
+        verbose_name='Enrollment Service Type'
         verbose_name_plural = 'Enrollment Service Types'
         
 
@@ -163,6 +166,7 @@ class EnrollmentService(ObjectRoot):
         db_table = 'program_enrollment_service'
         ordering = ['id']
         verbose_name_plural = 'Enrollment Services'
+        verbose_name = 'Enrollment Service'
     enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='services')
     service_type = models.ForeignKey(EnrollmentServiceType, null=True, blank=True,
                                      on_delete=models.SET_NULL, related_name='enrollment_services')

@@ -6,7 +6,8 @@ from core.managers import AgencyObjectManager
 class ClientAddress(models.Model):
     class Meta:
         db_table = 'client_address'
-        verbose_name_plural = 'Client Adresses'
+        verbose_name='Client Address'
+        verbose_name_plural = 'Client Addresses'
 
     street = models.CharField(max_length=256, blank=True, default='')
     city = models.CharField(max_length=64, blank=True, default='')
