@@ -12,4 +12,5 @@ class Note(ObjectRoot):
     source_id = models.UUIDField(primary_key=False)
     source_type = models.ForeignKey(ContentType, null=True, related_name='notes', on_delete=models.CASCADE)
     source = GenericForeignKey('source_type', 'source_id')
-    text = models.TextField(blank=True)
+    title = models.TextField(blank=True, default='')
+    text = models.TextField(blank=True, default='')
