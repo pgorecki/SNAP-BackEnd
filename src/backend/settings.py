@@ -126,6 +126,8 @@ class BaseConfiguration(Configuration):
 
     STATIC_URL = '/static/'
 
+    MEDIA_ROOT = "../uploads/"
+
     REST_FRAMEWORK = {
         # Use Django's standard `django.contrib.auth` permissions,
         # or allow read-only access for unauthenticated users.
