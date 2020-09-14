@@ -8,7 +8,7 @@ class ClientIEPViewsetFilter(django_filters.FilterSet):
     type = django_filters.CharFilter(method='filter_by_type')
 
     def filter_by_type(self, qs, name, value):
-        status = [IEPStatus.IN_ORIENTATION, IEPStatus.NOT_ELIGIBLE, IEPStatus.IN_PLANNING]
+        status = [IEPStatus.IN_ORIENTATION, IEPStatus.NOT_ELIGIBLE, IEPStatus.IN_PLANNING, IEPStatus.IN_PROGRESS]
         if value == 'new':
             return qs.filter(status__in=status, client__is_new=True)
         elif value == 'existing':
