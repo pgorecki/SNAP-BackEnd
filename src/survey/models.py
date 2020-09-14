@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField, ArrayField
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
 from core.models import ObjectRoot
@@ -85,7 +85,7 @@ class Response(ObjectRoot):
 
 class Answer(models.Model):
     response = models.ForeignKey(
-        Response, related_name='answers', on_delete=models.PROTECT
+        Response, related_name='answers', on_delete=models.CASCADE
     )
     question = models.ForeignKey(
         Question, related_name='answers', on_delete=models.PROTECT
@@ -93,7 +93,7 @@ class Answer(models.Model):
     value = models.CharField(max_length=256)
 
 
-@receiver(pre_save, sender=Survey)
+@receiver(post_save, sender=Survey)
 def save_related_questions(sender, instance, *args, **kwargs):
     def traverse_items(current, questions=[]):
         if current.get('type', None) == 'question' and 'questionId' in current:

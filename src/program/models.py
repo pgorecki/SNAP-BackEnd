@@ -160,7 +160,8 @@ class EnrollmentService(ObjectRoot):
         db_table = 'program_enrollment_service'
         ordering = ['id']
     enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='services')
-    service_type = models.OneToOneField(EnrollmentServiceType, null=True, blank=True, on_delete=models.SET_NULL)
+    service_type = models.ForeignKey(EnrollmentServiceType, null=True, blank=True,
+                                     on_delete=models.SET_NULL, related_name='enrollment_services')
 
     effective_date = models.DateField(blank=True, null=True)
     offered = models.CharField(max_length=6, blank=True, null=True,
