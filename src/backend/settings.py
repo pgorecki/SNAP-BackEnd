@@ -46,6 +46,7 @@ class BaseConfiguration(Configuration):
         'corsheaders',
         'simple_history',
         'drf_yasg',
+        'import_export',
         'rules.apps.AutodiscoverRulesConfig',
         'cancan',
         'core',
