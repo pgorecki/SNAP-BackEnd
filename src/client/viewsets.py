@@ -12,7 +12,6 @@ from core.permissions import AbilityPermission
 
 
 class ClientViewset(ModelViewSet):
-    queryset = Client.objects.all()
     read_serializer_class = ClientReader
     write_serializer_class = ClientWriter
     permission_classes = [AbilityPermission]

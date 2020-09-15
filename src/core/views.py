@@ -54,7 +54,7 @@ class DashboardSummary(APIView):
         content = {
             'clients': request.ability.queryset_for('view', Client).distinct().count(),
             'surveys': request.ability.queryset_for('view', Survey).count(),
-            'responses': request.ability.queryset_for('view', SurveyResponse).count(),
+            'responses': request.ability.queryset_for('view', SurveyResponse).distinct().count(),
             'questions': request.ability.queryset_for('view', Question).count(),
         }
         return Response(content)

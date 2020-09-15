@@ -12,14 +12,13 @@ from .filters import ClientIEPViewsetFilter
 
 
 class ClientIEPViewset(ModelViewSet):
-    queryset = ClientIEP.objects.all()
     read_serializer_class = ClientIEPReader
     write_serializer_class = ClientIEPWriter
     permission_classes = [AbilityPermission]
     filterset_class = ClientIEPViewsetFilter
 
     def get_queryset(self):
-        return self.request.ability.queryset_for(self.action, ClientIEP)
+        return self.request.ability.queryset_for(self.action, ClientIEP).distinct()
 
     def perform_create(self, serializer):
         """

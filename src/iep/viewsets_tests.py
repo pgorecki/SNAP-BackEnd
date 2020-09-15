@@ -135,7 +135,8 @@ def test_list_iep_by_type__existing():
     ClientIEPFactory(client=client, status=IEPStatus.IN_ORIENTATION)
 
     assert api_client.get('/iep/?type=new').data['count'] == 0
-    assert api_client.get('/iep/?type=existing').data['count'] == 1
+    print(api_client.get('/iep/?type=existing').data)
+    assert api_client.get('/iep/?type=existing').data['count'] == 2
     assert api_client.get('/iep/?type=historical').data['count'] == 0
 
 
