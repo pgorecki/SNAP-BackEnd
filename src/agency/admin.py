@@ -29,13 +29,16 @@ class AgencyAdmin(admin.ModelAdmin):
 
             if form.is_valid():
                 # file is saved
-                object = form.save()
-                result, message, other = object.inspect()
+                obj = form.save(commit=False)
+                obj.agency_id = object_id
+                obj.user = request.user
+                obj.save()
+                result, message, other = obj.inspect()
 
                 if not result:
                     self.message_user(request, message, level=messages.ERROR)
                 else:
-                    run_result, rows, errors = object.run()
+                    run_result, rows, errors = obj.run()
 
                     self.message_user(request, json.dumps(run_result))
 
