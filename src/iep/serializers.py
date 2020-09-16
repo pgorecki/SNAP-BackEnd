@@ -6,7 +6,7 @@ from client.serializers import ClientReader
 from program.models import Enrollment
 from program.enums import EnrollmentStatus
 from eligibility.models import ClientEligibility
-from .models import ClientIEP, ClientIEPEnrollment
+from .models import ClientIEP, ClientIEPEnrollment, JobPlacement
 
 
 class ClientIEPEnrollmentReader(ObjectSerializer):
@@ -40,12 +40,29 @@ class ClientIEPEnrollmentWriter(ObjectSerializer):
         fields = ('id', 'status', 'client', 'program')
 
 
+class JobPlacementReader(serializers.ModelSerializer):
+    class Meta:
+        model = JobPlacement
+        fields = ('id', 'effective_date', 'hire_date', 'weekly_hours',
+                  'hourly_wage', 'total_weekly_income', 'total_monthly_income',
+                  'how_was_job_placement_verified', 'Company', )
+
+
+class JobPlacementWriter(serializers.ModelSerializer):
+    class Meta:
+        model = JobPlacement
+        fields = ('effective_date', 'hire_date', 'weekly_hours',
+                  'hourly_wage', 'total_weekly_income', 'total_monthly_income',
+                  'how_was_job_placement_verified', 'Company', )
+
+
 class ClientIEPReader(ObjectSerializer):
     created_by = CreatedByReader()
     client = ClientReader()
     enrollments = ClientIEPEnrollmentReader(many=True, source='iep_enrollments')
     client_is_eligible = serializers.SerializerMethodField()
     resolved_by = serializers.SerializerMethodField()
+    job_placement = JobPlacementReader(required=False)
 
     def get_resolved_by(self, obj):
         user = None
@@ -59,7 +76,7 @@ class ClientIEPReader(ObjectSerializer):
         fields = ('id', 'object', 'client', 'orientation_completed', 'status',
                   'resolved_by', 'client_is_eligible',
                   'enrollments', 'start_date', 'end_date', 'projected_end_date',
-                  'outcome', 'created_by', 'created_at', 'modified_at')
+                  'outcome', 'job_placement', 'created_by', 'created_at', 'modified_at')
 
     def get_client_is_eligible(self, object) -> bool:
         return ClientEligibility.is_eligible(object.client)
@@ -67,12 +84,13 @@ class ClientIEPReader(ObjectSerializer):
 
 class ClientIEPWriter(ObjectSerializer):
     enrollments = ClientIEPEnrollmentWriter(many=True, required=False)
+    job_placement = JobPlacementWriter(required=False)
 
     class Meta:
         model = ClientIEP
         fields = ('client', 'orientation_completed', 'status',
                   'enrollments', 'start_date', 'end_date', 'projected_end_date',
-                  'outcome')
+                  'outcome', 'job_placement')
 
     def update(self, instance, validated_data):
         if 'enrollments' in validated_data:
@@ -122,7 +140,12 @@ class ClientIEPWriter(ObjectSerializer):
 
         info = model_meta.get_field_info(instance)
         for attr, value in validated_data.items():
-            if attr in info.relations and info.relations[attr].to_many:
+            if attr == 'job_placement':
+                if instance.job_placement:
+                    JobPlacementWriter().update(instance.job_placement, value)
+                else:
+                    instance.job_placement = JobPlacementWriter().create(value)
+            elif attr in info.relations and info.relations[attr].to_many:
                 pass
             else:
                 setattr(instance, attr, value)

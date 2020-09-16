@@ -6,7 +6,7 @@ from program.factories import EnrollmentFactory
 from eligibility.factories import AgencyWithEligibilityFactory
 from .choices import IEPStatus
 from .factories import ClientIEPFactory
-from .models import ClientIEP
+from .models import ClientIEP, JobPlacement
 
 
 def test_retrieve_client_iep():
@@ -374,3 +374,27 @@ def test_replace_iep_enrollment_with_existing_enrollment():
     assert response.status_code == 400
     # assert iep.iep_enrollments.count() == 1
     # assert response.data['enrollments'][0]['id'] == str(new_enrollment.id)
+
+
+def test_update_iep_job_placement():
+    agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
+    user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename='change_clientiep'))
+    user.user_permissions.add(Permission.objects.get(codename='view_client'))
+
+    client = Client.objects.first()
+    iep = ClientIEPFactory(client=client)
+
+    url = f'/iep/{iep.id}/'
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+
+    response = api_client.patch(url, {
+        'job_placement': {
+            'effective_date': '2020-01-01',
+            'Company': 'foobar',
+        },
+    }, format='json')
+    assert response.status_code == 200
+    iep.refresh_from_db()
+    assert iep.job_placement.Company == 'foobar'
