@@ -6,7 +6,7 @@ from django.db import transaction
 import datetime
 from note.models import Note
 from random import randint
-from agency.models import Agency
+from agency.models import Agency, AgencyClient
 from datetime import date
 from iep.models import ClientIEP, ClientIEPEnrollment, JobPlacement
 from django.core.exceptions import MultipleObjectsReturned
@@ -22,6 +22,7 @@ from client.models import Client, ClientAddress
 import logging
 logging.basicConfig(filename='MPRapp.log', level=logging.INFO)
 
+## TODO: When you are creating new client you should also create an AgencyClient associated with this client and agency. It is required for access control/permission i.e. my_new_client.agency_clients.create(agency=user.profile.agency)
 
 class FileImport(models.Model):  # MPR
     ftype = models.CharField(max_length=32, blank=False, null=False, help_text='Excel File Type Import:',  # MPR
@@ -126,7 +127,7 @@ class FileImport(models.Model):  # MPR
                 valid_row = True
                 try:
                     with transaction.atomic():
-                        c3 = Client.objects.filter(snap_id=row[' Client ID']).first()
+                        c3 = Client.objects.filter(snap_id='333333333' if pd.isnull(row[' Client ID']) else str(int(row[' Client ID']))).first()
                         if c3:
                             print('Client in the DB:' + str(c3.first_name) + ' ' +
                                   str(c3.last_name) + ' with pk=' + str(c3.id))
@@ -135,22 +136,22 @@ class FileImport(models.Model):  # MPR
                                 c3.address.save()
                         else:
                             ca1 = ClientAddress(county=row['County of Residence'])
-                            c3 = Client(first_name=row['First Name'], last_name=row['Last Name'],
-                                        snap_id=row[' Client ID'], address=ca1)
+                            c3 = Client(first_name=row['First Name'], last_name=row['Last Name'], snap_id=None if pd.isnull(row[' Client ID']) else str(int(row[' Client ID'])), address=ca1)
                             ca1.save()
                             c3.save()
                             print('Created Client ' + str(c3.first_name) + ' ' +
                                   str(c3.last_name) + ' with pk=' + str(c3.id))
-                        if Client.objects.filter(snap_id=row[' Client ID']).count() > 1:
+                            c3.agency_clients.create(agency=a3)   ##TODO: Is this saving automatically
+                        if Client.objects.filter(snap_id='333333333' if pd.isnull(row[' Client ID']) else str(int(row[' Client ID']))).count() > 1:
                             print('MultipleObjectsReturned for gsnap_id=' + str(c3.snap_id) +
                                   '. Picking the first one with pk=' + str(c3.pk))
                             logging.exception('MultipleObjectsReturned for gsnap_id=' +
                                               str(c3.snap_id) + '. Picking the first one with pk=' + str(c3.pk))
                         # TODO: Do we update c3.address.county?
                         if c3.ieps.count():
-                            ciep3 = c3.ieps.filter(case_number=row['Case Number']).first()
+                            ciep3 = c3.ieps.filter(case_number='333333333' if pd.isnull(row['Case Number']) else str(int(row['Case Number']))).first()
                             if not ciep3:
-                                ciep3 = ClientIEP(client=c3, case_number=row['Case Number'], projected_end_date=None if pd.isnull(
+                                ciep3 = ClientIEP(client=c3, case_number=None if pd.isnull(row['Case Number']) else str(int(row['Case Number'])), projected_end_date=None if pd.isnull(
                                     row['Projected End Date ']) else pd.to_datetime(row['Projected End Date ']).date())
                                 print('Created ClientIEP with case number=' +
                                       str(ciep3.case_number) + ' with pk=' + str(ciep3.id))
@@ -159,7 +160,7 @@ class FileImport(models.Model):  # MPR
                                 ciep3.projected_end_date = None if pd.isnull(
                                     row['Projected End Date ']) else pd.to_datetime(row['Projected End Date ']).date()
                         else:
-                            ciep3 = ClientIEP(client=c3, case_number=row['Case Number'], projected_end_date=None if pd.isnull(
+                            ciep3 = ClientIEP(client=c3, case_number=None if pd.isnull(row['Case Number']) else str(int(row['Case Number'])), projected_end_date=None if pd.isnull(
                                 row['Projected End Date ']) else pd.to_datetime(row['Projected End Date ']).date())
                             print('Created ClientIEP with case number=' +
                                   str(ciep3.case_number) + ' with pk=' + str(ciep3.id))
@@ -172,7 +173,8 @@ class FileImport(models.Model):  # MPR
                         if ciep_en3.enrollment and ciep_en3.enrollment.start_date == pd.to_datetime(row['Activity Enrollment Date']).date():
                             print('Enrollment exists')
                             e3 = ciep_en3.enrollment
-                            e3.end_date = pd.to_datetime(row['Date Participation Terminated']).date()
+                            e3.end_date = None if pd.isnull(row['Date Participation Terminated']) else pd.to_datetime(
+                                                     row['Date Participation Terminated']).date()
                             e3.end_reason = row['Reason Participation Terminated']
                             e3.save()
                         else:
@@ -189,10 +191,8 @@ class FileImport(models.Model):  # MPR
                             ciep_en3.save()
                         # Create EnrollmentActivity
                         ea3 = EnrollmentActivity(enrollment=e3,
-                                                 start_date=None if pd.isnull(row['Activity Enrollment Date']) else pd.to_datetime(
-                                                     row['Activity Enrollment Date']).date(),
-                                                 end_date=None if pd.isnull(row['Date Participation Terminated']) else pd.to_datetime(
-                                                     row['Date Participation Terminated']).date(),
+                                                 start_date=None if pd.isnull(row['Activity Enrollment Date']) else pd.to_datetime(row['Activity Enrollment Date']).date(),
+                                                 end_date=None if pd.isnull(row['Date Participation Terminated']) else pd.to_datetime(row['Date Participation Terminated']).date(), 
                                                  qualifying_activity_name=row['Qualifying Activity Enrolled'],
                                                  qualifying_activity_hours=row['Qualifying Activity (51% or >) Hours'],
                                                  billable_activity=row['Is Qualifying Activity Billable (Y/N)'], non_qualifying_activity_hours=row['Non-Qualifying Activity (49% or <) Hours'], required_number_of_articipatio_hours=row[
@@ -290,7 +290,7 @@ class FileImport(models.Model):  # MPR
         if self.agency:
             a3 = self.agency
         else:
-            return ({'records read': 0, 'records successfuly processed': 0, 'records failed': 0, 'error': 'Error: agency must be set. '+str(e)}, None, None)
+            return ({'records read': 0, 'records successfuly processed': 0, 'records failed': 0, 'error': 'Error: agency must be set. '}, None, None)
         try:
             df['row_number'] = df.index + 8
             df['result'] = ''
@@ -314,7 +314,7 @@ class FileImport(models.Model):  # MPR
                 attempt_count += 1
                 try:
                     with transaction.atomic():
-                        c3 = Client.objects.filter(Q(snap_id='333333333' if pd.isnull(row[' Client ID']) else row[' Client ID']) | Q(ssn='333333333' if pd.isnull(row['SSN ']) else row['SSN ']) | Q(
+                        c3 = Client.objects.filter(Q(snap_id='333333333' if pd.isnull(row[' Client ID']) else str(int(row[' Client ID']))) | Q(ssn='333333333' if pd.isnull(row['SSN ']) else row['SSN ']) | Q(
                             first_name=row['First Name'], last_name=row['Last Name'], dob=date(1900, 1, 1) if pd.isnull(row['Date of Birth']) else pd.to_datetime(row['Date of Birth']).date())).first()
                         if c3:
                             # Update Client Fields
@@ -328,8 +328,8 @@ class FileImport(models.Model):  # MPR
                                 c3.dob = pd.to_datetime(row['Date of Birth']).date()
                             # if row['SSN '] and c3.ssn!=row['SSN ']:  ## QUESTION: Do we update Client .SSN?
                                 # c3.ssn=row['SSN ']
-                            if row[' Client ID'] and c3.snap_id != row[' Client ID']:
-                                c3.snap_id = row[' Client ID']
+                            if row[' Client ID'] and c3.snap_id != str(int(row[' Client ID'])):
+                                c3.snap_id = str(int(row[' Client ID']))
                             if c3.address:
                                 if row['Address'] and c3.address.street != row['Address']:
                                     c3.address.street = row['Address']
@@ -350,21 +350,22 @@ class FileImport(models.Model):  # MPR
                             # Create Client
                             ca1 = ClientAddress(street='' if pd.isnull(row['Address']) else row['Address'], city='' if pd.isnull(row['City']) else row['City'], zip='' if pd.isnull(
                                 row['Zip Code']) else str(int(row['Zip Code'])), county='' if pd.isnull(row['County of Residence']) else row['County of Residence'])
-                            c3 = Client(first_name=row['First Name'], last_name=row['Last Name'], snap_id=row[' Client ID'],
+                            c3 = Client(first_name=row['First Name'], last_name=row['Last Name'], snap_id=None if pd.isnull(row[' Client ID']) else str(int(row[' Client ID'])),
                                         ssn=row['SSN '], dob=pd.to_datetime(row['Date of Birth']).date(), address=ca1)
                             ca1.save()
                             c3.save()
                             print('Created Client ' + str(c3.first_name) + ' ' +
                                   str(c3.last_name) + ' with pk=' + str(c3.id))
-                        if Client.objects.filter(snap_id=row[' Client ID']).count() > 1:
+                            c3.agency_clients.create(agency=a3)
+                        if Client.objects.filter(snap_id='333333333' if pd.isnull(row[' Client ID']) else str(int(row[' Client ID']))).count() > 1:
                             print('MultipleObjectsReturned for gsnap_id=' + str(c3.snap_id) +
                                   '. Picking the first one with pk=' + str(c3.pk))
                             logging.exception('MultipleObjectsReturned for gsnap_id=' +
                                               str(c3.snap_id) + '. Picking the first one with pk=' + str(c3.pk))
                         if c3.ieps.count():
-                            ciep3 = c3.ieps.filter(case_number=row['Case #']).first()
+                            ciep3 = c3.ieps.filter(case_number='333333333' if pd.isnull(row['Case #']) else str(int(row['Case #']))).first()
                             if not ciep3:
-                                ciep3 = ClientIEP(client=c3, case_number=row['Case #'], start_date=None if pd.isnull(row['Reverse Referral Request Date']) else pd.to_datetime(row['Reverse Referral Request Date']).date(), projected_end_date=None if pd.isnull(row['Projected End Date ']) else pd.to_datetime(
+                                ciep3 = ClientIEP(client=c3, case_number=None if pd.isnull(row['Case #']) else str(int(row['Case #'])), start_date=None if pd.isnull(row['Reverse Referral Request Date']) else pd.to_datetime(row['Reverse Referral Request Date']).date(), projected_end_date=None if pd.isnull(row['Projected End Date ']) else pd.to_datetime(
                                     row['Projected End Date ']).date(), abawd=row['ABAWD (Y/N)'], assessment_completed=str(row['Assessment Completed (Y/N)']).lower().__eq__('y'), orientation_completed=str(row['Orientation Completed (Y/N)']).lower().__eq__('y'))
                                 print('Created ClientIEP with case number=' +
                                       str(ciep3.case_number) + ' with pk=' + str(ciep3.id))
@@ -379,7 +380,7 @@ class FileImport(models.Model):  # MPR
                                 ciep3.start_date = None if pd.isnull(row['Reverse Referral Request Date']) else pd.to_datetime(
                                     row['Reverse Referral Request Date']).date()
                         else:
-                            ciep3 = ClientIEP(client=c3, case_number=row['Case #'], projected_end_date=None if pd.isnull(row['Projected End Date ']) else pd.to_datetime(row['Projected End Date ']).date(
+                            ciep3 = ClientIEP(client=c3, case_number=None if pd.isnull(row['Case #']) else str(int(row['Case #'])), projected_end_date=None if pd.isnull(row['Projected End Date ']) else pd.to_datetime(row['Projected End Date ']).date(
                             ), abawd=row['ABAWD (Y/N)'], assessment_completed=str(row['Assessment Completed (Y/N)']).lower().__eq__('y'), orientation_completed=str(row['Orientation Completed (Y/N)']).lower().__eq__('y'))
                             print('Created ClientIEP with case number=' +
                                   str(ciep3.case_number) + ' with pk=' + str(ciep3.id))
@@ -401,8 +402,7 @@ class FileImport(models.Model):  # MPR
                                 print('Creating program')
                                 p3 = Program(name=row['IEP Qualifying  Activity'], agency=a3)
                                 p3.save()
-                            e3 = Enrollment(client=c3, program=p3, start_date=None if pd.isnull(row['Activity Enrollment Date']) else pd.to_datetime(row['Activity Enrollment Date']).date(
-                            ), status=EnrollmentStatus.PLANNED.value if (pd.isnull(row[' Client ID']) and pd.isnull(row['Case #'])) else EnrollmentStatus.ENROLLED.value)
+                            e3 = Enrollment(client=c3, program=p3, start_date=None if pd.isnull(row['Activity Enrollment Date']) else pd.to_datetime(row['Activity Enrollment Date']).date(), status=EnrollmentStatus.PLANNED.value if (pd.isnull(row[' Client ID']) and pd.isnull(row['Case #'])) else EnrollmentStatus.ENROLLED.value)
                             e3.save()
                             ciep_en3.enrollment = e3
                             ciep_en3.save()
@@ -418,8 +418,7 @@ class FileImport(models.Model):  # MPR
                             celig3.effective_date = None if pd.isnull(row['Date Eligibility Screening Completed']) else pd.to_datetime(
                                 row['Date Eligibility Screening Completed']).date()
                         else:
-                            celig3 = ClientEligibility(status=EligibilityStatus.ELIGIBLE if row['SNAP E&T Eligible (Y/N)'] == 'Y' else EligibilityStatus.NOT_ELIGIBLE,
-                                                       effective_date=None if pd.isnull(row['Date Eligibility Screening Completed']) else pd.to_datetime(
+                            celig3 = ClientEligibility(status=EligibilityStatus.ELIGIBLE if row['SNAP E&T Eligible (Y/N)'] == 'Y' else EligibilityStatus.NOT_ELIGIBLE, effective_date=None if pd.isnull(row['Date Eligibility Screening Completed']) else pd.to_datetime(
                                 row['Date Eligibility Screening Completed']).date(),
                                 client=c3,
                                 eligibility=elig3)
@@ -494,14 +493,13 @@ class FileImport(models.Model):  # MPR
                     c3 = None
                     ciep3 = None
                     with transaction.atomic():
-                        c3 = Client.objects.filter(Q(snap_id='333333333' if pd.isnull(
-                            row['Client ID']) else row['Client ID'])).first()
+                        c3 = Client.objects.filter(Q(snap_id='333333333' if pd.isnull(row['Client ID']) else str(int(row['Client ID'])))).first()
                         if c3:
-                            ciep3 = c3.ieps.filter(case_number=row['Case Number']).first()
+                            ciep3 = c3.ieps.filter(case_number='3333333' if pd.isnull(row['Case Number']) else str(int(row['Case Number']))).first()
                             if not ciep3:
-                                ciep3 = ClientIEP.objects.filter(case_number=row['Case Number']).first()
+                                ciep3 = ClientIEP.objects.filter(case_number='3333333' if pd.isnull(row['Case Number']) else str(int(row['Case Number']))).first()
                         else:
-                            ciep3 = ClientIEP.objects.filter(case_number=row['Case Number']).first()
+                            ciep3 = ClientIEP.objects.filter(case_number='3333333' if pd.isnull(row['Case Number']) else str(int(row['Case Number']))).first()
                         print('Client ID=' + str(row['Client ID']))
                         # TODO:Second attempt to locate client by name?
                         # TODO:Do we update Name and county of the client? Or the Case# or the Client ID?
