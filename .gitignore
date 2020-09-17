@@ -1,3 +1,4 @@
+/uploads
 .env
 *.sqlite3
 .vscode
