@@ -1,3 +1,4 @@
+from rest_framework.authtoken.models import Token
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
@@ -20,3 +21,5 @@ class CustomUserAdmin(UserAdmin):
 admin.site.site_header = 'SNAP Admin'
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
+
+admin.site.unregister(Token)

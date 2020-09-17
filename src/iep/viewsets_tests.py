@@ -6,7 +6,7 @@ from program.factories import EnrollmentFactory
 from eligibility.factories import AgencyWithEligibilityFactory
 from .choices import IEPStatus
 from .factories import ClientIEPFactory
-from .models import ClientIEP, JobPlacement
+from .models import ClientIEP
 
 
 def test_retrieve_client_iep():

@@ -1,10 +1,9 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 from agency.models import Agency
-from .models import Eligibility, AgencyEligibilityConfig, ClientEligibility, EligibilityQueue
+from .models import Eligibility, ClientEligibility, EligibilityQueue
 
 # Register your models here.
-admin.site.register(AgencyEligibilityConfig)
 
 
 @admin.register(EligibilityQueue)

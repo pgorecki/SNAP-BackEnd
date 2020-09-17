@@ -1,4 +1,5 @@
 from django.db.models import Q  # for querying Client.objects
+from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType  # To access Note objects with generic foreign keys
 from eligibility.enums import EligibilityStatus
 from eligibility.models import ClientEligibility, Eligibility
@@ -22,7 +23,8 @@ from client.models import Client, ClientAddress
 import logging
 logging.basicConfig(filename='MPRapp.log', level=logging.INFO)
 
-## TODO: When you are creating new client you should also create an AgencyClient associated with this client and agency. It is required for access control/permission i.e. my_new_client.agency_clients.create(agency=user.profile.agency)
+# TODO: When you are creating new client you should also create an AgencyClient associated with this client and agency. It is required for access control/permission i.e. my_new_client.agency_clients.create(agency=user.profile.agency)
+
 
 class FileImport(models.Model):  # MPR
     ftype = models.CharField(max_length=32, blank=False, null=False, help_text='Excel File Type Import:',  # MPR
@@ -41,7 +43,7 @@ class FileImport(models.Model):  # MPR
     result = models.CharField(max_length=500, blank=True, null=True,
                               help_text='result of import job run stored as dictionary string')
     run_id = models.IntegerField(blank=True, null=True, help_text='Label of import job run stored as dictionary string')
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
     @property
     def loc(self):
@@ -127,7 +129,8 @@ class FileImport(models.Model):  # MPR
                 valid_row = True
                 try:
                     with transaction.atomic():
-                        c3 = Client.objects.filter(snap_id='333333333' if pd.isnull(row[' Client ID']) else str(int(row[' Client ID']))).first()
+                        c3 = Client.objects.filter(snap_id='333333333' if pd.isnull(
+                            row[' Client ID']) else str(int(row[' Client ID']))).first()
                         if c3:
                             print('Client in the DB:' + str(c3.first_name) + ' ' +
                                   str(c3.last_name) + ' with pk=' + str(c3.id))
@@ -136,12 +139,13 @@ class FileImport(models.Model):  # MPR
                                 c3.address.save()
                         else:
                             ca1 = ClientAddress(county=row['County of Residence'])
-                            c3 = Client(first_name=row['First Name'], last_name=row['Last Name'], snap_id=None if pd.isnull(row[' Client ID']) else str(int(row[' Client ID'])), address=ca1)
+                            c3 = Client(first_name=row['First Name'], last_name=row['Last Name'], snap_id=None if pd.isnull(
+                                row[' Client ID']) else str(int(row[' Client ID'])), address=ca1)
                             ca1.save()
                             c3.save()
                             print('Created Client ' + str(c3.first_name) + ' ' +
                                   str(c3.last_name) + ' with pk=' + str(c3.id))
-                            c3.agency_clients.create(agency=a3)   ##TODO: Is this saving automatically
+                            c3.agency_clients.create(agency=a3)  # TODO: Is this saving automatically
                         if Client.objects.filter(snap_id='333333333' if pd.isnull(row[' Client ID']) else str(int(row[' Client ID']))).count() > 1:
                             print('MultipleObjectsReturned for gsnap_id=' + str(c3.snap_id) +
                                   '. Picking the first one with pk=' + str(c3.pk))
@@ -149,7 +153,8 @@ class FileImport(models.Model):  # MPR
                                               str(c3.snap_id) + '. Picking the first one with pk=' + str(c3.pk))
                         # TODO: Do we update c3.address.county?
                         if c3.ieps.count():
-                            ciep3 = c3.ieps.filter(case_number='333333333' if pd.isnull(row['Case Number']) else str(int(row['Case Number']))).first()
+                            ciep3 = c3.ieps.filter(case_number='333333333' if pd.isnull(
+                                row['Case Number']) else str(int(row['Case Number']))).first()
                             if not ciep3:
                                 ciep3 = ClientIEP(client=c3, case_number=None if pd.isnull(row['Case Number']) else str(int(row['Case Number'])), projected_end_date=None if pd.isnull(
                                     row['Projected End Date ']) else pd.to_datetime(row['Projected End Date ']).date())
@@ -174,7 +179,7 @@ class FileImport(models.Model):  # MPR
                             print('Enrollment exists')
                             e3 = ciep_en3.enrollment
                             e3.end_date = None if pd.isnull(row['Date Participation Terminated']) else pd.to_datetime(
-                                                     row['Date Participation Terminated']).date()
+                                row['Date Participation Terminated']).date()
                             e3.end_reason = row['Reason Participation Terminated']
                             e3.save()
                         else:
@@ -191,8 +196,10 @@ class FileImport(models.Model):  # MPR
                             ciep_en3.save()
                         # Create EnrollmentActivity
                         ea3 = EnrollmentActivity(enrollment=e3,
-                                                 start_date=None if pd.isnull(row['Activity Enrollment Date']) else pd.to_datetime(row['Activity Enrollment Date']).date(),
-                                                 end_date=None if pd.isnull(row['Date Participation Terminated']) else pd.to_datetime(row['Date Participation Terminated']).date(), 
+                                                 start_date=None if pd.isnull(row['Activity Enrollment Date']) else pd.to_datetime(
+                                                     row['Activity Enrollment Date']).date(),
+                                                 end_date=None if pd.isnull(row['Date Participation Terminated']) else pd.to_datetime(
+                                                     row['Date Participation Terminated']).date(),
                                                  qualifying_activity_name=row['Qualifying Activity Enrolled'],
                                                  qualifying_activity_hours=row['Qualifying Activity (51% or >) Hours'],
                                                  billable_activity=row['Is Qualifying Activity Billable (Y/N)'], non_qualifying_activity_hours=row['Non-Qualifying Activity (49% or <) Hours'], required_number_of_articipatio_hours=row[
@@ -260,7 +267,7 @@ class FileImport(models.Model):  # MPR
         else:
             (run_report, row_numbers, results) = ('Unknown ftype', 0, '')
         self.save()
-        logging.info(str(self.ftype) + ' ' + str(self.timestamp) + ' ' + str(self.run_id) + ':' + str(self.result))
+        logging.info(str(self.ftype) + ' ' + str(self.created_at) + ' ' + str(self.run_id) + ':' + str(self.result))
         return run_report, row_numbers, results
 
     def run_RRIEP(self):
@@ -363,7 +370,8 @@ class FileImport(models.Model):  # MPR
                             logging.exception('MultipleObjectsReturned for gsnap_id=' +
                                               str(c3.snap_id) + '. Picking the first one with pk=' + str(c3.pk))
                         if c3.ieps.count():
-                            ciep3 = c3.ieps.filter(case_number='333333333' if pd.isnull(row['Case #']) else str(int(row['Case #']))).first()
+                            ciep3 = c3.ieps.filter(case_number='333333333' if pd.isnull(
+                                row['Case #']) else str(int(row['Case #']))).first()
                             if not ciep3:
                                 ciep3 = ClientIEP(client=c3, case_number=None if pd.isnull(row['Case #']) else str(int(row['Case #'])), start_date=None if pd.isnull(row['Reverse Referral Request Date']) else pd.to_datetime(row['Reverse Referral Request Date']).date(), projected_end_date=None if pd.isnull(row['Projected End Date ']) else pd.to_datetime(
                                     row['Projected End Date ']).date(), abawd=row['ABAWD (Y/N)'], assessment_completed=str(row['Assessment Completed (Y/N)']).lower().__eq__('y'), orientation_completed=str(row['Orientation Completed (Y/N)']).lower().__eq__('y'))
@@ -402,7 +410,8 @@ class FileImport(models.Model):  # MPR
                                 print('Creating program')
                                 p3 = Program(name=row['IEP Qualifying  Activity'], agency=a3)
                                 p3.save()
-                            e3 = Enrollment(client=c3, program=p3, start_date=None if pd.isnull(row['Activity Enrollment Date']) else pd.to_datetime(row['Activity Enrollment Date']).date(), status=EnrollmentStatus.PLANNED.value if (pd.isnull(row[' Client ID']) and pd.isnull(row['Case #'])) else EnrollmentStatus.ENROLLED.value)
+                            e3 = Enrollment(client=c3, program=p3, start_date=None if pd.isnull(row['Activity Enrollment Date']) else pd.to_datetime(row['Activity Enrollment Date']).date(
+                            ), status=EnrollmentStatus.PLANNED.value if (pd.isnull(row[' Client ID']) and pd.isnull(row['Case #'])) else EnrollmentStatus.ENROLLED.value)
                             e3.save()
                             ciep_en3.enrollment = e3
                             ciep_en3.save()
@@ -493,13 +502,17 @@ class FileImport(models.Model):  # MPR
                     c3 = None
                     ciep3 = None
                     with transaction.atomic():
-                        c3 = Client.objects.filter(Q(snap_id='333333333' if pd.isnull(row['Client ID']) else str(int(row['Client ID'])))).first()
+                        c3 = Client.objects.filter(Q(snap_id='333333333' if pd.isnull(
+                            row['Client ID']) else str(int(row['Client ID'])))).first()
                         if c3:
-                            ciep3 = c3.ieps.filter(case_number='3333333' if pd.isnull(row['Case Number']) else str(int(row['Case Number']))).first()
+                            ciep3 = c3.ieps.filter(case_number='3333333' if pd.isnull(
+                                row['Case Number']) else str(int(row['Case Number']))).first()
                             if not ciep3:
-                                ciep3 = ClientIEP.objects.filter(case_number='3333333' if pd.isnull(row['Case Number']) else str(int(row['Case Number']))).first()
+                                ciep3 = ClientIEP.objects.filter(case_number='3333333' if pd.isnull(
+                                    row['Case Number']) else str(int(row['Case Number']))).first()
                         else:
-                            ciep3 = ClientIEP.objects.filter(case_number='3333333' if pd.isnull(row['Case Number']) else str(int(row['Case Number']))).first()
+                            ciep3 = ClientIEP.objects.filter(case_number='3333333' if pd.isnull(
+                                row['Case Number']) else str(int(row['Case Number']))).first()
                         print('Client ID=' + str(row['Client ID']))
                         # TODO:Second attempt to locate client by name?
                         # TODO:Do we update Name and county of the client? Or the Case# or the Client ID?
