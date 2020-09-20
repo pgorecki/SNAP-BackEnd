@@ -1,7 +1,7 @@
 FROM python:3.7
 ENV PYTHONUNBUFFERED 1
 ENV SETUPTOOLS_USE_DISTUTILS stdlib
-RUN apt-get update && apt-get install -y nano && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y nano zip && rm -rf /var/lib/apt/lists/*
 RUN mkdir /code
 WORKDIR /code
 RUN pip install pipenv
