@@ -17,7 +17,6 @@ from .filters import (
 
 
 class EligibilityViewset(ModelViewSet):
-    queryset = Eligibility.objects.all()
     read_serializer_class = EligibilityReader
     write_serializer_class = EligibilityWriter
     permission_classes = [AbilityPermission]
@@ -30,7 +29,6 @@ class EligibilityViewset(ModelViewSet):
 
 
 class AgencyEligibilityConfigViewset(ModelViewSet):
-    queryset = AgencyEligibilityConfig.objects.all()
     read_serializer_class = AgencyEligibilityConfigReader
     write_serializer_class = AgencyEligibilityConfigWriter
     permission_classes = [AbilityPermission]
@@ -44,14 +42,13 @@ class AgencyEligibilityConfigViewset(ModelViewSet):
 
 
 class ClientEligibilityViewset(ModelViewSet):
-    queryset = ClientEligibility.objects.all()
     read_serializer_class = ClientEligibilityReader
     write_serializer_class = ClientEligibilityWriter
     permission_classes = [AbilityPermission]
     filterset_class = ClientEligibilityViewsetFilter
 
     def get_queryset(self):
-        return self.request.ability.queryset_for(self.action, ClientEligibility)
+        return self.request.ability.queryset_for(self.action, ClientEligibility).distinct()
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user, eligibility=Eligibility.objects.first())
@@ -61,11 +58,13 @@ class ClientEligibilityViewset(ModelViewSet):
 
 
 class EligibilityQueueViewset(ModelViewSet):
-    queryset = EligibilityQueue.objects.all()
     read_serializer_class = EligibilityQueueReader
     write_serializer_class = EligibilityQueueWriter
     permission_classes = [AbilityPermission]
     filterset_class = EligibilityQueueViewsetFilter
+
+    def get_queryset(self):
+        return self.request.ability.queryset_for(self.action, EligibilityQueue).distinct()
 
     def validate(self, request, data, action):
         client = data.get('client')

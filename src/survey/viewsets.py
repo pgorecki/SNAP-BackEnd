@@ -43,7 +43,7 @@ class ResponseViewset(ModelViewSet):
     ordering_fields = ['survey__name', 'created_at', 'modified_at']
 
     def get_queryset(self):
-        return self.request.ability.queryset_for(self.action, Response)
+        return self.request.ability.queryset_for(self.action, Response).distinct()
 
     def perform_create(self, serializer):
         self.validate_response(serializer.validated_data)

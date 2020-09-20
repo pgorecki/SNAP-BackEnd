@@ -6,7 +6,6 @@ from .filters import NoteFilter
 
 
 class NoteViewset(ModelViewSet):
-    queryset = Note.objects.all()
     read_serializer_class = NoteReader
     write_serializer_class = NoteWriter
     permission_classes = [AbilityPermission]

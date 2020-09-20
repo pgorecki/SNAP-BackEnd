@@ -29,6 +29,7 @@ drf-writable-nested = "*"
 django-cancan = "*"
 pandas = "*"
 xlrd = "*"
+django-import-export = "*"
 
 [dev-packages]
 autopep8 = "*"
