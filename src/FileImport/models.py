@@ -6,13 +6,11 @@ from django.contrib.contenttypes.models import (
 from eligibility.enums import EligibilityStatus
 from eligibility.models import ClientEligibility, Eligibility
 from django.db import transaction
-import datetime
 from note.models import Note
 from random import randint
-from agency.models import Agency, AgencyClient
+from agency.models import Agency
 from datetime import date
 from iep.models import ClientIEP, ClientIEPEnrollment, JobPlacement
-from django.core.exceptions import MultipleObjectsReturned
 from django.db import models
 from .enums import FileImportTypes
 from program.enums import EnrollmentStatus
@@ -26,10 +24,15 @@ import logging
 
 logging.basicConfig(filename="MPRapp.log", level=logging.INFO)
 
-# TODO: When you are creating new client you should also create an AgencyClient associated with this client and agency. It is required for access control/permission i.e. my_new_client.agency_clients.create(agency=user.profile.agency)
+# TODO: When you are creating new client you should also create an AgencyClient associated with this client and agency.
+# It is required for access control/permission i.e. my_new_client.agency_clients.create(agency=user.profile.agency)
 
 
 class FileImport(models.Model):  # MPR
+    class Meta:
+        verbose_name = "Data Import Log"
+        verbose_name_plural = "Data Import Logs"
+
     ftype = models.CharField(
         max_length=32,
         blank=False,
@@ -40,9 +43,9 @@ class FileImport(models.Model):  # MPR
     )  # MPR
     file_path = models.CharField(
         max_length=200,
-        blank=False,
-        null=False,
-        help_text="Path of file to be imported including the file name",
+        blank=True,
+        null=True,
+        help_text="Path of file to be imported including the file name (if not attached directly via XLS file field)",
     )  # MPR
     xls_file = models.FileField(upload_to="xls_imports", null=True)
     user = models.ForeignKey(
