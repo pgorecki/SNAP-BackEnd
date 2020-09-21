@@ -10,5 +10,5 @@ def test_users_me():
     api_client = APIClient()
     api_client.force_authenticate(user)
 
-    response = api_client.get('/users/me/')
+    response = api_client.get("/users/me/")
     assert response.status_code == 200

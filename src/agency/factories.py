@@ -9,7 +9,7 @@ class AgencyFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Agency
 
-    name = factory.Sequence(lambda n: f'Agency{n}')
+    name = factory.Sequence(lambda n: f"Agency{n}")
 
     @factory.post_generation
     def users(obj, create, extracted, **kwargs):
@@ -19,7 +19,7 @@ class AgencyFactory(factory.django.DjangoModelFactory):
         if extracted:
             assert isinstance(extracted, int)
             for i in range(extracted):
-                user = UserFactory(username=f'{obj.name}-user{i}')
+                user = UserFactory(username=f"{obj.name}-user{i}")
                 user.profile.agency = obj
                 user.save()
 

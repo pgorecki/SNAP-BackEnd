@@ -12,28 +12,58 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('agency', '0002_auto_20200422_1730'),
+        ("agency", "0002_auto_20200422_1730"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Program',
+            name="Program",
             fields=[
-                ('is_removed', models.BooleanField(default=False)),
-                ('id', model_utils.fields.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created_at')),
-                ('modified_at', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified_at')),
-                ('name', models.CharField(max_length=64)),
-                ('description', models.TextField(blank=True, default='')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                ("is_removed", models.BooleanField(default=False)),
+                (
+                    "id",
+                    model_utils.fields.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "created_at",
+                    model_utils.fields.AutoCreatedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created_at",
+                    ),
+                ),
+                (
+                    "modified_at",
+                    model_utils.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="modified_at",
+                    ),
+                ),
+                ("name", models.CharField(max_length=64)),
+                ("description", models.TextField(blank=True, default="")),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'db_table': 'program',
+                "db_table": "program",
             },
         ),
         migrations.AddField(
-            model_name='agency',
-            name='programs',
-            field=models.ManyToManyField(blank=True, to='agency.Program'),
+            model_name="agency",
+            name="programs",
+            field=models.ManyToManyField(blank=True, to="agency.Program"),
         ),
     ]

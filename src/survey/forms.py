@@ -6,7 +6,7 @@ from .validators import SurveyValidator
 class SurveyAdminForm(forms.ModelForm):
     class Meta:
         model = Survey
-        exclude = ('questions', )
+        exclude = ("questions",)
 
     def clean(self):
         new_instance = Survey(**self.cleaned_data)

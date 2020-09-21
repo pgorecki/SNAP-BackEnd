@@ -2,17 +2,26 @@ from core.exceptions import ApplicationValidationError
 from core.viewsets import ModelViewSet
 from core.permissions import AbilityPermission
 from core.validation import validate_fields_with_rules
-from .models import Eligibility, AgencyEligibilityConfig, ClientEligibility, EligibilityQueue
+from .models import (
+    Eligibility,
+    AgencyEligibilityConfig,
+    ClientEligibility,
+    EligibilityQueue,
+)
 from .serializers import (
-    EligibilityReader, EligibilityWriter,
-    AgencyEligibilityConfigReader, AgencyEligibilityConfigWriter,
-    ClientEligibilityReader, ClientEligibilityWriter,
-    EligibilityQueueReader, EligibilityQueueWriter,
+    EligibilityReader,
+    EligibilityWriter,
+    AgencyEligibilityConfigReader,
+    AgencyEligibilityConfigWriter,
+    ClientEligibilityReader,
+    ClientEligibilityWriter,
+    EligibilityQueueReader,
+    EligibilityQueueWriter,
 )
 from .filters import (
     AgencyEligibilityConfigViewsetFilter,
     ClientEligibilityViewsetFilter,
-    EligibilityQueueViewsetFilter
+    EligibilityQueueViewsetFilter,
 )
 
 
@@ -48,13 +57,22 @@ class ClientEligibilityViewset(ModelViewSet):
     filterset_class = ClientEligibilityViewsetFilter
 
     def get_queryset(self):
-        return self.request.ability.queryset_for(self.action, ClientEligibility).distinct()
+        return self.request.ability.queryset_for(
+            self.action, ClientEligibility
+        ).distinct()
 
     def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user, eligibility=Eligibility.objects.first())
+        serializer.save(
+            created_by=self.request.user, eligibility=Eligibility.objects.first()
+        )
 
     def validate(self, request, data, action):
-        validate_fields_with_rules(request.user, data, client='can_read_client', eligibility='can_read_eligibility')
+        validate_fields_with_rules(
+            request.user,
+            data,
+            client="can_read_client",
+            eligibility="can_read_eligibility",
+        )
 
 
 class EligibilityQueueViewset(ModelViewSet):
@@ -64,13 +82,17 @@ class EligibilityQueueViewset(ModelViewSet):
     filterset_class = EligibilityQueueViewsetFilter
 
     def get_queryset(self):
-        return self.request.ability.queryset_for(self.action, EligibilityQueue).distinct()
+        return self.request.ability.queryset_for(
+            self.action, EligibilityQueue
+        ).distinct()
 
     def validate(self, request, data, action):
-        client = data.get('client')
-        if action == 'create':
+        client = data.get("client")
+        if action == "create":
             if client.eligibility_queue.filter(status=None).count():
-                raise ApplicationValidationError({'client': ['Client is already in the queue']})
+                raise ApplicationValidationError(
+                    {"client": ["Client is already in the queue"]}
+                )
 
     def perform_create(self, serializer):
         serializer.save(
@@ -81,7 +103,7 @@ class EligibilityQueueViewset(ModelViewSet):
 
     def perform_update(self, serializer):
         status = self.get_object().status
-        new_status = serializer.validated_data.get('status')
+        new_status = serializer.validated_data.get("status")
         if status is None and new_status is not None:
             serializer.save(resolved_by=self.request.user)
         else:

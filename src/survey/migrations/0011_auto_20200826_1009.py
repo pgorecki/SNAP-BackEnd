@@ -6,8 +6,8 @@ from django.db import migrations
 def move_respondent_to_client(apps, schema_editor):
     # We can't import the Person model directly as it may be a newer
     # version than this migration expects. We use the historical version.
-    Response = apps.get_model('survey', 'Response')
-    Client = apps.get_model('client', 'Client')
+    Response = apps.get_model("survey", "Response")
+    Client = apps.get_model("client", "Client")
     for r in Response.objects.all():
         client = Client.objects.filter(pk=str(r.respondent_id)).first()
         r.client = client or Client.objects.first()
@@ -17,7 +17,7 @@ def move_respondent_to_client(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('survey', '0010_auto_20200826_1008'),
+        ("survey", "0010_auto_20200826_1008"),
     ]
 
     operations = [

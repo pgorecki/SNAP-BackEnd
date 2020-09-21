@@ -7,14 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('eligibility', '0005_auto_20200814_1022'),
-        ('iep', '0005_clientiep_eligibility_request'),
+        ("eligibility", "0005_auto_20200814_1022"),
+        ("iep", "0005_clientiep_eligibility_request"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='clientiep',
-            name='eligibility_request',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='eligibility.EligibilityQueue'),
+            model_name="clientiep",
+            name="eligibility_request",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="eligibility.EligibilityQueue",
+            ),
         ),
     ]

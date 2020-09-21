@@ -9,28 +9,34 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('iep', '0003_auto_20200818_0942'),
+        ("iep", "0003_auto_20200818_0942"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='clientiep',
-            name='end_date',
+            model_name="clientiep",
+            name="end_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='clientiep',
-            name='projected_end_date',
+            model_name="clientiep",
+            name="projected_end_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='clientiep',
-            name='start_date',
+            model_name="clientiep",
+            name="start_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='clientiep',
-            name='case_manager',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='iep', to=settings.AUTH_USER_MODEL),
+            model_name="clientiep",
+            name="case_manager",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="iep",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

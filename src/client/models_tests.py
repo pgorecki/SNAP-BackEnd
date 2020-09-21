@@ -5,6 +5,7 @@ from .models import Client
 
 # manager / query tests
 
+
 def test_ClientManager_for_user_returns_clients_from_user_agency():
     agency1, agency2, user1, user2, client1, client2 = setup_2_agencies()
 

@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('eligibility', '0002_auto_20200707_0933'),
+        ("eligibility", "0002_auto_20200707_0933"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='clienteligibility',
-            name='effective_date',
+            model_name="clienteligibility",
+            name="effective_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='historicalclienteligibility',
-            name='effective_date',
+            model_name="historicalclienteligibility",
+            name="effective_date",
             field=models.DateField(blank=True, null=True),
         ),
     ]

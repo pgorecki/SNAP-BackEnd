@@ -7,19 +7,36 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('eligibility', '0005_auto_20200814_1022'),
-        ('iep', '0007_auto_20200826_0936'),
+        ("eligibility", "0005_auto_20200814_1022"),
+        ("iep", "0007_auto_20200826_0936"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='clientiep',
-            name='eligibility_request',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='ieps', to='eligibility.eligibilityqueue'),
+            model_name="clientiep",
+            name="eligibility_request",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="ieps",
+                to="eligibility.eligibilityqueue",
+            ),
         ),
         migrations.AlterField(
-            model_name='clientiep',
-            name='status',
-            field=models.CharField(choices=[('awaiting_approval', 'Awaiting approval'), ('in_orientation', 'In orientation'), ('in_planning', 'In planning'), ('in_progress', 'In progress'), ('not_eligible', 'Not eligible'), ('ended', 'Ended')], default='awaiting_approval', max_length=32),
+            model_name="clientiep",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("awaiting_approval", "Awaiting approval"),
+                    ("in_orientation", "In orientation"),
+                    ("in_planning", "In planning"),
+                    ("in_progress", "In progress"),
+                    ("not_eligible", "Not eligible"),
+                    ("ended", "Ended"),
+                ],
+                default="awaiting_approval",
+                max_length=32,
+            ),
         ),
     ]

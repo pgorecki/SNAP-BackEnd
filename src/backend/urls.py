@@ -36,7 +36,7 @@ from core.logging import logger
 schema_view = get_schema_view(
     openapi.Info(
         title="GEORGIA API",
-        default_version='v1',
+        default_version="v1",
         #   description="Test description",
         #   terms_of_service="https://www.google.com/policies/terms/",
         #   contact=openapi.Contact(email="contact@snippets.local"),
@@ -47,45 +47,64 @@ schema_view = get_schema_view(
 )
 
 router = routers.DefaultRouter()
-router.register('clients', client.viewsets.ClientViewset, basename='client')
-router.register('notes', note.viewsets.NoteViewset, basename='note')
-router.register('surveys', survey.viewsets.SurveyViewset, basename='survey')
-router.register('questions', survey.viewsets.QuestionViewset, basename='question')
-router.register('responses', survey.viewsets.ResponseViewset, basename='response')
+router.register("clients", client.viewsets.ClientViewset, basename="client")
+router.register("notes", note.viewsets.NoteViewset, basename="note")
+router.register("surveys", survey.viewsets.SurveyViewset, basename="survey")
+router.register("questions", survey.viewsets.QuestionViewset, basename="question")
+router.register("responses", survey.viewsets.ResponseViewset, basename="response")
 
-router.register('eligibility/clients', eligibility.viewsets.ClientEligibilityViewset,
-                basename='eligibility_clients')
-router.register('eligibility/queue', eligibility.viewsets.EligibilityQueueViewset,
-                basename='eligibility_queue')
-router.register('iep', iep.viewsets.ClientIEPViewset,
-                basename='iep')
-router.register('programs/enrollments', program.viewsets.EnrollmentViewset,
-                basename='enrollment')
+router.register(
+    "eligibility/clients",
+    eligibility.viewsets.ClientEligibilityViewset,
+    basename="eligibility_clients",
+)
+router.register(
+    "eligibility/queue",
+    eligibility.viewsets.EligibilityQueueViewset,
+    basename="eligibility_queue",
+)
+router.register("iep", iep.viewsets.ClientIEPViewset, basename="iep")
+router.register(
+    "programs/enrollments", program.viewsets.EnrollmentViewset, basename="enrollment"
+)
 # router.register('programs/eligibility', program.viewsets.ProgramEligibilityViewset,
 #                 basename='eligibility')
-router.register('programs/services/types', program.viewsets.EnrollmentServiceTypeViewset,
-                basename='enrollment_service_type')
-router.register('programs/services', program.viewsets.EnrollmentServiceViewset, basename='enrollment_service')
-router.register('programs', program.viewsets.ProgramViewset, basename='program')
+router.register(
+    "programs/services/types",
+    program.viewsets.EnrollmentServiceTypeViewset,
+    basename="enrollment_service_type",
+)
+router.register(
+    "programs/services",
+    program.viewsets.EnrollmentServiceViewset,
+    basename="enrollment_service",
+)
+router.register("programs", program.viewsets.ProgramViewset, basename="program")
 
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('users/me/', core.views.UsersMe.as_view(), name='users_me'),
-    path('users/auth/', obtain_auth_token, name='users_auth'),
-    path('dashboard/summary/', core.views.DashboardSummary.as_view(), name='dashboard_summary'),
-
-    path('health/', core.views.HealthViewSet.as_view(), name='health'),
-
-    re_path('swagger(?P<format>.json|.yaml)$',
-            schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    path('swagger/', schema_view.with_ui('swagger',
-                                         cache_timeout=0), name='schema-swagger-ui'),
-
-    path('sentry/', lambda x: 1 / 0, name='setry-test'),
-
-    path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
+    path("", include(router.urls)),
+    path("users/me/", core.views.UsersMe.as_view(), name="users_me"),
+    path("users/auth/", obtain_auth_token, name="users_auth"),
+    path(
+        "dashboard/summary/",
+        core.views.DashboardSummary.as_view(),
+        name="dashboard_summary",
+    ),
+    path("health/", core.views.HealthViewSet.as_view(), name="health"),
+    re_path(
+        "swagger(?P<format>.json|.yaml)$",
+        schema_view.without_ui(cache_timeout=0),
+        name="schema-json",
+    ),
+    path(
+        "swagger/",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    path("sentry/", lambda x: 1 / 0, name="setry-test"),
+    path("admin/", admin.site.urls),
+    path("api-auth/", include("rest_framework.urls")),
 ]
 
 
@@ -93,7 +112,7 @@ handler404 = core.views.error404
 handler500 = core.views.error500
 
 # this code is executed only once on server statup
-logger.info('App started')
+logger.info("App started")
 
 
 if (
@@ -101,11 +120,11 @@ if (
     and getattr(settings, "SENTRY_DSN", None) is not None
     and getattr(settings, "SENTRY_ENVIRONMENT", None) is not None
 ):
-    print('Setting up sentry')
+    print("Setting up sentry")
     sentry_sdk.init(
         dsn=str(settings.SENTRY_DSN),
         integrations=[DjangoIntegration()],
         environment=settings.SENTRY_ENVIRONMENT,
         traces_sample_rate=1.0,
-        send_default_pii=True
+        send_default_pii=True,
     )

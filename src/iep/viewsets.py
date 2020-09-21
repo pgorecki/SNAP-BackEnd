@@ -6,7 +6,8 @@ from core.validation import validate_fields_with_rules
 from eligibility.models import EligibilityQueue
 from .models import ClientIEP
 from .serializers import (
-    ClientIEPReader, ClientIEPWriter,
+    ClientIEPReader,
+    ClientIEPWriter,
 )
 from .filters import ClientIEPViewsetFilter
 
@@ -25,14 +26,19 @@ class ClientIEPViewset(ModelViewSet):
         when new IEP is created, eligibility request is created  (if needed)
         or associated (if already exists) with this iep
         """
-        client = serializer.validated_data['client']
+        client = serializer.validated_data["client"]
         agency = self.request.user.profile.agency
         if agency is None:
-            ApplicationValidationError({'user': 'Agency is not set in your user profile'})
-        existing_request = EligibilityQueue.objects.filter(client=client, requestor=agency, status=None).first()
+            ApplicationValidationError(
+                {"user": "Agency is not set in your user profile"}
+            )
+        existing_request = EligibilityQueue.objects.filter(
+            client=client, requestor=agency, status=None
+        ).first()
 
         serializer.save(
             created_by=self.request.user,
-            status='awaiting_approval',
-            eligibility_request=existing_request or EligibilityQueue.objects.create(client=client, requestor=agency)
+            status="awaiting_approval",
+            eligibility_request=existing_request
+            or EligibilityQueue.objects.create(client=client, requestor=agency),
         )

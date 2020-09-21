@@ -7,7 +7,7 @@ from .models import (
     Enrollment,
     ProgramEligibility,
     EnrollmentService,
-    EnrollmentServiceType
+    EnrollmentServiceType,
 )
 
 
@@ -19,15 +19,31 @@ class ProgramReader(ObjectSerializer):
 
     class Meta:
         model = Program
-        fields = ('id', 'object', 'name', 'agency', 'description', 'created_at', 'modified_at',
-                  'enrollment_entry_survey', 'enrollment_update_survey', 'enrollment_exit_survey')
+        fields = (
+            "id",
+            "object",
+            "name",
+            "agency",
+            "description",
+            "created_at",
+            "modified_at",
+            "enrollment_entry_survey",
+            "enrollment_update_survey",
+            "enrollment_exit_survey",
+        )
 
 
 class ProgramWriter(ObjectSerializer):
     class Meta:
         model = Program
-        fields = ('name', 'agency', 'description',
-                  'enrollment_entry_survey', 'enrollment_update_survey', 'enrollment_exit_survey')
+        fields = (
+            "name",
+            "agency",
+            "description",
+            "enrollment_entry_survey",
+            "enrollment_update_survey",
+            "enrollment_exit_survey",
+        )
 
 
 class ProgramEligibilityReader(ObjectSerializer):
@@ -36,13 +52,21 @@ class ProgramEligibilityReader(ObjectSerializer):
 
     class Meta:
         model = ProgramEligibility
-        fields = ('id', 'object', 'status', 'client', 'program', 'created_at', 'modified_at')
+        fields = (
+            "id",
+            "object",
+            "status",
+            "client",
+            "program",
+            "created_at",
+            "modified_at",
+        )
 
 
 class ProgramEligibilityWriter(ObjectSerializer):
     class Meta:
         model = ProgramEligibility
-        fields = ('status', 'client', 'program')
+        fields = ("status", "client", "program")
 
 
 class EnrollmentReader(ObjectSerializer):
@@ -51,15 +75,31 @@ class EnrollmentReader(ObjectSerializer):
 
     class Meta:
         model = Enrollment
-        fields = ('id', 'object', 'status', 'client', 'program', 'start_date',
-                  'projected_end_date', 'end_date', 'created_at', 'modified_at')
+        fields = (
+            "id",
+            "object",
+            "status",
+            "client",
+            "program",
+            "start_date",
+            "projected_end_date",
+            "end_date",
+            "created_at",
+            "modified_at",
+        )
 
 
 class EnrollmentWriter(ObjectSerializer):
     class Meta:
         model = Enrollment
-        fields = ('status', 'client', 'program', 'start_date',
-                  'projected_end_date', 'end_date')
+        fields = (
+            "status",
+            "client",
+            "program",
+            "start_date",
+            "projected_end_date",
+            "end_date",
+        )
 
 
 class EnrollmentServiceReader(ObjectSerializer):
@@ -70,7 +110,7 @@ class EnrollmentServiceReader(ObjectSerializer):
     class EnrollmentServiceEnrollmentServiceTypeReader(ObjectSerializer):
         class Meta:
             model = EnrollmentServiceType
-            fields = ('id', 'object', 'name', 'category')
+            fields = ("id", "object", "name", "category")
 
     enrollment = EnrollmentServiceEnrollmentReader()
     service_type = EnrollmentServiceEnrollmentServiceTypeReader()
@@ -78,24 +118,32 @@ class EnrollmentServiceReader(ObjectSerializer):
 
     class Meta:
         model = EnrollmentService
-        fields = ('id', 'object', 'enrollment', 'service_type', 'effective_date',
-                  'values', 'created_by', 'created_at', 'modified_at')
+        fields = (
+            "id",
+            "object",
+            "enrollment",
+            "service_type",
+            "effective_date",
+            "values",
+            "created_by",
+            "created_at",
+            "modified_at",
+        )
 
 
 class EnrollmentServiceWriter(ObjectSerializer):
     class Meta:
         model = EnrollmentService
-        fields = ('id', 'enrollment', 'service_type', 'effective_date',
-                  'values')
+        fields = ("id", "enrollment", "service_type", "effective_date", "values")
 
 
 class EnrollmentServiceTypeReader(ObjectSerializer):
     class Meta:
         model = EnrollmentServiceType
-        fields = ('id', 'object', 'name', 'category', 'agency')
+        fields = ("id", "object", "name", "category", "agency")
 
 
 class EnrollmentServiceTypeWriter(ObjectSerializer):
     class Meta:
         model = EnrollmentServiceType
-        fields = ('name', 'category', 'agency')
+        fields = ("name", "category", "agency")

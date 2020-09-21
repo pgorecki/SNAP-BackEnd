@@ -8,7 +8,7 @@ class ClientIEPEnrollmentInline(admin.StackedInline):
 
 @admin.register(ClientIEP)
 class ClientIEPAdmin(admin.ModelAdmin):
-    inlines = (ClientIEPEnrollmentInline, )
+    inlines = (ClientIEPEnrollmentInline,)
 
 
 admin.site.register(JobPlacement)

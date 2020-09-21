@@ -6,48 +6,75 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('iep', '0010_auto_20200909_0539'),
+        ("iep", "0010_auto_20200909_0539"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='clientiep',
-            name='assessment_completed',
+            model_name="clientiep",
+            name="assessment_completed",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='jobplacement',
-            name='Company',
-            field=models.CharField(blank=True, help_text='Company Participant Employed With', max_length=64, null=True),
+            model_name="jobplacement",
+            name="Company",
+            field=models.CharField(
+                blank=True,
+                help_text="Company Participant Employed With",
+                max_length=64,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='jobplacement',
-            name='hire_date',
-            field=models.DateField(blank=True, help_text="Participant's Hire Date", null=True),
+            model_name="jobplacement",
+            name="hire_date",
+            field=models.DateField(
+                blank=True, help_text="Participant's Hire Date", null=True
+            ),
         ),
         migrations.AddField(
-            model_name='jobplacement',
-            name='hourly_wage',
-            field=models.DecimalField(decimal_places=2, help_text="Disenrollment&JobPlacement file column:Participant's hourly Wage", max_digits=5, null=True),
+            model_name="jobplacement",
+            name="hourly_wage",
+            field=models.DecimalField(
+                decimal_places=2,
+                help_text="Disenrollment&JobPlacement file column:Participant's hourly Wage",
+                max_digits=5,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='jobplacement',
-            name='how_was_job_placement_verified',
+            model_name="jobplacement",
+            name="how_was_job_placement_verified",
             field=models.CharField(blank=True, max_length=64, null=True),
         ),
         migrations.AddField(
-            model_name='jobplacement',
-            name='total_monthly_income',
-            field=models.DecimalField(decimal_places=2, help_text='Disenrollment&JobPlacement file column:Total income monthly', max_digits=6, null=True),
+            model_name="jobplacement",
+            name="total_monthly_income",
+            field=models.DecimalField(
+                decimal_places=2,
+                help_text="Disenrollment&JobPlacement file column:Total income monthly",
+                max_digits=6,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='jobplacement',
-            name='total_weekly_income',
-            field=models.DecimalField(decimal_places=2, help_text='Disenrollment&JobPlacement file column:Total income weekly', max_digits=6, null=True),
+            model_name="jobplacement",
+            name="total_weekly_income",
+            field=models.DecimalField(
+                decimal_places=2,
+                help_text="Disenrollment&JobPlacement file column:Total income weekly",
+                max_digits=6,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='jobplacement',
-            name='weekly_hours',
-            field=models.DecimalField(decimal_places=2, help_text="Disenrollment&JobPlacement file column:Participant's Weekly Hours", max_digits=5, null=True),
+            model_name="jobplacement",
+            name="weekly_hours",
+            field=models.DecimalField(
+                decimal_places=2,
+                help_text="Disenrollment&JobPlacement file column:Participant's Weekly Hours",
+                max_digits=5,
+                null=True,
+            ),
         ),
     ]

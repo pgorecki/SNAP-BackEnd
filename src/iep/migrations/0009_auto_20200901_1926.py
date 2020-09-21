@@ -7,24 +7,36 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('iep', '0008_auto_20200826_1416'),
+        ("iep", "0008_auto_20200826_1416"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='JobPlacement',
+            name="JobPlacement",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('effective_date', models.DateField(blank=True, null=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("effective_date", models.DateField(blank=True, null=True)),
             ],
             options={
-                'db_table': 'iep_job_placement',
-                'ordering': ['id'],
+                "db_table": "iep_job_placement",
+                "ordering": ["id"],
             },
         ),
         migrations.AddField(
-            model_name='clientiep',
-            name='job_placement',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.SET_NULL, to='iep.jobplacement'),
+            model_name="clientiep",
+            name="job_placement",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="iep.jobplacement",
+            ),
         ),
     ]

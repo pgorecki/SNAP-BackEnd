@@ -6,16 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('iep', '0006_auto_20200820_0807'),
+        ("iep", "0006_auto_20200820_0807"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='clientiep',
-            options={'ordering': ['-created_at']},
+            name="clientiep",
+            options={"ordering": ["-created_at"]},
         ),
         migrations.AlterModelOptions(
-            name='clientiepenrollment',
-            options={'ordering': ['id']},
+            name="clientiepenrollment",
+            options={"ordering": ["id"]},
         ),
     ]

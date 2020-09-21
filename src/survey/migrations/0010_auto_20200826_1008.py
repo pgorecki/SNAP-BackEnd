@@ -7,30 +7,46 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('client', '0008_client_is_new'),
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('survey', '0009_auto_20200720_1456'),
+        ("client", "0008_client_is_new"),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("survey", "0009_auto_20200720_1456"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='response',
-            name='client',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='responses', to='client.client'),
+            model_name="response",
+            name="client",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="responses",
+                to="client.client",
+            ),
         ),
         migrations.AddField(
-            model_name='response',
-            name='response_context_id',
+            model_name="response",
+            name="response_context_id",
             field=models.UUIDField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='response',
-            name='response_context_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='responses', to='contenttypes.contenttype'),
+            model_name="response",
+            name="response_context_type",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="responses",
+                to="contenttypes.contenttype",
+            ),
         ),
         migrations.AlterField(
-            model_name='response',
-            name='respondent_type',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='old_responses', to='contenttypes.contenttype'),
+            model_name="response",
+            name="respondent_type",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="old_responses",
+                to="contenttypes.contenttype",
+            ),
         ),
     ]

@@ -7,13 +7,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('survey', '0008_auto_20200717_0849'),
+        ("survey", "0008_auto_20200717_0849"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='question',
-            name='columns',
+            model_name="question",
+            name="columns",
             field=core.json_yaml_field.JsonYamlField(blank=True, null=True),
         ),
     ]

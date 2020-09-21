@@ -9,4 +9,4 @@ def can_read_client(user, client):
     return user == client.created_by
 
 
-rules.add_rule('can_read_client', can_read_client)
+rules.add_rule("can_read_client", can_read_client)

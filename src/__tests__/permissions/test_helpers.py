@@ -2,7 +2,7 @@ from django.contrib.auth.models import Permission, AnonymousUser
 from cancan.middleware import CanCanMiddleware
 
 
-class FakeRequest():
+class FakeRequest:
     def __init__(self):
         self.user = AnonymousUser()
 

@@ -6,12 +6,15 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('client', '0010_merge_20200909_0538'),
+        ("client", "0010_merge_20200909_0538"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='clientaddress',
-            options={'verbose_name': 'Client Address', 'verbose_name_plural': 'Client Addresses'},
+            name="clientaddress",
+            options={
+                "verbose_name": "Client Address",
+                "verbose_name_plural": "Client Addresses",
+            },
         ),
     ]

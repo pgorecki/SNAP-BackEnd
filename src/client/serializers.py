@@ -7,13 +7,13 @@ from .models import Client, ClientAddress
 class ClientAddressReader(ObjectSerializer):
     class Meta:
         model = ClientAddress
-        fields = ('object', 'street', 'city', 'state', 'zip', 'county')
+        fields = ("object", "street", "city", "state", "zip", "county")
 
 
 class ClientAddressWriter(ObjectSerializer):
     class Meta:
         model = ClientAddress
-        fields = ('street', 'city', 'state', 'zip', 'county')
+        fields = ("street", "city", "state", "zip", "county")
 
 
 class ClientReader(ObjectSerializer):
@@ -22,8 +22,20 @@ class ClientReader(ObjectSerializer):
 
     class Meta:
         model = Client
-        fields = ('id', 'object', 'first_name', 'middle_name', 'last_name',
-                  'dob', 'ssn', 'snap_id', 'address', 'created_at', 'modified_at', 'created_by')
+        fields = (
+            "id",
+            "object",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "dob",
+            "ssn",
+            "snap_id",
+            "address",
+            "created_at",
+            "modified_at",
+            "created_by",
+        )
 
 
 class ClientWriter(NestedCreateMixin, NestedUpdateMixin, ObjectSerializer):
@@ -31,4 +43,12 @@ class ClientWriter(NestedCreateMixin, NestedUpdateMixin, ObjectSerializer):
 
     class Meta:
         model = Client
-        fields = ('first_name', 'middle_name', 'last_name', 'dob', 'ssn', 'snap_id', 'address')
+        fields = (
+            "first_name",
+            "middle_name",
+            "last_name",
+            "dob",
+            "ssn",
+            "snap_id",
+            "address",
+        )

@@ -16,12 +16,12 @@ class AnswersInline(admin.TabularInline):
 
 @admin.register(Response)
 class ResponseAdmin(admin.ModelAdmin):
-    inlines = (AnswersInline, )
+    inlines = (AnswersInline,)
 
 
 @admin.register(Question)
 class QuestionAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('title', 'id', 'usage_count')
+    list_display = ("title", "id", "usage_count")
 
 
 @admin.register(Survey)
