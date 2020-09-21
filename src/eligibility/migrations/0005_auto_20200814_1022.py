@@ -11,32 +11,98 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('agency', '0012_remove_agency_programs'),
-        ('client', '0004_remove_client_is_removed'),
+        ("agency", "0012_remove_agency_programs"),
+        ("client", "0004_remove_client_is_removed"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('eligibility', '0004_auto_20200717_0849'),
+        ("eligibility", "0004_auto_20200717_0849"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='EligibilityQueue',
+            name="EligibilityQueue",
             fields=[
-                ('id', model_utils.fields.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created_at')),
-                ('modified_at', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified_at')),
-                ('status', models.CharField(blank=True, choices=[('ELIGIBLE', 'eligible'), ('NOT_ELIGIBLE', 'not eligible')], max_length=32, null=True)),
-                ('client', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='eligibility_queue', to='client.Client')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('requestor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='agency.Agency')),
-                ('resolved_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='resolved_eligibility', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    model_utils.fields.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "created_at",
+                    model_utils.fields.AutoCreatedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created_at",
+                    ),
+                ),
+                (
+                    "modified_at",
+                    model_utils.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="modified_at",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("ELIGIBLE", "eligible"),
+                            ("NOT_ELIGIBLE", "not eligible"),
+                        ],
+                        max_length=32,
+                        null=True,
+                    ),
+                ),
+                (
+                    "client",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="eligibility_queue",
+                        to="client.Client",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "requestor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="agency.Agency"
+                    ),
+                ),
+                (
+                    "resolved_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="resolved_eligibility",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'db_table': 'eligibility_queue',
-                'ordering': ['-created_at'],
+                "db_table": "eligibility_queue",
+                "ordering": ["-created_at"],
             },
         ),
         migrations.AddConstraint(
-            model_name='eligibilityqueue',
-            constraint=models.UniqueConstraint(condition=models.Q(status=None), fields=('client', 'requestor'), name='unique_eligilibity_request'),
+            model_name="eligibilityqueue",
+            constraint=models.UniqueConstraint(
+                condition=models.Q(status=None),
+                fields=("client", "requestor"),
+                name="unique_eligilibity_request",
+            ),
         ),
     ]

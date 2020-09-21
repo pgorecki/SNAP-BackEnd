@@ -6,14 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0003_auto_20200617_1538'),
-        ('agency', '0005_agency_programs'),
+        ("program", "0003_auto_20200617_1538"),
+        ("agency", "0005_agency_programs"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='agency',
-            name='programs',
-            field=models.ManyToManyField(related_name='agencies', through='program.AgencyProgramConfig', to='program.Program'),
+            model_name="agency",
+            name="programs",
+            field=models.ManyToManyField(
+                related_name="agencies",
+                through="program.AgencyProgramConfig",
+                to="program.Program",
+            ),
         ),
     ]

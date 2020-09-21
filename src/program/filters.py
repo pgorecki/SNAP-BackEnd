@@ -1,32 +1,38 @@
 import django_filters
-from .models import Program, ProgramEligibility, Enrollment, EnrollmentService, EnrollmentServiceType
+from .models import (
+    Program,
+    ProgramEligibility,
+    Enrollment,
+    EnrollmentService,
+    EnrollmentServiceType,
+)
 
 
 class ProgramViewsetFilter(django_filters.FilterSet):
     class Meta:
         model = Program
-        fields = ['agency']
+        fields = ["agency"]
 
 
 class ProgramEligibilityViewsetFilter(django_filters.FilterSet):
     class Meta:
         model = ProgramEligibility
-        fields = ['client']
+        fields = ["client"]
 
 
 class EnrollmentViewsetFilter(django_filters.FilterSet):
     class Meta:
         model = Enrollment
-        fields = ['client', 'program']
+        fields = ["client", "program"]
 
 
 class EnrollmentServiceViewsetFilter(django_filters.FilterSet):
     class Meta:
         model = EnrollmentService
-        fields = ['enrollment']
+        fields = ["enrollment"]
 
 
 class EnrollmentServiceTypeViewsetFilter(django_filters.FilterSet):
     class Meta:
         model = EnrollmentServiceType
-        fields = ['agency']
+        fields = ["agency"]

@@ -10,14 +10,15 @@ class ContentObjectRelatedField(serializers.RelatedField):
     """
     A custom field to serialize generic relations
     """
+
     class Meta:
         swagger_schema_fields = {
             "type": openapi.TYPE_OBJECT,
             "title": "SourceObject",
             "properties": {
                 "id": openapi.Schema(
-                     title="source object id",
-                     type=openapi.TYPE_STRING,
+                    title="source object id",
+                    type=openapi.TYPE_STRING,
                 ),
                 "type": openapi.Schema(
                     title="source object type, (Client, User, ...)",
@@ -27,30 +28,30 @@ class ContentObjectRelatedField(serializers.RelatedField):
                     title="other fields of source object",
                     type=openapi.TYPE_STRING,
                     read_only=True,
-                )
+                ),
             },
             "required": ["subject", "body"],
         }
 
     MODELS = {
-        'Client': ('client', 'Client'),
+        "Client": ("client", "Client"),
         # 'Enrollment': ('program', 'Enrollment'),
     }
 
     def to_representation(self, object):
         object_app = object._meta.app_label
         object_name = object._meta.object_name
-        serializer_module_path = f'{object_app}.serializers.{object_name}Reader'
+        serializer_module_path = f"{object_app}.serializers.{object_name}Reader"
         serializer_class = import_string(serializer_module_path)
         data = serializer_class(object).data
         return data
 
     def to_internal_value(self, data):
-        if 'type' not in data:
-            raise ApplicationValidationError({'type': ["Field is required"]})
-        model_type = data['type']
+        if "type" not in data:
+            raise ApplicationValidationError({"type": ["Field is required"]})
+        model_type = data["type"]
 
-        app_name, model_name = self.MODELS.get(data['type'], (None, data['type']))
+        app_name, model_name = self.MODELS.get(data["type"], (None, data["type"]))
         if app_name is None:
             for model in apps.get_models():
                 if model.__name__ == model_name:
@@ -58,10 +59,10 @@ class ContentObjectRelatedField(serializers.RelatedField):
         else:
             model = apps.get_model(app_name, model_name)
         try:
-            return model.objects.get(pk=data['id'])
+            return model.objects.get(pk=data["id"])
         except Exception as e:
             print(str(e))
-            raise ApplicationValidationError({'id': [str(e)]})
+            raise ApplicationValidationError({"id": [str(e)]})
 
 
 class ObjectSerializer(serializers.ModelSerializer):
@@ -74,7 +75,7 @@ class ObjectSerializer(serializers.ModelSerializer):
 class CreatedByReader(ObjectSerializer):
     class Meta:
         model = User
-        fields = ('id', 'object', 'first_name', 'last_name')
+        fields = ("id", "object", "first_name", "last_name")
 
 
 class UserReader(CreatedByReader):

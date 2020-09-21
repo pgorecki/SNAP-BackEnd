@@ -7,32 +7,53 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0010_auto_20200817_1230'),
-        ('iep', '0001_initial'),
+        ("program", "0010_auto_20200817_1230"),
+        ("iep", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ClientIEPEnrollment',
+            name="ClientIEPEnrollment",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('enrollment', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='program.Enrollment')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "enrollment",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="program.Enrollment",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'iep_enrollment',
+                "db_table": "iep_enrollment",
             },
         ),
         migrations.AlterField(
-            model_name='clientiep',
-            name='outcome',
-            field=models.CharField(blank=True, default='', help_text='Outcome when completed', max_length=64),
+            model_name="clientiep",
+            name="outcome",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="Outcome when completed",
+                max_length=64,
+            ),
         ),
         migrations.DeleteModel(
-            name='ClientIEPProgramStatus',
+            name="ClientIEPProgramStatus",
         ),
         migrations.AddField(
-            model_name='clientiepenrollment',
-            name='iep',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='iep.ClientIEP'),
+            model_name="clientiepenrollment",
+            name="iep",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="iep.ClientIEP"
+            ),
         ),
     ]

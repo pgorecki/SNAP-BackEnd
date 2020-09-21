@@ -5,7 +5,7 @@ from model_utils.models import (
     UUIDModel,
     AutoCreatedField,
     AutoLastModifiedField,
-    TimeStampedModel as TSM
+    TimeStampedModel as TSM,
 )
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -17,32 +17,39 @@ from .validation import ModelValidationMixin
 class ObjectRoot(ModelValidationMixin, UUIDModel):
     class Meta:
         abstract = True
-        ordering = ['created_at']
+        ordering = ["created_at"]
 
     created_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, blank=True, null=True)
-    created_at = AutoCreatedField(_('created_at'))
-    modified_at = AutoLastModifiedField(_('modified_at'))
+        User, on_delete=models.PROTECT, blank=True, null=True
+    )
+    created_at = AutoCreatedField(_("created_at"))
+    modified_at = AutoLastModifiedField(_("modified_at"))
 
 
 class TimeStampedModel(TSM):
     class Meta:
         abstract = True
-        ordering = ['created_at']
+        ordering = ["created_at"]
 
-    created_at = AutoCreatedField(_('created_at'))
-    modified_at = AutoLastModifiedField(_('modified_at'))
+    created_at = AutoCreatedField(_("created_at"))
+    modified_at = AutoLastModifiedField(_("modified_at"))
     created_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, blank=True, null=True)
+        User, on_delete=models.PROTECT, blank=True, null=True
+    )
 
 
 class UserProfile(models.Model):
     class Meta:
-        db_table = 'user_profile'
-    user = models.OneToOneField(
-        User, related_name='profile', on_delete=models.CASCADE)
+        db_table = "user_profile"
+
+    user = models.OneToOneField(User, related_name="profile", on_delete=models.CASCADE)
     agency = models.ForeignKey(
-        'agency.Agency', related_name='user_profiles', on_delete=models.PROTECT, blank=True, null=True)
+        "agency.Agency",
+        related_name="user_profiles",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+    )
 
 
 @receiver(post_save, sender=User)

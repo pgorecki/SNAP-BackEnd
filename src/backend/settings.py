@@ -20,7 +20,7 @@ class BaseConfiguration(Configuration):
     # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    SECRET_KEY = 'secret'
+    SECRET_KEY = "secret"
 
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = values.BooleanValue(False)
@@ -33,88 +33,90 @@ class BaseConfiguration(Configuration):
     # Application definition
 
     INSTALLED_APPS = [
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-        'django_extensions',
-        'django_filters',
-        'rest_framework',
-        'rest_framework.authtoken',
-        'corsheaders',
-        'simple_history',
-        'drf_yasg',
-        'import_export',
-        'rules.apps.AutodiscoverRulesConfig',
-        'cancan',
-        'core',
-        'agency',
-        'client',
-        'survey',
-        'program',
-        'eligibility',
-        'iep',
-        'security',
-        'note',
-        'FileImport',  # MPR
+        "django.contrib.admin",
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
+        "django.contrib.sessions",
+        "django.contrib.messages",
+        "django.contrib.staticfiles",
+        "django_extensions",
+        "django_filters",
+        "rest_framework",
+        "rest_framework.authtoken",
+        "corsheaders",
+        "simple_history",
+        "drf_yasg",
+        "import_export",
+        "rules.apps.AutodiscoverRulesConfig",
+        "cancan",
+        "core",
+        "agency",
+        "client",
+        "survey",
+        "program",
+        "eligibility",
+        "iep",
+        "security",
+        "note",
+        "FileImport",  # MPR
     ]
 
     MIDDLEWARE = [
-        'django.middleware.security.SecurityMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'corsheaders.middleware.CorsMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'simple_history.middleware.HistoryRequestMiddleware',
-        'core.middleware.LoggingMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.clickjacking.XFrameOptionsMiddleware',
-        'cancan.middleware.CanCanMiddleware',
+        "django.middleware.security.SecurityMiddleware",
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "corsheaders.middleware.CorsMiddleware",
+        "django.middleware.common.CommonMiddleware",
+        "django.middleware.csrf.CsrfViewMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "simple_history.middleware.HistoryRequestMiddleware",
+        "core.middleware.LoggingMiddleware",
+        "django.contrib.messages.middleware.MessageMiddleware",
+        "django.middleware.clickjacking.XFrameOptionsMiddleware",
+        "cancan.middleware.CanCanMiddleware",
     ]
 
-    ROOT_URLCONF = 'backend.urls'
+    ROOT_URLCONF = "backend.urls"
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': ['templates'],
-            'APP_DIRS': True,
-            'OPTIONS': {
-                'context_processors': [
-                    'django.template.context_processors.debug',
-                    'django.template.context_processors.request',
-                    'django.contrib.auth.context_processors.auth',
-                    'django.contrib.messages.context_processors.messages',
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": ["templates"],
+            "APP_DIRS": True,
+            "OPTIONS": {
+                "context_processors": [
+                    "django.template.context_processors.debug",
+                    "django.template.context_processors.request",
+                    "django.contrib.auth.context_processors.auth",
+                    "django.contrib.messages.context_processors.messages",
                 ],
             },
         },
     ]
 
-    WSGI_APPLICATION = 'backend.wsgi.application'
+    WSGI_APPLICATION = "backend.wsgi.application"
 
-    DATABASES = values.DatabaseURLValue('postgresql://devuser:devuser@localhost:5432/gsnapdb1', environ=True)
+    DATABASES = values.DatabaseURLValue(
+        "postgresql://devuser:devuser@localhost:5432/gsnapdb1", environ=True
+    )
 
     # Password validation
     # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
     AUTH_PASSWORD_VALIDATORS = [
         {
-            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-            'OPTIONS': {
-                'min_length': 6,
-            }
+            "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+            "OPTIONS": {
+                "min_length": 6,
+            },
         },
     ]
 
     # Internationalization
     # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-    LANGUAGE_CODE = 'en-us'
+    LANGUAGE_CODE = "en-us"
 
-    TIME_ZONE = 'UTC'
+    TIME_ZONE = "UTC"
 
     USE_I18N = True
 
@@ -125,66 +127,58 @@ class BaseConfiguration(Configuration):
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-    STATIC_URL = '/static/'
+    STATIC_URL = "/static/"
 
     MEDIA_ROOT = "../uploads/"
 
     REST_FRAMEWORK = {
         # Use Django's standard `django.contrib.auth` permissions,
         # or allow read-only access for unauthenticated users.
-        'DEFAULT_PERMISSION_CLASSES': [
-            'rest_framework.permissions.IsAuthenticated'
+        "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+        "DEFAULT_AUTHENTICATION_CLASSES": [
+            "rest_framework.authentication.TokenAuthentication",
+            "rest_framework.authentication.SessionAuthentication",
         ],
-        'DEFAULT_AUTHENTICATION_CLASSES': [
-            'rest_framework.authentication.TokenAuthentication',
-            'rest_framework.authentication.SessionAuthentication',
+        "DEFAULT_PAGINATION_CLASS": "core.pagination.PageNumberPaginationWithTotalPages",
+        "DEFAULT_FILTER_BACKENDS": [
+            "django_filters.rest_framework.DjangoFilterBackend",
+            "rest_framework.filters.OrderingFilter",
         ],
-        'DEFAULT_PAGINATION_CLASS': 'core.pagination.PageNumberPaginationWithTotalPages',
-        'DEFAULT_FILTER_BACKENDS': [
-            'django_filters.rest_framework.DjangoFilterBackend',
-            'rest_framework.filters.OrderingFilter'
-        ],
-        'PAGE_SIZE': 100,
+        "PAGE_SIZE": 100,
     }
 
     CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = [
-        'http://localhost:3030',
+        "http://localhost:3030",
     ]
     CORS_ORIGIN_REGEX_WHITELIST = [
-        'http://localhost:3030',
+        "http://localhost:3030",
     ]
 
     SWAGGER_SETTINGS = {
-        'SECURITY_DEFINITIONS': {
-            'DRF Token': {
-                'type': 'apiKey',
-                'name': 'Authorization',
-                'in': 'header'
-            }
+        "SECURITY_DEFINITIONS": {
+            "DRF Token": {"type": "apiKey", "name": "Authorization", "in": "header"}
         },
-        'LOGIN_URL': '/admin/login/',
-        'LOGOUT_URL': '/admin/logout/',
+        "LOGIN_URL": "/admin/login/",
+        "LOGOUT_URL": "/admin/logout/",
     }
 
-    CANCAN = {
-        'ABILITIES': 'backend.abilities.declare_abilities'
-    }
+    CANCAN = {"ABILITIES": "backend.abilities.declare_abilities"}
 
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
     # Logging
-    LOG_FILE = values.Value('./../application.log')
-    LOG_LEVEL = values.Value('DEBUG')
+    LOG_FILE = values.Value("./../application.log")
+    LOG_LEVEL = values.Value("DEBUG")
     LOGGING_CONFIG = None
 
-    BUILD_VERSION = values.Value('development')
+    BUILD_VERSION = values.Value("development")
     BUILD_DATE = values.Value(datetime.now())
 
     def __init__(self):
-        print(f'Using {self.__class__.__name__} config')
-        print(f'Logging {self.LOG_LEVEL} messages to {os.path.abspath(self.LOG_FILE)}')
+        print(f"Using {self.__class__.__name__} config")
+        print(f"Logging {self.LOG_LEVEL} messages to {os.path.abspath(self.LOG_FILE)}")
         setup_logging(str(self.LOG_LEVEL), str(self.LOG_FILE))
 
 
@@ -202,7 +196,7 @@ class Staging(BaseConfiguration):
     DEBUG = False
     STATIC_ROOT = "/host/static/"
     MEDIA_ROOT = "/host/uploads/"
-    ALLOWED_HOSTS = ['*']
+    ALLOWED_HOSTS = ["*"]
 
     SECRET_KEY = values.SecretValue()
 
@@ -210,5 +204,5 @@ class Staging(BaseConfiguration):
 
     @classmethod
     def post_setup(cls):
-        print('Using Staging config')
+        print("Using Staging config")
         # super().post_setup()

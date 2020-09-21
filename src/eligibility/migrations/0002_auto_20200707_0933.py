@@ -6,20 +6,20 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('eligibility', '0001_initial'),
+        ("eligibility", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='agencyeligibilityconfig',
-            options={'ordering': ['-created_at']},
+            name="agencyeligibilityconfig",
+            options={"ordering": ["-created_at"]},
         ),
         migrations.AlterModelOptions(
-            name='clienteligibility',
-            options={'ordering': ['-created_at']},
+            name="clienteligibility",
+            options={"ordering": ["-created_at"]},
         ),
         migrations.AlterModelOptions(
-            name='eligibility',
-            options={'ordering': ['-created_at'], 'verbose_name_plural': 'Eligibility'},
+            name="eligibility",
+            options={"ordering": ["-created_at"], "verbose_name_plural": "Eligibility"},
         ),
     ]

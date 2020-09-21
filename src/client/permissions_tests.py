@@ -8,7 +8,7 @@ from agency.factories import AgencyFactory
 from .viewsets import ClientViewset
 
 
-class FakeRequest():
+class FakeRequest:
     def __init__(self):
         self.user = AnonymousUser()
 
@@ -29,26 +29,31 @@ def test_is_protected():
     agency = AgencyFactory(users=1, clients=2)
 
     user = agency.user_profiles.first().user
-    view = create_view(ClientViewset, 'view', user)
+    view = create_view(ClientViewset, "view", user)
     assert AbilityPermission in view.permission_classes
 
 
-@pytest.mark.parametrize("action", ['view', 'change', 'delete'])
+@pytest.mark.parametrize("action", ["view", "change", "delete"])
 def test_client_user_no_permissions(action):
     agency1 = AgencyFactory(users=2, clients=2)
 
     user1, user2 = [p.user for p in agency1.user_profiles.all()]
     client1, client2 = [ac.client for ac in agency1.agency_clients.all()]
 
-    view1 = create_view(ClientViewset, 'view', user1)
+    view1 = create_view(ClientViewset, "view", user1)
 
     assert view1.get_queryset().count() == 0
 
 
-@pytest.mark.parametrize("action,permission",
-                         [("view", "view_client"), ("change", "change_client"),
-                          ("delete", "delete_client"),
-                          ("delete", "delete_client_agency")])
+@pytest.mark.parametrize(
+    "action,permission",
+    [
+        ("view", "view_client"),
+        ("change", "change_client"),
+        ("delete", "delete_client"),
+        ("delete", "delete_client_agency"),
+    ],
+)
 def test_client_user_as_owner(action, permission):
     agency1 = AgencyFactory(users=2, clients=2)
 
@@ -66,8 +71,13 @@ def test_client_user_as_owner(action, permission):
     assert client2 in view2.get_queryset()
 
 
-@pytest.mark.parametrize("action,permission",
-                         [("view", "view_client_agency"), ("change", "change_client_agency"), ])
+@pytest.mark.parametrize(
+    "action,permission",
+    [
+        ("view", "view_client_agency"),
+        ("change", "change_client_agency"),
+    ],
+)
 def test_client_user_as_agency_member(action, permission):
     agency1 = AgencyFactory(users=2, clients=2)
     agency2 = AgencyFactory(users=1)
@@ -75,7 +85,7 @@ def test_client_user_as_agency_member(action, permission):
     user1, user2 = [p.user for p in agency1.user_profiles.all()]
     client1, client2 = [ac.client for ac in agency1.agency_clients.all()]
 
-    userA, = [p.user for p in agency2.user_profiles.all()]
+    (userA,) = [p.user for p in agency2.user_profiles.all()]
 
     view1 = create_view(ClientViewset, action, user1, permission)
     view2 = create_view(ClientViewset, action, user2, permission)

@@ -6,20 +6,32 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('eligibility', '0006_auto_20200910_1145'),
+        ("eligibility", "0006_auto_20200910_1145"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='agencyeligibilityconfig',
-            options={'ordering': ['-created_at'], 'verbose_name': 'Agency Eligibility Config', 'verbose_name_plural': 'Agency Eligibility Config'},
+            name="agencyeligibilityconfig",
+            options={
+                "ordering": ["-created_at"],
+                "verbose_name": "Agency Eligibility Config",
+                "verbose_name_plural": "Agency Eligibility Config",
+            },
         ),
         migrations.AlterModelOptions(
-            name='clienteligibility',
-            options={'ordering': ['-created_at'], 'verbose_name': 'Client Eligibility', 'verbose_name_plural': 'Client Eligibility'},
+            name="clienteligibility",
+            options={
+                "ordering": ["-created_at"],
+                "verbose_name": "Client Eligibility",
+                "verbose_name_plural": "Client Eligibility",
+            },
         ),
         migrations.AlterModelOptions(
-            name='historicalclienteligibility',
-            options={'get_latest_by': 'history_date', 'ordering': ('-history_date', '-history_id'), 'verbose_name': 'historical Client Eligibility'},
+            name="historicalclienteligibility",
+            options={
+                "get_latest_by": "history_date",
+                "ordering": ("-history_date", "-history_id"),
+                "verbose_name": "historical Client Eligibility",
+            },
         ),
     ]

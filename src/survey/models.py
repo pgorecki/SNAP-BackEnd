@@ -14,14 +14,14 @@ from survey.enums import QuestionCategory
 
 class Question(ObjectRoot):
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     title = models.CharField(max_length=64)
-    description = models.TextField(default='', blank=True)
-    category = models.CharField(choices=QuestionCategory.choices,
-                                max_length=32, default=QuestionCategory.TEXT)
-    options = ArrayField(models.CharField(
-        max_length=64), null=True, blank=True)
+    description = models.TextField(default="", blank=True)
+    category = models.CharField(
+        choices=QuestionCategory.choices, max_length=32, default=QuestionCategory.TEXT
+    )
+    options = ArrayField(models.CharField(max_length=64), null=True, blank=True)
     other = models.BooleanField(default=False)
     refusable = models.BooleanField(default=False)
     rows = models.IntegerField(null=True, blank=True)
@@ -40,8 +40,8 @@ class Question(ObjectRoot):
 
 class Survey(ObjectRoot):
     class Meta:
-        db_table = 'survey'
-        ordering = ['-created_at']
+        db_table = "survey"
+        ordering = ["-created_at"]
 
     name = models.CharField(max_length=64)
     definition = JsonYamlField()
@@ -53,15 +53,15 @@ class Survey(ObjectRoot):
     def get_definition_items(self):
         def traverse_items(current, all_items=[]):
             yield current
-            for item in current.get('items', []):
+            for item in current.get("items", []):
                 yield item
 
         yield from traverse_items(self.definition)
 
     def get_related_question_ids(self):
         for item in self.get_definition_items():
-            if item.get('type', None) == 'question' and 'questionId' in item:
-                yield (item.get('id', None), item['questionId'])
+            if item.get("type", None) == "question" and "questionId" in item:
+                yield (item.get("id", None), item["questionId"])
 
     def __str__(self):
         return self.name
@@ -69,26 +69,33 @@ class Survey(ObjectRoot):
 
 class Response(ObjectRoot):
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     survey = models.ForeignKey(
-        Survey, related_name='responses', on_delete=models.PROTECT
+        Survey, related_name="responses", on_delete=models.PROTECT
     )
-    client = models.ForeignKey(Client, related_name='responses', on_delete=models.CASCADE)
+    client = models.ForeignKey(
+        Client, related_name="responses", on_delete=models.CASCADE
+    )
     response_context_type = models.ForeignKey(
-        ContentType, related_name='responses', on_delete=models.SET_NULL, blank=True, null=True)
+        ContentType,
+        related_name="responses",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
     response_context_id = models.UUIDField(primary_key=False, blank=True, null=True)
-    response_context = GenericForeignKey('response_context_type', 'response_context_id')
+    response_context = GenericForeignKey("response_context_type", "response_context_id")
 
     objects = AgencyObjectManager()
 
 
 class Answer(models.Model):
     response = models.ForeignKey(
-        Response, related_name='answers', on_delete=models.CASCADE
+        Response, related_name="answers", on_delete=models.CASCADE
     )
     question = models.ForeignKey(
-        Question, related_name='answers', on_delete=models.PROTECT
+        Question, related_name="answers", on_delete=models.PROTECT
     )
     value = models.CharField(max_length=256)
 
@@ -96,11 +103,11 @@ class Answer(models.Model):
 @receiver(post_save, sender=Survey)
 def save_related_questions(sender, instance, *args, **kwargs):
     def traverse_items(current, questions=[]):
-        if current.get('type', None) == 'question' and 'questionId' in current:
-            q = Question.objects.get(pk=current['questionId'])
+        if current.get("type", None) == "question" and "questionId" in current:
+            q = Question.objects.get(pk=current["questionId"])
             questions.append(q)
 
-        for item in current.get('items', []):
+        for item in current.get("items", []):
             traverse_items(item, questions)
 
         return questions

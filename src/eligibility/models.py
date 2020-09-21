@@ -21,9 +21,9 @@ from .managers import (
 class Eligibility(ObjectRoot):
     # TODO: should be removed in the future?
     class Meta:
-        verbose_name_plural = 'Eligibility'
-        db_table = 'eligibility'
-        ordering = ['-created_at']
+        verbose_name_plural = "Eligibility"
+        db_table = "eligibility"
+        ordering = ["-created_at"]
 
     name = models.CharField(max_length=64)
     objects = EligibilityObjectManager()
@@ -32,10 +32,10 @@ class Eligibility(ObjectRoot):
 class AgencyEligibilityConfig(ObjectRoot):
     # TODO: should be removed in the future?
     class Meta:
-        db_table = 'eligibility_agency_config'
-        ordering = ['-created_at']
-        verbose_name='Agency Eligibility Config'
-        verbose_name_plural = 'Agency Eligibility Config'
+        db_table = "eligibility_agency_config"
+        ordering = ["-created_at"]
+        verbose_name = "Agency Eligibility Config"
+        verbose_name_plural = "Agency Eligibility Config"
 
     agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
     eligibility = models.ForeignKey(Eligibility, on_delete=models.CASCADE)
@@ -45,21 +45,20 @@ class AgencyEligibilityConfig(ObjectRoot):
 
 class ClientEligibility(ObjectRoot):
     class Meta:
-        db_table = 'eligibility_client'
-        ordering = ['-created_at']
-        verbose_name='Client Eligibility'
-        verbose_name_plural = 'Client Eligibility'
+        db_table = "eligibility_client"
+        ordering = ["-created_at"]
+        verbose_name = "Client Eligibility"
+        verbose_name_plural = "Client Eligibility"
 
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    client = models.ForeignKey(
+        Client, on_delete=models.CASCADE, related_name="eligibility"
     )
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='eligibility')
-    eligibility = models.ForeignKey(Eligibility, on_delete=models.CASCADE)  # TODO: should be removed in the future?
+    eligibility = models.ForeignKey(
+        Eligibility, on_delete=models.CASCADE
+    )  # TODO: should be removed in the future?
     status = models.CharField(
-        max_length=32,
-        choices=[(x.name, x.value) for x in EligibilityStatus]
+        max_length=32, choices=[(x.name, x.value) for x in EligibilityStatus]
     )
     effective_date = models.DateField(blank=True, null=True)
     history = HistoricalRecords()
@@ -70,35 +69,50 @@ class ClientEligibility(ObjectRoot):
     def is_eligible(cls, client):
         newest = cls.objects.filter(client=client).first()
         # TODO refactor enums to TextChoice
-        is_eligible = newest is not None and newest.status == EligibilityStatus.ELIGIBLE.name
+        is_eligible = (
+            newest is not None and newest.status == EligibilityStatus.ELIGIBLE.name
+        )
         return is_eligible
 
 
 class EligibilityQueue(ObjectRoot):
     class Meta:
-        db_table = 'eligibility_queue'
-        ordering = ['-created_at']
+        db_table = "eligibility_queue"
+        ordering = ["-created_at"]
         constraints = [
-            models.UniqueConstraint(fields=['client', 'requestor'], condition=Q(
-                status=None), name='unique_eligilibity_request')
+            models.UniqueConstraint(
+                fields=["client", "requestor"],
+                condition=Q(status=None),
+                name="unique_eligilibity_request",
+            )
         ]
-        verbose_name_plural = 'Eligibility Queue'
+        verbose_name_plural = "Eligibility Queue"
 
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='eligibility_queue')
+    client = models.ForeignKey(
+        Client, on_delete=models.CASCADE, related_name="eligibility_queue"
+    )
     requestor = models.ForeignKey(Agency, on_delete=models.CASCADE)
     status = models.CharField(
         blank=True,
         null=True,
         max_length=32,
         # TODO refactor enums https://adamj.eu/tech/2020/01/27/moving-to-django-3-field-choices-enumeration-types/
-        choices=[(x.name, x.value) for x in EligibilityStatus]
+        choices=[(x.name, x.value) for x in EligibilityStatus],
     )
-    resolved_by = models.ForeignKey(User, on_delete=models.PROTECT, blank=True,
-                                    null=True, related_name='resolved_eligibility')
+    resolved_by = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name="resolved_eligibility",
+    )
 
     def clean(self):
-        if self.status is None and self._meta.model.objects.filter(client=self.client, status=None).count():
-            raise ValidationError('This client already exists in the queue.')
+        if (
+            self.status is None
+            and self._meta.model.objects.filter(client=self.client, status=None).count()
+        ):
+            raise ValidationError("This client already exists in the queue.")
 
     @property
     def is_resolved(self):
@@ -108,7 +122,7 @@ class EligibilityQueue(ObjectRoot):
 
     def __str__(self):
         full_name = self.client.full_name
-        return f'{full_name} by {self.requestor}'
+        return f"{full_name} by {self.requestor}"
 
 
 @receiver(post_save, sender=EligibilityQueue)
@@ -118,7 +132,7 @@ def update_client_eligibility(sender, instance, created, **kwargs):
         instance.client.eligibility.create(
             status=instance.status,
             eligibility=Eligibility.objects.first(),  # should be removed in the future?
-            created_by=instance.resolved_by
+            created_by=instance.resolved_by,
         )
 
 

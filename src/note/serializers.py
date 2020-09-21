@@ -1,4 +1,8 @@
-from core.serializers import ContentObjectRelatedField, ObjectSerializer, CreatedByReader
+from core.serializers import (
+    ContentObjectRelatedField,
+    ObjectSerializer,
+    CreatedByReader,
+)
 from .models import Note
 
 
@@ -8,16 +12,26 @@ class NoteReader(ObjectSerializer):
 
     class Meta:
         model = Note
-        fields = ('id', 'object', 'title', 'text', 'effective_date', 'source', 'created_at', 'modified_at', 'created_by')
+        fields = (
+            "id",
+            "object",
+            "title",
+            "text",
+            "effective_date",
+            "source",
+            "created_at",
+            "modified_at",
+            "created_by",
+        )
 
 
 class NoteWriter(ObjectSerializer):
-
     class SourceWriter(ContentObjectRelatedField):
         def get_queryset(self):
             return None
+
     source = SourceWriter()
 
     class Meta:
         model = Note
-        fields = ('title', 'text', 'effective_date', 'source')
+        fields = ("title", "text", "effective_date", "source")

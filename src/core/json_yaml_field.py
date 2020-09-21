@@ -13,7 +13,7 @@ class YAMLString(str):
 
 class YAMLFormField(forms.JSONField):
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be valid YAML."),
+        "invalid": _("'%(value)s' value must be valid YAML."),
     }
 
     def to_python(self, value):
@@ -27,9 +27,9 @@ class YAMLFormField(forms.JSONField):
             converted = yaml.load(value)
         except yaml.YAMLError:
             raise forms.ValidationError(
-                self.error_messages['invalid'],
-                code='invalid',
-                params={'value': value},
+                self.error_messages["invalid"],
+                code="invalid",
+                params={"value": value},
             )
         if isinstance(converted, str):
             return YAMLString(converted)
@@ -52,6 +52,6 @@ class YAMLFormField(forms.JSONField):
 
 class JsonYamlField(fields.JSONField):
     def formfield(self, **kwargs):
-        defaults = {'form_class': YAMLFormField}
+        defaults = {"form_class": YAMLFormField}
         defaults.update(kwargs)
         return super().formfield(**defaults)

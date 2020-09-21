@@ -20,7 +20,9 @@ def setup_agency_data():
 
     Agency2 has 2 clients: first one created by user1, second one created by user2
     """
-    agency1 = AgencyWithEligibilityFactory(name="Agency1", users=2, clients=2, num_eligibility=1)
+    agency1 = AgencyWithEligibilityFactory(
+        name="Agency1", users=2, clients=2, num_eligibility=1
+    )
 
     user1, user2 = [p.user for p in agency1.user_profiles.all()]
     client1, client2 = [ac.client for ac in agency1.agency_clients.all()]
@@ -59,17 +61,18 @@ def assertScenario(action, model, scenario):
                 user.user_permissions.add(Permission.objects.get(codename=codename))
 
         request = create_fake_request(user)
-        for obj, true_access, idx in zip(objects_to_check, expected_results, range(len(objects_to_check))):
-            print('*', user, obj, permissions)
+        for obj, true_access, idx in zip(
+            objects_to_check, expected_results, range(len(objects_to_check))
+        ):
+            print("*", user, obj, permissions)
             user_access = request.ability.can(action, obj)
 
-            to_text = {
-                True: 'can',
-                False: "can't"
-            }
+            to_text = {True: "can", False: "can't"}
 
-            assert user_access == true_access, "\n".join([
-                f"{user} {to_text[user_access]} access {obj},",
-                f"expected {to_text[true_access]} (row {row_idx}, obj {idx})",
-                f"user permissions: {permissions}"
-            ])
+            assert user_access == true_access, "\n".join(
+                [
+                    f"{user} {to_text[user_access]} access {obj},",
+                    f"expected {to_text[true_access]} (row {row_idx}, obj {idx})",
+                    f"user permissions: {permissions}",
+                ]
+            )

@@ -6,7 +6,7 @@ from .filters import (
     ProgramEligibilityViewsetFilter,
     EnrollmentViewsetFilter,
     EnrollmentServiceViewsetFilter,
-    EnrollmentServiceTypeViewsetFilter
+    EnrollmentServiceTypeViewsetFilter,
 )
 from .models import (
     Program,
@@ -16,11 +16,16 @@ from .models import (
     EnrollmentServiceType,
 )
 from .serializers import (
-    ProgramReader, ProgramWriter,
-    ProgramEligibilityReader, ProgramEligibilityWriter,
-    EnrollmentReader, EnrollmentWriter,
-    EnrollmentServiceReader, EnrollmentServiceWriter,
-    EnrollmentServiceTypeReader, EnrollmentServiceTypeWriter,
+    ProgramReader,
+    ProgramWriter,
+    ProgramEligibilityReader,
+    ProgramEligibilityWriter,
+    EnrollmentReader,
+    EnrollmentWriter,
+    EnrollmentServiceReader,
+    EnrollmentServiceWriter,
+    EnrollmentServiceTypeReader,
+    EnrollmentServiceTypeWriter,
 )
 
 
@@ -47,7 +52,9 @@ class ProgramEligibilityViewset(ModelViewSet):
         return self.request.ability.queryset_for(self.action, ProgramEligibility)
 
     def validate(self, request, data, action):
-        validate_fields_with_rules(request.user, data, client='can_read_client', program='can_read_program')
+        validate_fields_with_rules(
+            request.user, data, client="can_read_client", program="can_read_program"
+        )
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
@@ -63,7 +70,9 @@ class EnrollmentViewset(ModelViewSet):
         return self.request.ability.queryset_for(self.action, Enrollment).distinct()
 
     def validate(self, request, data, action):
-        validate_fields_with_rules(request.user, data, client='can_read_client', program='can_read_program')
+        validate_fields_with_rules(
+            request.user, data, client="can_read_client", program="can_read_program"
+        )
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
@@ -86,4 +95,6 @@ class EnrollmentServiceViewset(ModelViewSet):
     filterset_class = EnrollmentServiceViewsetFilter
 
     def get_queryset(self):
-        return self.request.ability.queryset_for(self.action, EnrollmentService).distinct()
+        return self.request.ability.queryset_for(
+            self.action, EnrollmentService
+        ).distinct()

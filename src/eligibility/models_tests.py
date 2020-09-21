@@ -19,8 +19,12 @@ def test_can_have_multiple_resolved_requests_for_same_client():
     agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
     client = Client.objects.first()
 
-    EligibilityQueue.objects.create(client=client, requestor=agency, status=EligibilityStatus.ELIGIBLE)
-    EligibilityQueue.objects.create(client=client, requestor=agency, status=EligibilityStatus.ELIGIBLE)
+    EligibilityQueue.objects.create(
+        client=client, requestor=agency, status=EligibilityStatus.ELIGIBLE
+    )
+    EligibilityQueue.objects.create(
+        client=client, requestor=agency, status=EligibilityStatus.ELIGIBLE
+    )
     assert EligibilityQueue.objects.count() == 2
 
 
@@ -31,7 +35,9 @@ def test_adding_second_unresolved_eq_will_fail_for_same_client():
     EligibilityQueue.objects.create(client=client, requestor=agency, status=None)
     try:
         with transaction.atomic():
-            EligibilityQueue.objects.create(client=client, requestor=agency, status=None)
+            EligibilityQueue.objects.create(
+                client=client, requestor=agency, status=None
+            )
         # adding another EQ should not be possible, because there is one with status=None
         assert False
     except django.db.utils.IntegrityError:

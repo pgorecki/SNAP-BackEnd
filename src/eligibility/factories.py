@@ -7,7 +7,7 @@ class EligibilityFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Eligibility
 
-    name = factory.Sequence(lambda n: f'Eligibility {n}')
+    name = factory.Sequence(lambda n: f"Eligibility {n}")
 
 
 class EligibilityQueueFactory(factory.django.DjangoModelFactory):
@@ -16,7 +16,6 @@ class EligibilityQueueFactory(factory.django.DjangoModelFactory):
 
 
 class AgencyWithEligibilityFactory(AgencyFactory):
-
     @factory.post_generation
     def num_eligibility(obj, create, extracted, **kwargs):
         if not create:

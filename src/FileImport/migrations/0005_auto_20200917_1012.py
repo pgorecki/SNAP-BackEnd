@@ -7,17 +7,17 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('FileImport', '0004_fileimport_xls_file'),
+        ("FileImport", "0004_fileimport_xls_file"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='fileimport',
-            name='timestamp',
+            model_name="fileimport",
+            name="timestamp",
         ),
         migrations.AddField(
-            model_name='fileimport',
-            name='created_at',
+            model_name="fileimport",
+            name="created_at",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
     ]

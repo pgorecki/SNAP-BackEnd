@@ -6,16 +6,22 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('eligibility', '0005_auto_20200814_1022'),
+        ("eligibility", "0005_auto_20200814_1022"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='clienteligibility',
-            options={'ordering': ['-created_at'], 'verbose_name_plural': 'Client eligibility'},
+            name="clienteligibility",
+            options={
+                "ordering": ["-created_at"],
+                "verbose_name_plural": "Client eligibility",
+            },
         ),
         migrations.AlterModelOptions(
-            name='eligibilityqueue',
-            options={'ordering': ['-created_at'], 'verbose_name_plural': 'Eligibility Queue'},
+            name="eligibilityqueue",
+            options={
+                "ordering": ["-created_at"],
+                "verbose_name_plural": "Eligibility Queue",
+            },
         ),
     ]

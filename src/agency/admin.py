@@ -4,7 +4,8 @@ from django.forms import ValidationError
 from django.shortcuts import render, redirect
 from django.urls import path
 from agency.models import Agency, AgencyClient
-#from .forms import XlsUploadForm
+
+# from .forms import XlsUploadForm
 from FileImport.forms import FileImportForm
 
 
@@ -15,9 +16,7 @@ class AgencyClientInline(admin.TabularInline):
 @admin.register(Agency)
 class AgencyAdmin(admin.ModelAdmin):
     def get_urls(self):
-        return [
-            path('<object_id>/import-xls/', self.import_xls)
-        ] + super().get_urls()
+        return [path("<object_id>/import-xls/", self.import_xls)] + super().get_urls()
 
     def import_xls(self, request, object_id):
         form = FileImportForm()
@@ -25,7 +24,10 @@ class AgencyAdmin(admin.ModelAdmin):
         if request.method == "POST":
             form = FileImportForm(request.POST, request.FILES)
             if not request.user.is_superuser:
-                self.message_user('You must be a super user to perform this action', level=messages.ERROR)
+                self.message_user(
+                    "You must be a super user to perform this action",
+                    level=messages.ERROR,
+                )
 
             if form.is_valid():
                 # file is saved
@@ -44,7 +46,5 @@ class AgencyAdmin(admin.ModelAdmin):
 
             return redirect("..")
 
-        payload = {'form': form}
-        return render(
-            request, 'admin/agency/xls_import.html', payload
-        )
+        payload = {"form": form}
+        return render(request, "admin/agency/xls_import.html", payload)

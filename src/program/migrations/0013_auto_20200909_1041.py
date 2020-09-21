@@ -7,29 +7,40 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('agency', '0012_remove_agency_programs'),
-        ('program', '0012_enrollmentservicetype'),
+        ("agency", "0012_remove_agency_programs"),
+        ("program", "0012_enrollmentservicetype"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='enrollmentservicetype',
-            old_name='service_type',
-            new_name='category',
+            model_name="enrollmentservicetype",
+            old_name="service_type",
+            new_name="category",
         ),
         migrations.AddField(
-            model_name='enrollmentservice',
-            name='service_type',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='program.enrollmentservicetype'),
+            model_name="enrollmentservice",
+            name="service_type",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="program.enrollmentservicetype",
+            ),
         ),
         migrations.AddField(
-            model_name='enrollmentservice',
-            name='values',
+            model_name="enrollmentservice",
+            name="values",
             field=models.JSONField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='enrollmentservicetype',
-            name='agency',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='enrollment_service_types', to='agency.agency'),
+            model_name="enrollmentservicetype",
+            name="agency",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="enrollment_service_types",
+                to="agency.agency",
+            ),
         ),
     ]

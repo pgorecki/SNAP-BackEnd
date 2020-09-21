@@ -16,7 +16,7 @@ class ClientViewset(ModelViewSet):
     write_serializer_class = ClientWriter
     permission_classes = [AbilityPermission]
     filterset_class = ClientSearchFilter
-    ordering_fields = ['first_name', 'middle_name', 'last_name', 'dob']
+    ordering_fields = ["first_name", "middle_name", "last_name", "dob"]
 
     def get_queryset(self):
         return self.request.ability.queryset_for(self.action, Client).distinct()
