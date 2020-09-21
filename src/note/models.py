@@ -1,7 +1,8 @@
 from django.db import models
-from core.models import ObjectRoot
+from django.utils import timezone
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from core.models import ObjectRoot
 
 
 class Note(ObjectRoot):
@@ -14,3 +15,4 @@ class Note(ObjectRoot):
     source = GenericForeignKey('source_type', 'source_id')
     title = models.TextField(blank=True, default='')
     text = models.TextField(blank=True, default='')
+    effective_date = models.DateTimeField(default=timezone.now)

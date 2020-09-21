@@ -8,7 +8,7 @@ class NoteReader(ObjectSerializer):
 
     class Meta:
         model = Note
-        fields = ('id', 'object', 'title', 'text', 'source', 'created_at', 'modified_at', 'created_by')
+        fields = ('id', 'object', 'title', 'text', 'effective_date', 'source', 'created_at', 'modified_at', 'created_by')
 
 
 class NoteWriter(ObjectSerializer):
@@ -20,4 +20,4 @@ class NoteWriter(ObjectSerializer):
 
     class Meta:
         model = Note
-        fields = ('title', 'text', 'source')
+        fields = ('title', 'text', 'effective_date', 'source')
