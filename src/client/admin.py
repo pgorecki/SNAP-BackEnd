@@ -1,9 +1,6 @@
 from django.contrib import admin
-from client.models import Client, ClientAddress
+from client.models import Client
 from agency.admin import AgencyClientInline
-
-
-admin.site.register(ClientAddress)
 
 
 @admin.register(Client)
