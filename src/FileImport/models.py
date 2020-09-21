@@ -22,8 +22,6 @@ from client.models import Client, ClientAddress
 import logging
 logging.basicConfig(filename='MPRapp.log', level=logging.INFO)
 
-## TODO: When you are creating new client you should also create an AgencyClient associated with this client and agency. It is required for access control/permission i.e. my_new_client.agency_clients.create(agency=user.profile.agency)
-
 class FileImport(models.Model):  # MPR
     ftype = models.CharField(max_length=32, blank=False, null=False, help_text='Excel File Type Import:',  # MPR
                              choices=[(x.name, x.value) for x in FileImportTypes], default=FileImportTypes.MPR)  # MPR
@@ -69,7 +67,8 @@ class FileImport(models.Model):  # MPR
         # Throws exceptions if file contains incomplete and\or invalid data.
         # Provider is assumed to be in cell A3 and month in cell A5.
         # variable abbreviations\classes: c3=Client, a3=Agency, ciep3=ClientIEP, ciep_en3=ClientIEPEnrollment, e3=ciep_en3.enrollment, ea3=EnrollmentActivity, es3=EnrollmentService, n3=Note
-
+        # Remove unnecessary print statements
+        
         print('Running MPR Import Script')
         try:
             wb = xlrd.open_workbook(self.loc)
@@ -108,7 +107,6 @@ class FileImport(models.Model):  # MPR
             print(err3)
             # return ({'records read':0,'records successfuly processed':0,'records failed':0,'error':str(ve) + err3}, None, None)
         # print(df1)  ## TODO delete later
-        # df1[pd.isnull(df1)]=None  # didn't work
         df1 = df1.where(pd.notnull(df1), None)
         print(df1.iloc[0])  # TODO delete later
         print(df1.info())
@@ -128,6 +126,7 @@ class FileImport(models.Model):  # MPR
                 try:
                     with transaction.atomic():
                         c3 = Client.objects.filter(snap_id='333333333' if pd.isnull(row[' Client ID']) else str(int(row[' Client ID']))).first()
+                        ## TODO: Is there need to use 3333333 logic? CLient ID and Case Number can be null or blank . Replace it with null comparison?
                         if c3:
                             print('Client in the DB:' + str(c3.first_name) + ' ' +
                                   str(c3.last_name) + ' with pk=' + str(c3.id))
@@ -135,13 +134,17 @@ class FileImport(models.Model):  # MPR
                                 c3.address.county = row['County of Residence']
                                 c3.address.save()
                         else:
-                            ca1 = ClientAddress(county=row['County of Residence'])
-                            c3 = Client(first_name=row['First Name'], last_name=row['Last Name'], snap_id=None if pd.isnull(row[' Client ID']) else str(int(row[' Client ID'])), address=ca1)
-                            ca1.save()
-                            c3.save()
-                            print('Created Client ' + str(c3.first_name) + ' ' +
-                                  str(c3.last_name) + ' with pk=' + str(c3.id))
-                            c3.agency_clients.create(agency=a3)   ##TODO: Is this saving automatically
+                            if not pd.isnull(row['Case Number']) and not row['Case Number']=='':
+                               ciep3=ClientIEP.objects.filter(case_number=str(int(row['Case Number']))).first()
+                               if ciep3:
+                                  c3=ciep3.client
+                            if not c3:
+                               ca1 = ClientAddress(county=row['County of Residence'])
+                               c3 = Client(first_name=row['First Name'], last_name=row['Last Name'], snap_id=None if pd.isnull(row[' Client ID']) else str(int(row[' Client ID'])), address=ca1)
+                               ca1.save()
+                               c3.save()
+                               print('Created Client ' + str(c3.first_name) + ' ' + str(c3.last_name) + ' with pk=' + str(c3.id))
+                               c3.agency_clients.create(agency=a3)   
                         if Client.objects.filter(snap_id='333333333' if pd.isnull(row[' Client ID']) else str(int(row[' Client ID']))).count() > 1:
                             print('MultipleObjectsReturned for gsnap_id=' + str(c3.snap_id) +
                                   '. Picking the first one with pk=' + str(c3.pk))
@@ -347,16 +350,22 @@ class FileImport(models.Model):  # MPR
                                 c3.address = ca1
                             c3.save()
                         else:
-                            # Create Client
-                            ca1 = ClientAddress(street='' if pd.isnull(row['Address']) else row['Address'], city='' if pd.isnull(row['City']) else row['City'], zip='' if pd.isnull(
-                                row['Zip Code']) else str(int(row['Zip Code'])), county='' if pd.isnull(row['County of Residence']) else row['County of Residence'])
-                            c3 = Client(first_name=row['First Name'], last_name=row['Last Name'], snap_id=None if pd.isnull(row[' Client ID']) else str(int(row[' Client ID'])),
-                                        ssn=row['SSN '], dob=pd.to_datetime(row['Date of Birth']).date(), address=ca1)
-                            ca1.save()
-                            c3.save()
-                            print('Created Client ' + str(c3.first_name) + ' ' +
-                                  str(c3.last_name) + ' with pk=' + str(c3.id))
-                            c3.agency_clients.create(agency=a3)
+                            if not pd.isnull(row['Case #']) and not row['Case #']=='':
+                               ciep3=ClientIEP.objects.filter(case_number=str(int(row['Case #']))).first()
+                               if ciep3:
+                                  c3=ciep3.client
+                                  print('Client could not be found but there is IEPClient with case number=' + str(ciep3.case_number))
+                            if not c3:
+                                # Create Client
+                                ca1 = ClientAddress(street='' if pd.isnull(row['Address']) else row['Address'], city='' if pd.isnull(row['City']) else row['City'], zip='' if pd.isnull(
+                                    row['Zip Code']) else str(int(row['Zip Code'])), county='' if pd.isnull(row['County of Residence']) else row['County of Residence'])
+                                c3 = Client(first_name=row['First Name'], last_name=row['Last Name'], snap_id=None if pd.isnull(row[' Client ID']) else str(int(row[' Client ID'])),
+                                            ssn=row['SSN '], dob=pd.to_datetime(row['Date of Birth']).date(), address=ca1)
+                                ca1.save()
+                                c3.save()
+                                print('Created Client ' + str(c3.first_name) + ' ' +
+                                      str(c3.last_name) + ' with pk=' + str(c3.id))
+                                c3.agency_clients.create(agency=a3)
                         if Client.objects.filter(snap_id='333333333' if pd.isnull(row[' Client ID']) else str(int(row[' Client ID']))).count() > 1:
                             print('MultipleObjectsReturned for gsnap_id=' + str(c3.snap_id) +
                                   '. Picking the first one with pk=' + str(c3.pk))
