@@ -6,28 +6,48 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0009_auto_20200720_1423'),
+        ("program", "0009_auto_20200720_1423"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='enrollment',
-            name='projected_end_date',
+            model_name="enrollment",
+            name="projected_end_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='historicalenrollment',
-            name='projected_end_date',
+            model_name="historicalenrollment",
+            name="projected_end_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='enrollment',
-            name='status',
-            field=models.CharField(choices=[('AWAITING_ENTRY', 'awaiting entry'), ('PLANNED', 'planned'), ('ENROLLED', 'enrolled'), ('COMPLETED', 'completed'), ('CANCELLED', 'cancelled'), ('EXITED', 'exited')], max_length=32),
+            model_name="enrollment",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("AWAITING_ENTRY", "awaiting entry"),
+                    ("PLANNED", "planned"),
+                    ("ENROLLED", "enrolled"),
+                    ("COMPLETED", "completed"),
+                    ("CANCELLED", "cancelled"),
+                    ("EXITED", "exited"),
+                ],
+                max_length=32,
+            ),
         ),
         migrations.AlterField(
-            model_name='historicalenrollment',
-            name='status',
-            field=models.CharField(choices=[('AWAITING_ENTRY', 'awaiting entry'), ('PLANNED', 'planned'), ('ENROLLED', 'enrolled'), ('COMPLETED', 'completed'), ('CANCELLED', 'cancelled'), ('EXITED', 'exited')], max_length=32),
+            model_name="historicalenrollment",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("AWAITING_ENTRY", "awaiting entry"),
+                    ("PLANNED", "planned"),
+                    ("ENROLLED", "enrolled"),
+                    ("COMPLETED", "completed"),
+                    ("CANCELLED", "cancelled"),
+                    ("EXITED", "exited"),
+                ],
+                max_length=32,
+            ),
         ),
     ]

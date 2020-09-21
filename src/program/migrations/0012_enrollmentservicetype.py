@@ -6,20 +6,39 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0011_auto_20200909_0558'),
+        ("program", "0011_auto_20200909_0558"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='EnrollmentServiceType',
+            name="EnrollmentServiceType",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=64)),
-                ('service_type', models.CharField(choices=[('attendance', 'Attendance'), ('time_based', 'Time based'), ('direct', 'Direct')], default='direct', max_length=32)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=64)),
+                (
+                    "service_type",
+                    models.CharField(
+                        choices=[
+                            ("attendance", "Attendance"),
+                            ("time_based", "Time based"),
+                            ("direct", "Direct"),
+                        ],
+                        default="direct",
+                        max_length=32,
+                    ),
+                ),
             ],
             options={
-                'db_table': 'program_enrollment_service_type',
-                'ordering': ['name'],
+                "db_table": "program_enrollment_service_type",
+                "ordering": ["name"],
             },
         ),
     ]

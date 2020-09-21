@@ -7,12 +7,11 @@ class ProgramFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Program
 
-    name = factory.Sequence(lambda n: f'Program {n}')
-    description = factory.LazyAttribute(lambda obj: f'Description for {obj.name}')
+    name = factory.Sequence(lambda n: f"Program {n}")
+    description = factory.LazyAttribute(lambda obj: f"Description for {obj.name}")
 
 
 class AgencyWithProgramsFactory(AgencyFactory):
-
     @factory.post_generation
     def num_programs(obj, create, extracted, **kwargs):
         if not create:

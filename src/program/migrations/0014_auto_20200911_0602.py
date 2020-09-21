@@ -6,23 +6,40 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0013_auto_20200909_1041'),
+        ("program", "0013_auto_20200909_1041"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='enrollmentactivity',
-            name='data_import_id',
-            field=models.CharField(blank=True, help_text='MPR import job run instance', max_length=80, null=True),
+            model_name="enrollmentactivity",
+            name="data_import_id",
+            field=models.CharField(
+                blank=True,
+                help_text="MPR import job run instance",
+                max_length=80,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='enrollmentactivity',
-            name='month',
-            field=models.CharField(blank=True, default='Service Month:  ', help_text='MPR month or period', max_length=60, null=True),
+            model_name="enrollmentactivity",
+            name="month",
+            field=models.CharField(
+                blank=True,
+                default="Service Month:  ",
+                help_text="MPR month or period",
+                max_length=60,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='enrollmentactivity',
-            name='provider',
-            field=models.CharField(blank=True, default='(Provider Name)', help_text='MPR sheet name', max_length=60, null=True),
+            model_name="enrollmentactivity",
+            name="provider",
+            field=models.CharField(
+                blank=True,
+                default="(Provider Name)",
+                help_text="MPR sheet name",
+                max_length=60,
+                null=True,
+            ),
         ),
     ]

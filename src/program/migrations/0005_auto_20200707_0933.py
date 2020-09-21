@@ -6,24 +6,27 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0004_auto_20200702_1101'),
+        ("program", "0004_auto_20200702_1101"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='agencyprogramconfig',
-            options={'ordering': ['-created_at']},
+            name="agencyprogramconfig",
+            options={"ordering": ["-created_at"]},
         ),
         migrations.AlterModelOptions(
-            name='enrollment',
-            options={'ordering': ['-created_at']},
+            name="enrollment",
+            options={"ordering": ["-created_at"]},
         ),
         migrations.AlterModelOptions(
-            name='program',
-            options={'ordering': ['-created_at']},
+            name="program",
+            options={"ordering": ["-created_at"]},
         ),
         migrations.AlterModelOptions(
-            name='programeligibility',
-            options={'ordering': ['-created_at'], 'verbose_name_plural': 'Program eligibility'},
+            name="programeligibility",
+            options={
+                "ordering": ["-created_at"],
+                "verbose_name_plural": "Program eligibility",
+            },
         ),
     ]

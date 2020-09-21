@@ -5,4 +5,5 @@ class ApplicationValidationError(serializers.ValidationError):
     """
     class for application-level validation errors
     """
+
     pass

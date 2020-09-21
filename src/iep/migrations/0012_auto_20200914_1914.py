@@ -6,20 +6,28 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('iep', '0011_auto_20200914_0634'),
+        ("iep", "0011_auto_20200914_0634"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='clientiep',
-            options={'ordering': ['-created_at'], 'verbose_name': 'Client IEP', 'verbose_name_plural': 'Client IEPs'},
+            name="clientiep",
+            options={
+                "ordering": ["-created_at"],
+                "verbose_name": "Client IEP",
+                "verbose_name_plural": "Client IEPs",
+            },
         ),
         migrations.AlterModelOptions(
-            name='clientiepenrollment',
-            options={'ordering': ['id'], 'verbose_name': 'Client IEP Enrollment'},
+            name="clientiepenrollment",
+            options={"ordering": ["id"], "verbose_name": "Client IEP Enrollment"},
         ),
         migrations.AlterModelOptions(
-            name='jobplacement',
-            options={'ordering': ['id'], 'verbose_name': 'Job Placement', 'verbose_name_plural': 'Job Placements'},
+            name="jobplacement",
+            options={
+                "ordering": ["id"],
+                "verbose_name": "Job Placement",
+                "verbose_name_plural": "Job Placements",
+            },
         ),
     ]

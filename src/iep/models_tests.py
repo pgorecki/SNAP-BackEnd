@@ -78,8 +78,10 @@ def test_approving_eligibility_request_will_change_status():
 
     iep = ClientIEPFactory(client=client)
 
-    Eligibility.objects.create(name='test')
-    eligibility_request = EligibilityQueue.objects.create(client=client, requestor=agency)
+    Eligibility.objects.create(name="test")
+    eligibility_request = EligibilityQueue.objects.create(
+        client=client, requestor=agency
+    )
     iep.eligibility_request = eligibility_request
     iep.save()
 
@@ -97,8 +99,10 @@ def test_denying_eligibility_request_will_change_status():
 
     iep = ClientIEPFactory(client=client)
 
-    Eligibility.objects.create(name='test')
-    eligibility_request = EligibilityQueue.objects.create(client=client, requestor=agency)
+    Eligibility.objects.create(name="test")
+    eligibility_request = EligibilityQueue.objects.create(
+        client=client, requestor=agency
+    )
     iep.eligibility_request = eligibility_request
     iep.save()
 

@@ -5,6 +5,7 @@ from eligibility.enums import EligibilityStatus
 from eligibility.models import Eligibility, ClientEligibility
 from eligibility.viewsets import ClientEligibilityViewset, EligibilityQueueViewset
 from django.contrib.auth.models import Permission
+
 """
 Eligiblity endpoints
 
@@ -18,7 +19,7 @@ def test_client_eligibility_is_protected():
     user1, user2 = agency_users(agency1)
 
     user = agency1.user_profiles.first().user
-    view = create_view(ClientEligibilityViewset, 'view', user)
+    view = create_view(ClientEligibilityViewset, "view", user)
     assert AbilityPermission in view.permission_classes
 
 
@@ -40,11 +41,15 @@ def test_client_eligibility_access():
         created_by=user2,
     )
 
-    assertScenario('view', ClientEligibility, (
-        (None,  eli1,  eli2),
-        (user1, False, False, 'view_clienteligibility'),
-        (user1, True,  False, ['view_clienteligibility', 'view_client']),
-    ))
+    assertScenario(
+        "view",
+        ClientEligibility,
+        (
+            (None, eli1, eli2),
+            (user1, False, False, "view_clienteligibility"),
+            (user1, True, False, ["view_clienteligibility", "view_client"]),
+        ),
+    )
 
 
 def test_eligibility_queue_is_protected():
@@ -52,5 +57,5 @@ def test_eligibility_queue_is_protected():
     user1, user2 = agency_users(agency1)
 
     user = agency1.user_profiles.first().user
-    view = create_view(EligibilityQueueViewset, 'view', user)
+    view = create_view(EligibilityQueueViewset, "view", user)
     assert AbilityPermission in view.permission_classes

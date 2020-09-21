@@ -3,32 +3,32 @@ from cancan.ability import AbilityValidator
 from cancan.middleware import CanCanMiddleware
 
 
-class AbilityPermission():
+class AbilityPermission:
     def has_permission(self, request, view=None):
-        print('hp', view.action, view.get_queryset().model)
+        print("hp", view.action, view.get_queryset().model)
         validator = request.ability
         ability = validator.ability
-        ability.set_alias('list', 'view')
-        ability.set_alias('retrieve', 'view')
-        ability.set_alias('create', 'add')
-        ability.set_alias('update', 'change')
-        ability.set_alias('partial_update', 'change')
-        ability.set_alias('destroy', 'delete')
+        ability.set_alias("list", "view")
+        ability.set_alias("retrieve", "view")
+        ability.set_alias("create", "add")
+        ability.set_alias("update", "change")
+        ability.set_alias("partial_update", "change")
+        ability.set_alias("destroy", "delete")
         result = validator.can(view.action, view.get_queryset().model)
         return result
 
         return validator.can(view.action, view.get_queryset().model)
 
     def has_object_permission(self, request, view, obj):
-        print('hop', view.action, obj)
+        print("hop", view.action, obj)
         validator = request.ability
         ability = validator.ability
-        ability.set_alias('list', 'view')
-        ability.set_alias('retrieve', 'view')
-        ability.set_alias('create', 'add')
-        ability.set_alias('update', 'change')
-        ability.set_alias('partial_update', 'change')
-        ability.set_alias('destroy', 'delete')
+        ability.set_alias("list", "view")
+        ability.set_alias("retrieve", "view")
+        ability.set_alias("create", "add")
+        ability.set_alias("update", "change")
+        ability.set_alias("partial_update", "change")
+        ability.set_alias("destroy", "delete")
         return validator.can(view.action, obj)
 
 
@@ -38,7 +38,7 @@ class IsAgencyMemberReadOnly(IsAuthenticated):
     """
 
     def has_permission(self, request, view=None):
-        if view.action not in ['list', 'retrieve']:
+        if view.action not in ["list", "retrieve"]:
             return False
 
         try:

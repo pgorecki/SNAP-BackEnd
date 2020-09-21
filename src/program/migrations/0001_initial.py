@@ -14,132 +14,524 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('client', '0002_auto_20200521_1352'),
-        ('agency', '0004_auto_20200610_0450'),
+        ("client", "0002_auto_20200521_1352"),
+        ("agency", "0004_auto_20200610_0450"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('survey', '0005_auto_20200605_1114'),
+        ("survey", "0005_auto_20200605_1114"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Program',
+            name="Program",
             fields=[
-                ('is_removed', models.BooleanField(default=False)),
-                ('id', model_utils.fields.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created_at')),
-                ('modified_at', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified_at')),
-                ('name', models.CharField(max_length=64)),
-                ('description', models.TextField(blank=True, default='')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('enrollment_entry_survey', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='programs_where_is_entry_survey', to='survey.Survey')),
-                ('enrollment_exit_survey', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='programs_where_is_exit_survey', to='survey.Survey')),
-                ('enrollment_update_survey', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='programs_where_is_update_survey', to='survey.Survey')),
+                ("is_removed", models.BooleanField(default=False)),
+                (
+                    "id",
+                    model_utils.fields.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "created_at",
+                    model_utils.fields.AutoCreatedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created_at",
+                    ),
+                ),
+                (
+                    "modified_at",
+                    model_utils.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="modified_at",
+                    ),
+                ),
+                ("name", models.CharField(max_length=64)),
+                ("description", models.TextField(blank=True, default="")),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "enrollment_entry_survey",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="programs_where_is_entry_survey",
+                        to="survey.Survey",
+                    ),
+                ),
+                (
+                    "enrollment_exit_survey",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="programs_where_is_exit_survey",
+                        to="survey.Survey",
+                    ),
+                ),
+                (
+                    "enrollment_update_survey",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="programs_where_is_update_survey",
+                        to="survey.Survey",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'program',
+                "db_table": "program",
             },
         ),
         migrations.CreateModel(
-            name='HistoricalEnrollment',
+            name="HistoricalEnrollment",
             fields=[
-                ('is_removed', models.BooleanField(default=False)),
-                ('created_at', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created_at')),
-                ('modified_at', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified_at')),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False)),
-                ('status', models.CharField(choices=[('AWAITING_ENTRY', 'awaiting entry'), ('ENROLLED', 'enrolled'), ('EXITED', 'exited')], max_length=32)),
-                ('history_id', models.AutoField(primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField()),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('client', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='client.Client')),
-                ('created_by', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('program', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='program.Program')),
-                ('response', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='survey.Response')),
+                ("is_removed", models.BooleanField(default=False)),
+                (
+                    "created_at",
+                    model_utils.fields.AutoCreatedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created_at",
+                    ),
+                ),
+                (
+                    "modified_at",
+                    model_utils.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="modified_at",
+                    ),
+                ),
+                (
+                    "id",
+                    models.UUIDField(db_index=True, default=uuid.uuid4, editable=False),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("AWAITING_ENTRY", "awaiting entry"),
+                            ("ENROLLED", "enrolled"),
+                            ("EXITED", "exited"),
+                        ],
+                        max_length=32,
+                    ),
+                ),
+                ("history_id", models.AutoField(primary_key=True, serialize=False)),
+                ("history_date", models.DateTimeField()),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(
+                        choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")],
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "client",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="client.Client",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "program",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="program.Program",
+                    ),
+                ),
+                (
+                    "response",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="survey.Response",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical enrollment',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': 'history_date',
+                "verbose_name": "historical enrollment",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": "history_date",
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
         migrations.CreateModel(
-            name='HistoricalEligibility',
+            name="HistoricalEligibility",
             fields=[
-                ('is_removed', models.BooleanField(default=False)),
-                ('created_at', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created_at')),
-                ('modified_at', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified_at')),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False)),
-                ('status', models.CharField(choices=[('ELIGIBLE', 'eligible'), ('NOT_ELIGIBLE', 'not eligible')], max_length=32)),
-                ('history_id', models.AutoField(primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField()),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('client', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='client.Client')),
-                ('created_by', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('program', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='program.Program')),
+                ("is_removed", models.BooleanField(default=False)),
+                (
+                    "created_at",
+                    model_utils.fields.AutoCreatedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created_at",
+                    ),
+                ),
+                (
+                    "modified_at",
+                    model_utils.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="modified_at",
+                    ),
+                ),
+                (
+                    "id",
+                    models.UUIDField(db_index=True, default=uuid.uuid4, editable=False),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("ELIGIBLE", "eligible"),
+                            ("NOT_ELIGIBLE", "not eligible"),
+                        ],
+                        max_length=32,
+                    ),
+                ),
+                ("history_id", models.AutoField(primary_key=True, serialize=False)),
+                ("history_date", models.DateTimeField()),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(
+                        choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")],
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "client",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="client.Client",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "program",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="program.Program",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical eligibility',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': 'history_date',
+                "verbose_name": "historical eligibility",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": "history_date",
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
         migrations.CreateModel(
-            name='Enrollment',
+            name="Enrollment",
             fields=[
-                ('is_removed', models.BooleanField(default=False)),
-                ('created_at', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created_at')),
-                ('modified_at', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified_at')),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('status', models.CharField(choices=[('AWAITING_ENTRY', 'awaiting entry'), ('ENROLLED', 'enrolled'), ('EXITED', 'exited')], max_length=32)),
-                ('client', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='enrollments', to='client.Client')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('program', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='enrollments', to='program.Program')),
-                ('response', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='enrollment', to='survey.Response')),
+                ("is_removed", models.BooleanField(default=False)),
+                (
+                    "created_at",
+                    model_utils.fields.AutoCreatedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created_at",
+                    ),
+                ),
+                (
+                    "modified_at",
+                    model_utils.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="modified_at",
+                    ),
+                ),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("AWAITING_ENTRY", "awaiting entry"),
+                            ("ENROLLED", "enrolled"),
+                            ("EXITED", "exited"),
+                        ],
+                        max_length=32,
+                    ),
+                ),
+                (
+                    "client",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="enrollments",
+                        to="client.Client",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "program",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="enrollments",
+                        to="program.Program",
+                    ),
+                ),
+                (
+                    "response",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="enrollment",
+                        to="survey.Response",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['created_at'],
-                'abstract': False,
+                "ordering": ["created_at"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Eligibility',
+            name="Eligibility",
             fields=[
-                ('is_removed', models.BooleanField(default=False)),
-                ('created_at', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created_at')),
-                ('modified_at', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified_at')),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('status', models.CharField(choices=[('ELIGIBLE', 'eligible'), ('NOT_ELIGIBLE', 'not eligible')], max_length=32)),
-                ('client', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='eligibility', to='client.Client')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('program', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='eligibility', to='program.Program')),
+                ("is_removed", models.BooleanField(default=False)),
+                (
+                    "created_at",
+                    model_utils.fields.AutoCreatedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created_at",
+                    ),
+                ),
+                (
+                    "modified_at",
+                    model_utils.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="modified_at",
+                    ),
+                ),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("ELIGIBLE", "eligible"),
+                            ("NOT_ELIGIBLE", "not eligible"),
+                        ],
+                        max_length=32,
+                    ),
+                ),
+                (
+                    "client",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="eligibility",
+                        to="client.Client",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "program",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="eligibility",
+                        to="program.Program",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['created_at'],
-                'abstract': False,
+                "ordering": ["created_at"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='AgencyProgramConfig',
+            name="AgencyProgramConfig",
             fields=[
-                ('is_removed', models.BooleanField(default=False)),
-                ('id', model_utils.fields.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created_at')),
-                ('modified_at', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified_at')),
-                ('agency', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='agency.Agency')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('enrollment_entry_survey', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='agency_programs_where_is_entry_survey', to='survey.Survey')),
-                ('enrollment_exit_survey', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='agency_programs_where_is_exit_survey', to='survey.Survey')),
-                ('enrollment_update_survey', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='agency_programs_where_is_update_survey', to='survey.Survey')),
-                ('program', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='program.Program')),
+                ("is_removed", models.BooleanField(default=False)),
+                (
+                    "id",
+                    model_utils.fields.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "created_at",
+                    model_utils.fields.AutoCreatedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created_at",
+                    ),
+                ),
+                (
+                    "modified_at",
+                    model_utils.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="modified_at",
+                    ),
+                ),
+                (
+                    "agency",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="agency.Agency"
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "enrollment_entry_survey",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="agency_programs_where_is_entry_survey",
+                        to="survey.Survey",
+                    ),
+                ),
+                (
+                    "enrollment_exit_survey",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="agency_programs_where_is_exit_survey",
+                        to="survey.Survey",
+                    ),
+                ),
+                (
+                    "enrollment_update_survey",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="agency_programs_where_is_update_survey",
+                        to="survey.Survey",
+                    ),
+                ),
+                (
+                    "program",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="program.Program",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['created_at'],
-                'abstract': False,
+                "ordering": ["created_at"],
+                "abstract": False,
             },
         ),
     ]

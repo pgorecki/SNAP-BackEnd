@@ -7,13 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0014_auto_20200911_0602'),
+        ("program", "0014_auto_20200911_0602"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='enrollmentservice',
-            name='service_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='enrollment_services', to='program.enrollmentservicetype'),
+            model_name="enrollmentservice",
+            name="service_type",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="enrollment_services",
+                to="program.enrollmentservicetype",
+            ),
         ),
     ]

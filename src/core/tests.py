@@ -4,22 +4,20 @@ from client.models import Client
 
 
 def test_client_full_name_1():
-    client = Client(
-        first_name='A', middle_name='B', last_name='C')
+    client = Client(first_name="A", middle_name="B", last_name="C")
 
-    assert str(client) == 'A B C'
+    assert str(client) == "A B C"
 
 
 def test_client_full_name_2():
-    client = Client(
-        first_name='A', last_name='C')
+    client = Client(first_name="A", last_name="C")
 
-    assert str(client) == 'A C'
+    assert str(client) == "A C"
 
 
 def test_user_agency_associacion():
-    user = User.objects.create(username='John')
-    agency = Agency.objects.create(name='Georgia')
+    user = User.objects.create(username="John")
+    agency = Agency.objects.create(name="Georgia")
 
     user.profile.agency = agency
     user.save()
@@ -29,8 +27,8 @@ def test_user_agency_associacion():
 
 
 def test_client_agency_associacion():
-    agency = Agency.objects.create(name='Georgia')
-    client = Client.objects.create(dob='2000-01-01')
+    agency = Agency.objects.create(name="Georgia")
+    client = Client.objects.create(dob="2000-01-01")
 
     AgencyClient.objects.create(agency=agency, client=client)
 

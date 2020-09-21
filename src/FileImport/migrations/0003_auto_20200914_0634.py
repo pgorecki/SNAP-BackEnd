@@ -7,24 +7,35 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('FileImport', '0002_fileimport_agency'),
+        ("FileImport", "0002_fileimport_agency"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='fileimport',
-            name='result',
-            field=models.CharField(blank=True, help_text='result of import job run stored as dictionary string', max_length=500, null=True),
+            model_name="fileimport",
+            name="result",
+            field=models.CharField(
+                blank=True,
+                help_text="result of import job run stored as dictionary string",
+                max_length=500,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='fileimport',
-            name='run_id',
-            field=models.IntegerField(blank=True, help_text='Label of import job run stored as dictionary string', null=True),
+            model_name="fileimport",
+            name="run_id",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Label of import job run stored as dictionary string",
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='fileimport',
-            name='timestamp',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="fileimport",
+            name="timestamp",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
     ]

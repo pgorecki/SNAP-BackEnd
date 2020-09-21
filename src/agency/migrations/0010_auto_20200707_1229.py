@@ -6,16 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('agency', '0009_agency_security_groups'),
+        ("agency", "0009_agency_security_groups"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='agency',
-            options={'ordering': ['name'], 'verbose_name_plural': 'Agencies'},
+            name="agency",
+            options={"ordering": ["name"], "verbose_name_plural": "Agencies"},
         ),
         migrations.RemoveField(
-            model_name='agency',
-            name='security_groups',
+            model_name="agency",
+            name="security_groups",
         ),
     ]

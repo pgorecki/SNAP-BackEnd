@@ -9,29 +9,56 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('agency', '0008_auto_20200707_0933'),
+        ("agency", "0008_auto_20200707_0933"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SecurityGroup',
+            name="SecurityGroup",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=64)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=64)),
             ],
             options={
-                'db_table': 'security_group',
+                "db_table": "security_group",
             },
         ),
         migrations.CreateModel(
-            name='SecurityGroupAgencyConfig',
+            name="SecurityGroupAgencyConfig",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('agency', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='agency.Agency')),
-                ('security_group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='security.SecurityGroup')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "agency",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="agency.Agency"
+                    ),
+                ),
+                (
+                    "security_group",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="security.SecurityGroup",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'security_group_agency_config',
+                "db_table": "security_group_agency_config",
             },
         ),
     ]

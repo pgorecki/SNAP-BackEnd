@@ -6,28 +6,48 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0015_auto_20200914_0528'),
+        ("program", "0015_auto_20200914_0528"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='enrollmentactivity',
-            options={'ordering': ['id'], 'verbose_name': 'Program Activity', 'verbose_name_plural': 'Program Activities'},
+            name="enrollmentactivity",
+            options={
+                "ordering": ["id"],
+                "verbose_name": "Program Activity",
+                "verbose_name_plural": "Program Activities",
+            },
         ),
         migrations.AlterModelOptions(
-            name='enrollmentservice',
-            options={'ordering': ['id'], 'verbose_name': 'Enrollment Service', 'verbose_name_plural': 'Enrollment Services'},
+            name="enrollmentservice",
+            options={
+                "ordering": ["id"],
+                "verbose_name": "Enrollment Service",
+                "verbose_name_plural": "Enrollment Services",
+            },
         ),
         migrations.AlterModelOptions(
-            name='enrollmentservicetype',
-            options={'ordering': ['name'], 'verbose_name': 'Enrollment Service Type', 'verbose_name_plural': 'Enrollment Service Types'},
+            name="enrollmentservicetype",
+            options={
+                "ordering": ["name"],
+                "verbose_name": "Enrollment Service Type",
+                "verbose_name_plural": "Enrollment Service Types",
+            },
         ),
         migrations.AlterModelOptions(
-            name='historicalprogrameligibility',
-            options={'get_latest_by': 'history_date', 'ordering': ('-history_date', '-history_id'), 'verbose_name': 'historical Program Eligibility'},
+            name="historicalprogrameligibility",
+            options={
+                "get_latest_by": "history_date",
+                "ordering": ("-history_date", "-history_id"),
+                "verbose_name": "historical Program Eligibility",
+            },
         ),
         migrations.AlterModelOptions(
-            name='programeligibility',
-            options={'ordering': ['-created_at'], 'verbose_name': 'Program Eligibility', 'verbose_name_plural': 'Program Eligibility'},
+            name="programeligibility",
+            options={
+                "ordering": ["-created_at"],
+                "verbose_name": "Program Eligibility",
+                "verbose_name_plural": "Program Eligibility",
+            },
         ),
     ]

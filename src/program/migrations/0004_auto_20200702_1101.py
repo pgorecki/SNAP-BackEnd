@@ -12,36 +12,93 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('client', '0002_auto_20200521_1352'),
-        ('program', '0003_auto_20200617_1538'),
+        ("client", "0002_auto_20200521_1352"),
+        ("program", "0003_auto_20200617_1538"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ProgramEligibility',
+            name="ProgramEligibility",
             fields=[
-                ('is_removed', models.BooleanField(default=False)),
-                ('created_at', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created_at')),
-                ('modified_at', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified_at')),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('status', models.CharField(choices=[('ELIGIBLE', 'eligible'), ('NOT_ELIGIBLE', 'not eligible')], max_length=32)),
-                ('client', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='program_eligibility', to='client.Client')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('program', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='program_eligibility', to='program.Program')),
+                ("is_removed", models.BooleanField(default=False)),
+                (
+                    "created_at",
+                    model_utils.fields.AutoCreatedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created_at",
+                    ),
+                ),
+                (
+                    "modified_at",
+                    model_utils.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="modified_at",
+                    ),
+                ),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("ELIGIBLE", "eligible"),
+                            ("NOT_ELIGIBLE", "not eligible"),
+                        ],
+                        max_length=32,
+                    ),
+                ),
+                (
+                    "client",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="program_eligibility",
+                        to="client.Client",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "program",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="program_eligibility",
+                        to="program.Program",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Program eligibility',
+                "verbose_name_plural": "Program eligibility",
             },
         ),
         migrations.RenameModel(
-            old_name='HistoricalEligibility',
-            new_name='HistoricalProgramEligibility',
+            old_name="HistoricalEligibility",
+            new_name="HistoricalProgramEligibility",
         ),
         migrations.AlterModelOptions(
-            name='historicalprogrameligibility',
-            options={'get_latest_by': 'history_date', 'ordering': ('-history_date', '-history_id'), 'verbose_name': 'historical program eligibility'},
+            name="historicalprogrameligibility",
+            options={
+                "get_latest_by": "history_date",
+                "ordering": ("-history_date", "-history_id"),
+                "verbose_name": "historical program eligibility",
+            },
         ),
         migrations.DeleteModel(
-            name='Eligibility',
+            name="Eligibility",
         ),
     ]

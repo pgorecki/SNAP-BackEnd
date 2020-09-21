@@ -6,29 +6,31 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0005_auto_20200707_0933'),
-        ('security', '0001_initial'),
+        ("program", "0005_auto_20200707_0933"),
+        ("security", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='securitygroup',
-            name='enrollments',
+            model_name="securitygroup",
+            name="enrollments",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='securitygroup',
-            name='programs',
-            field=models.ManyToManyField(related_name='security_groups', to='program.Program'),
+            model_name="securitygroup",
+            name="programs",
+            field=models.ManyToManyField(
+                related_name="security_groups", to="program.Program"
+            ),
         ),
         migrations.AddField(
-            model_name='securitygroup',
-            name='referrals',
+            model_name="securitygroup",
+            name="referrals",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='securitygroup',
-            name='responses',
+            model_name="securitygroup",
+            name="responses",
             field=models.BooleanField(default=False),
         ),
     ]

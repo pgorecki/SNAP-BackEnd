@@ -7,25 +7,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('survey', '0003_auto_20200424_1133'),
+        ("survey", "0003_auto_20200424_1133"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='question',
-            options={'ordering': ['created_at']},
+            name="question",
+            options={"ordering": ["created_at"]},
         ),
         migrations.AlterModelOptions(
-            name='response',
-            options={'ordering': ['created_at']},
+            name="response",
+            options={"ordering": ["created_at"]},
         ),
         migrations.AlterModelOptions(
-            name='survey',
-            options={'ordering': ['created_at']},
+            name="survey",
+            options={"ordering": ["created_at"]},
         ),
         migrations.AddField(
-            model_name='survey',
-            name='questions',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.UUIDField(), blank=True, null=True, size=None),
+            model_name="survey",
+            name="questions",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.UUIDField(), blank=True, null=True, size=None
+            ),
         ),
     ]

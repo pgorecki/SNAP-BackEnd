@@ -7,7 +7,9 @@ def can_read_eligibility(user, eligibility):
         return True
     if user.profile.agency is None:
         return False
-    return user.profile.agency.agencyeligibilityconfig_set.filter(eligibility=eligibility).exists()
+    return user.profile.agency.agencyeligibilityconfig_set.filter(
+        eligibility=eligibility
+    ).exists()
 
 
-rules.add_rule('can_read_eligibility', can_read_eligibility)
+rules.add_rule("can_read_eligibility", can_read_eligibility)

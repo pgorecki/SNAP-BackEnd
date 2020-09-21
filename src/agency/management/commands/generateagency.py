@@ -6,7 +6,7 @@ from survey.factories import SurveyFactory, QuestionFactory
 
 
 class Command(BaseCommand):
-    help = 'Generates fake data'
+    help = "Generates fake data"
 
     def add_arguments(self, parser):
         # parser.add_argument('poll_ids', nargs='+', type=int)

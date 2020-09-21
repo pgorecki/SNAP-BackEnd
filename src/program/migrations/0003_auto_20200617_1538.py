@@ -6,23 +6,23 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0002_auto_20200617_1350'),
+        ("program", "0002_auto_20200617_1350"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='agencyprogramconfig',
-            old_name='enrollment_entry_survey',
-            new_name='agency_enrollment_entry_survey',
+            model_name="agencyprogramconfig",
+            old_name="enrollment_entry_survey",
+            new_name="agency_enrollment_entry_survey",
         ),
         migrations.RenameField(
-            model_name='agencyprogramconfig',
-            old_name='enrollment_exit_survey',
-            new_name='agency_enrollment_exit_survey',
+            model_name="agencyprogramconfig",
+            old_name="enrollment_exit_survey",
+            new_name="agency_enrollment_exit_survey",
         ),
         migrations.RenameField(
-            model_name='agencyprogramconfig',
-            old_name='enrollment_update_survey',
-            new_name='agency_enrollment_update_survey',
+            model_name="agencyprogramconfig",
+            old_name="enrollment_update_survey",
+            new_name="agency_enrollment_update_survey",
         ),
     ]
