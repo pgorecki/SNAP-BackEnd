@@ -23,6 +23,8 @@ def test_list_enrollments():
 def test_create_enrollment():
     agency = AgencyWithProgramsFactory(users=1, clients=1, num_programs=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename="view_program"))
+    user.user_permissions.add(Permission.objects.get(codename="view_client"))
     user.user_permissions.add(Permission.objects.get(codename="add_enrollment"))
 
     url = "/programs/enrollments/"

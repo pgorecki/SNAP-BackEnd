@@ -47,7 +47,6 @@ class BaseConfiguration(Configuration):
         "simple_history",
         "drf_yasg",
         "import_export",
-        "rules.apps.AutodiscoverRulesConfig",
         "cancan",
         "core",
         "agency",

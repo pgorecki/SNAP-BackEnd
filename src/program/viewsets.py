@@ -1,6 +1,6 @@
 from core.viewsets import ModelViewSet
 from core.permissions import AbilityPermission
-from core.validation import validate_fields_with_rules
+from core.validation import validate_fields_with_abilities
 from .filters import (
     ProgramViewsetFilter,
     ProgramEligibilityViewsetFilter,
@@ -52,8 +52,8 @@ class ProgramEligibilityViewset(ModelViewSet):
         return self.request.ability.queryset_for(self.action, ProgramEligibility)
 
     def validate(self, request, data, action):
-        validate_fields_with_rules(
-            request.user, data, client="can_read_client", program="can_read_program"
+        validate_fields_with_abilities(
+            request.ability, data, client="view", program="view"
         )
 
     def perform_create(self, serializer):
@@ -70,8 +70,8 @@ class EnrollmentViewset(ModelViewSet):
         return self.request.ability.queryset_for(self.action, Enrollment).distinct()
 
     def validate(self, request, data, action):
-        validate_fields_with_rules(
-            request.user, data, client="can_read_client", program="can_read_program"
+        validate_fields_with_abilities(
+            request.ability, data, client="view", program="view"
         )
 
     def perform_create(self, serializer):

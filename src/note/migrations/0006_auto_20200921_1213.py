@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('note', '0005_note_effective_date'),
+        ("note", "0005_note_effective_date"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='note',
-            name='effective_date',
+            model_name="note",
+            name="effective_date",
             field=models.DateField(default=datetime.date.today),
         ),
     ]

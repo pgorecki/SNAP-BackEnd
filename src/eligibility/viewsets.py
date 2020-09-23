@@ -1,7 +1,7 @@
 from core.exceptions import ApplicationValidationError
 from core.viewsets import ModelViewSet
 from core.permissions import AbilityPermission
-from core.validation import validate_fields_with_rules
+from core.validation import validate_fields_with_abilities
 from .models import (
     Eligibility,
     AgencyEligibilityConfig,
@@ -67,11 +67,11 @@ class ClientEligibilityViewset(ModelViewSet):
         )
 
     def validate(self, request, data, action):
-        validate_fields_with_rules(
-            request.user,
+        validate_fields_with_abilities(
+            request.ability,
             data,
-            client="can_read_client",
-            eligibility="can_read_eligibility",
+            client="view",
+            eligibility="view",
         )
 
 

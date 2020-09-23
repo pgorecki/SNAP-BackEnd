@@ -22,6 +22,7 @@ def test_list_client_eligibility():
 def test_create_client_eligibility():
     agency = AgencyWithEligibilityFactory(users=1, clients=1, num_eligibility=1)
     user = agency.user_profiles.first().user
+    user.user_permissions.add(Permission.objects.get(codename="view_client"))
     user.user_permissions.add(Permission.objects.get(codename="add_clienteligibility"))
 
     url = "/eligibility/clients/"
@@ -37,6 +38,7 @@ def test_create_client_eligibility():
         },
         format="json",
     )
+    print(response.data)
     assert response.status_code == 201
 
 

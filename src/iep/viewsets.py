@@ -1,8 +1,6 @@
-import django.db.utils
 from core.exceptions import ApplicationValidationError
 from core.viewsets import ModelViewSet
 from core.permissions import AbilityPermission
-from core.validation import validate_fields_with_rules
 from eligibility.models import EligibilityQueue
 from .models import ClientIEP
 from .serializers import (
