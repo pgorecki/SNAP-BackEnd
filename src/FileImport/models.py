@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db.models import Q  # for querying Client.objects
 from django.contrib.contenttypes.models import (
     ContentType,
@@ -37,8 +38,8 @@ class FileImport(models.Model):  # MPR
     )  # MPR
     file_path = models.CharField(
         max_length=200,
-        blank=False,
-        null=False,
+        blank=True,
+        null=True,
         help_text="Path of file to be imported including the file name",
     )  # MPR
     xls_file = models.FileField(upload_to="xls_imports", null=True)
@@ -79,7 +80,7 @@ class FileImport(models.Model):  # MPR
         null=True,
         help_text="Label of import job run stored as dictionary string",
     )
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
     @property
     def loc(self):

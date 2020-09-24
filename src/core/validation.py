@@ -14,4 +14,6 @@ class ModelValidationMixin:
 def validate_fields_with_abilities(ability, data, **kwargs):
     for field, action in kwargs.items():
         if field in data and not ability.can(action, data[field]):
-            raise ApplicationValidationError({field: [f"Cannot {action} {field} {data[field]}"]})
+            raise ApplicationValidationError(
+                {field: [f"Cannot {action} {field} {data[field]}"]}
+            )

@@ -18,8 +18,15 @@ class EnrollmentAdmin(SimpleHistoryAdmin):
 
 @admin.register(EnrollmentService)
 class EnrollmentServiceAdmin(admin.ModelAdmin):
-    list_display = ("id", "service_type", "enrollment", "client", "agency", "effective_date")
-    exclude = ('values',)
+    list_display = (
+        "id",
+        "service_type",
+        "enrollment",
+        "client",
+        "agency",
+        "effective_date",
+    )
+    exclude = ("values",)
 
     def agency(self, obj):
         return obj.enrollment.program.agency
