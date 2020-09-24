@@ -20,10 +20,10 @@ class ClientEligibilityAdmin(SimpleHistoryAdmin):
     list_display = ("id", "client", "status", "created_at")
 
 
-@admin.register(Eligibility)
-class ProgramAdmin(admin.ModelAdmin):
-    class AgenciesInline(admin.TabularInline):
-        model = Agency.eligibility.through
-        exclude = ["created_by"]
+# @admin.register(Eligibility)
+# class ProgramAdmin(admin.ModelAdmin):
+#     class AgenciesInline(admin.TabularInline):
+#         model = Agency.eligibility.through
+#         exclude = ["created_by"]
 
-    inlines = (AgenciesInline,)
+#     inlines = (AgenciesInline,)

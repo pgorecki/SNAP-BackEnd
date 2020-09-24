@@ -14,9 +14,9 @@ class AnswersInline(admin.TabularInline):
     model = Answer
 
 
-@admin.register(Response)
-class ResponseAdmin(admin.ModelAdmin):
-    inlines = (AnswersInline,)
+# @admin.register(Response)
+# class ResponseAdmin(admin.ModelAdmin):
+#     inlines = (AnswersInline,)
 
 
 @admin.register(Question)
@@ -24,6 +24,6 @@ class QuestionAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ("title", "id", "usage_count")
 
 
-@admin.register(Survey)
-class SurveyAdmin(admin.ModelAdmin):
-    form = SurveyAdminForm
+# @admin.register(Survey)
+# class SurveyAdmin(admin.ModelAdmin):
+#     form = SurveyAdminForm
