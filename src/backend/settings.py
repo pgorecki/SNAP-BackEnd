@@ -48,6 +48,7 @@ class BaseConfiguration(Configuration):
         "drf_yasg",
         "import_export",
         "cancan",
+        "storages",
         "core",
         "agency",
         "client",
@@ -174,6 +175,23 @@ class BaseConfiguration(Configuration):
 
     BUILD_VERSION = values.Value("development")
     BUILD_DATE = values.Value(datetime.now())
+
+    USE_S3 = values.Value(False)
+    AWS_ACCESS_KEY_ID = values.Value()
+    AWS_SECRET_ACCESS_KEY = values.Value()
+    AWS_STORAGE_BUCKET_NAME = values.Value()
+    AWS_DEFAULT_ACL = values.Value("public-read")
+
+    @classmethod
+    def setup(cls):
+        super().setup()
+        if cls.USE_S3:
+            assert cls.AWS_STORAGE_BUCKET_NAME
+            cls.AWS_S3_CUSTOM_DOMAIN = f"{cls.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+            cls.AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+            cls.AWS_LOCATION = "static"
+            cls.STATIC_URL = f"https://{cls.AWS_S3_CUSTOM_DOMAIN}/{cls.AWS_LOCATION}/"
+            cls.STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
     def __init__(self):
         print(f"Using {self.__class__.__name__} config")

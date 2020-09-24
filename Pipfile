@@ -30,6 +30,7 @@ django-cancan = "*"
 pandas = "*"
 xlrd = "*"
 django-import-export = "*"
+django-storages = "*"
 
 [dev-packages]
 autopep8 = "*"
