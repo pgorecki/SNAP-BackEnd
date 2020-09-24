@@ -5,7 +5,6 @@ from survey.serializers import SurveyMiniReader
 from .models import (
     Program,
     Enrollment,
-    ProgramEligibility,
     EnrollmentService,
     EnrollmentServiceType,
 )
@@ -44,29 +43,6 @@ class ProgramWriter(ObjectSerializer):
             "enrollment_update_survey",
             "enrollment_exit_survey",
         )
-
-
-class ProgramEligibilityReader(ObjectSerializer):
-    client = ClientReader()
-    program = ProgramReader()
-
-    class Meta:
-        model = ProgramEligibility
-        fields = (
-            "id",
-            "object",
-            "status",
-            "client",
-            "program",
-            "created_at",
-            "modified_at",
-        )
-
-
-class ProgramEligibilityWriter(ObjectSerializer):
-    class Meta:
-        model = ProgramEligibility
-        fields = ("status", "client", "program")
 
 
 class EnrollmentReader(ObjectSerializer):

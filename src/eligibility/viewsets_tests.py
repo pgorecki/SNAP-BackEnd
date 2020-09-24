@@ -2,7 +2,6 @@ from django.contrib.auth.models import Permission
 from rest_framework.test import APIClient
 from client.models import Client
 from .factories import AgencyWithEligibilityFactory, EligibilityQueueFactory
-from .models import ClientEligibility
 
 
 def test_list_client_eligibility():
@@ -38,7 +37,6 @@ def test_create_client_eligibility():
         },
         format="json",
     )
-    print(response.data)
     assert response.status_code == 201
 
 

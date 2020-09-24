@@ -6,10 +6,9 @@ from agency.models import Agency
 from client.models import Client
 from survey.models import Survey, Response
 from .choices import ServiceType
-from .enums import EnrollmentStatus, ProgramEligibilityStatus
+from .enums import EnrollmentStatus
 from .managers import (
     ProgramObjectManager,
-    ProgramEligibilityObjectManager,
     EnrollmentObjectManager,
 )
 
@@ -88,29 +87,7 @@ class Enrollment(ObjectRoot):
     objects = EnrollmentObjectManager()
 
     def __str__(self):
-        return f"{self.id}"
-
-
-# TODO remove, not used
-class ProgramEligibility(ObjectRoot):
-    class Meta:
-        verbose_name = "Program Eligibility"
-        verbose_name_plural = "Program Eligibility"
-        ordering = ["-created_at"]
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    client = models.ForeignKey(
-        Client, on_delete=models.CASCADE, related_name="program_eligibility"
-    )
-    program = models.ForeignKey(
-        Program, on_delete=models.CASCADE, related_name="program_eligibility"
-    )
-    status = models.CharField(
-        max_length=32, choices=[(x.name, x.value) for x in ProgramEligibilityStatus]
-    )
-    history = HistoricalRecords()
-
-    objects = ProgramEligibilityObjectManager()
+        return f"{self.client}/{self.program} [{self.id}]"
 
 
 class EnrollmentActivity(ObjectRoot):

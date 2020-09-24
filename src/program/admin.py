@@ -16,6 +16,17 @@ class EnrollmentAdmin(SimpleHistoryAdmin):
     list_display = ("id", "status", "client", "program")
 
 
+@admin.register(EnrollmentService)
+class EnrollmentServiceAdmin(admin.ModelAdmin):
+    list_display = ("id", "service_type", "enrollment", "client", "agency", "effective_date")
+    exclude = ('values',)
+
+    def agency(self, obj):
+        return obj.enrollment.program.agency
+
+    def client(self, obj):
+        return obj.enrollment
+
+
 admin.site.register(EnrollmentActivity)
-admin.site.register(EnrollmentService)
 admin.site.register(EnrollmentServiceType)
