@@ -8,7 +8,10 @@ from .models import (
     EnrollmentServiceType,
 )
 
-admin.site.register(Program)
+
+@admin.register(Program)
+class ProgramAdmin(admin.ModelAdmin):
+    list_display = ("name", "agency")
 
 
 @admin.register(Enrollment)

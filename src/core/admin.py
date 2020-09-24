@@ -5,6 +5,12 @@ from django.contrib.auth.admin import UserAdmin
 from core.models import UserProfile
 
 
+from django.contrib.admin import AdminSite
+
+
+admin.site.site_url = "https://gsnap.ctagroup.org"
+
+
 class UserProfileInline(admin.TabularInline):
     model = UserProfile
 
