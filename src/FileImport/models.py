@@ -28,6 +28,10 @@ logging.basicConfig(filename="MPRapp.log", level=logging.INFO)
 
 
 class FileImport(models.Model):  # MPR
+    class Meta:
+        verbose_name = "Data Import Log"
+        verbose_name_plural = "Data Import Logs"
+
     ftype = models.CharField(
         max_length=32,
         blank=False,
