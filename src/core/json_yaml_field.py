@@ -1,5 +1,5 @@
 import yaml
-from django.contrib.postgres import fields
+from django.db import models
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
@@ -51,7 +51,7 @@ class YAMLFormField(forms.JSONField):
         return yaml.dump(value, default_flow_style=False)
 
 
-class JsonYamlField(fields.JSONField):
+class JsonYamlField(models.JSONField):
     def formfield(self, **kwargs):
         defaults = {"form_class": YAMLFormField}
         defaults.update(kwargs)

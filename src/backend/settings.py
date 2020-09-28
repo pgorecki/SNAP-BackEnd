@@ -162,6 +162,7 @@ class BaseConfiguration(Configuration):
         },
         "LOGIN_URL": "/admin/login/",
         "LOGOUT_URL": "/admin/logout/",
+        "DEFAULT_AUTO_SCHEMA_CLASS": "core.schema.CoreSwaggerAutoSchema",
     }
 
     CANCAN = {"ABILITIES": "backend.abilities.declare_abilities"}
