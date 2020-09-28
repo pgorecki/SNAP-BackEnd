@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from simple_history.models import HistoricalRecords
 from core.models import ObjectRoot
+from core.json_yaml_field import JsonYamlField
 from agency.models import Agency
 from client.models import Client
 from survey.models import Survey, Response
@@ -273,4 +274,4 @@ class EnrollmentService(ObjectRoot):
         max_length=36, blank=True, null=True, help_text="MPR import job run instance"
     )  # MPR
 
-    values = models.JSONField(null=True, blank=True)
+    values = JsonYamlField(null=True, blank=True)
