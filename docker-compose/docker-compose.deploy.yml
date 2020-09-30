@@ -32,12 +32,36 @@ services:
     env_file:
       - .env
     volumes:
-      - '/var/www/html/vimedo:/code/static'
-      - './sqlite-db/:/code/db'
+      - "/var/www/html/vimedo:/code/static"
+      - "./sqlite-db/:/code/db"
     ports:
       - "${COMPOSE_APP_PORT}:8000"
     depends_on:
       - db
+    networks:
+      - internal-network
+      - external-network
+
+  celery-beat:
+    image: "${COMPOSE_APP_IMAGE}"
+    restart: "no"
+    command: sh -c "celery -A backend beat -l DEBUG"
+    env_file:
+      - .env
+    depends_on:
+      - app
+    networks:
+      - internal-network
+      - external-network
+
+  celery-worker:
+    image: "${COMPOSE_APP_IMAGE}"
+    restart: "no"
+    command: sh -c "celery -A backend worker -l DEBUG"
+    env_file:
+      - .env
+    depends_on:
+      - app
     networks:
       - internal-network
       - external-network

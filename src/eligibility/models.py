@@ -91,7 +91,7 @@ class EligibilityQueue(ObjectRoot):
     client = models.ForeignKey(
         Client, on_delete=models.CASCADE, related_name="eligibility_queue"
     )
-    requestor = models.ForeignKey(Agency, on_delete=models.CASCADE)
+    requestor = models.ForeignKey(Agency, on_delete=models.CASCADE, null=True)
     status = models.CharField(
         blank=True,
         null=True,
@@ -128,11 +128,12 @@ class EligibilityQueue(ObjectRoot):
 @receiver(post_save, sender=EligibilityQueue)
 def update_client_eligibility(sender, instance, created, **kwargs):
     assert Eligibility.objects.count()  # should be removed in the future?
-    if instance._meta.model.objects.first() == instance and instance.is_resolved:
+    if instance.is_resolved:
         instance.client.eligibility.create(
             status=instance.status,
             eligibility=Eligibility.objects.first(),  # should be removed in the future?
             created_by=instance.resolved_by,
+            created_at=instance.created_at,
         )
 
 

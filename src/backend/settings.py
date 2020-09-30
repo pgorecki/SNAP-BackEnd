@@ -96,7 +96,7 @@ class BaseConfiguration(Configuration):
     WSGI_APPLICATION = "backend.wsgi.application"
 
     DATABASES = values.DatabaseURLValue(
-        "postgresql://devuser:devuser@localhost:5432/gsnapdb1", environ=True
+        "postgres://postgres@localhost:5432/postgres", environ=True
     )
 
     # Password validation
@@ -169,6 +169,16 @@ class BaseConfiguration(Configuration):
 
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+    # Celery
+    CELERY_BROKER_URL = values.Value(
+        "sqla+postgres://postgres@localhost:5432/postgres", environ=True
+    )
+    # CELERY_RESULT_BACKEND = values.Value("redis://localhost:6379")
+    CELERY_ACCEPT_CONTENT = values.Value(["application/json"])
+    CELERY_TASK_SERIALIZER = values.Value("json")
+    CELERY_RESULT_SERIALIZER = values.Value("json")
+    CELERY_TIMEZONE = values.Value("Africa/Nairobi")
+
     # Logging
     LOG_FILE = values.Value("./../application.log")
     LOG_LEVEL = values.Value("DEBUG")
@@ -193,6 +203,10 @@ class BaseConfiguration(Configuration):
             cls.AWS_LOCATION = "static"
             cls.STATIC_URL = f"https://{cls.AWS_S3_CUSTOM_DOMAIN}/{cls.AWS_LOCATION}/"
             cls.STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+    @classmethod
+    def post_setup(cls):
+        super().post_setup()
 
     def __init__(self):
         print(f"Using {self.__class__.__name__} config")

@@ -1,6 +1,6 @@
 import json
 from django.conf import settings
-from django.http import HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound
 from django.views import defaults
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -9,6 +9,13 @@ from agency.serializers import AgencyReader
 from core.logging import logger
 from survey.models import Survey, Question, Response as SurveyResponse
 from client.models import Client
+
+
+def celery_test(request):
+    from eligibility.tasks import add
+
+    add.delay(10, 20)
+    return HttpResponse("Celery")
 
 
 class HealthViewSet(APIView):

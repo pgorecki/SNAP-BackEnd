@@ -31,6 +31,8 @@ pandas = "*"
 xlrd = "*"
 django-import-export = "*"
 django-storages = "*"
+celery = "*"
+sqlalchemy = "*"
 
 [dev-packages]
 autopep8 = "*"

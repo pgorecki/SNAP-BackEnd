@@ -7,6 +7,8 @@ from agency.admin import AgencyClientInline
 class ClientAdmin(admin.ModelAdmin):
     list_display = ("id", "first_name", "middle_name", "last_name", "address")
 
+    exclude = ("address",)
+
     inlines = (AgencyClientInline,)
 
     def get_queryset(self, request):
