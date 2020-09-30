@@ -52,6 +52,18 @@ class UserProfile(models.Model):
     )
 
 
+class GlobalPermissions(models.Model):
+    class Meta:
+
+        managed = False  # No database table creation or deletion  \
+        # operations will be performed for this model.
+
+        default_permissions = ()  # disable "add", "change", "delete"
+        # and "view" default permissions
+
+        permissions = (("view_reports", "View Reports"),)
+
+
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
