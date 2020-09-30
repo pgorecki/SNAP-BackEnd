@@ -103,7 +103,6 @@ urlpatterns = [
         name="schema-swagger-ui",
     ),
     path("sentry/", lambda x: 1 / 0, name="setry-test"),
-    path("celery/", core.views.celery_test, name="setry-test"),
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
 ]
