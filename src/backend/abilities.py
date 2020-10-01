@@ -219,11 +219,12 @@ def declare_abilities(user, ability):
             ability.can("change", Enrollment)
 
     # program
+    ability.can("view", Program, agency=agency)
+
     if user.has_perm("program.add_program"):
         ability.can("add", Program)
 
-    ability.can("view", Program, agency=agency)
-    if user.is_superuser:
+    if user.is_superuser or user.has_perm("program.view_program"):
         ability.can("view", Program)
 
     if user.has_perm("program.add_program"):
