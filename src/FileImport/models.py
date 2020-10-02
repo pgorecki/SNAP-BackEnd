@@ -518,7 +518,7 @@ class FileImport(models.Model):  # MPR
         logging.info(
             str(self.ftype)
             + " "
-            + str(self.timestamp)
+            + str(self.created_at)
             + " "
             + str(self.run_id)
             + ":"
