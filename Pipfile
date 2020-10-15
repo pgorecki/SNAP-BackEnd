@@ -33,6 +33,7 @@ django-import-export = "*"
 django-storages = "*"
 celery = "*"
 sqlalchemy = "*"
+boto3 = "*"
 
 [dev-packages]
 autopep8 = "*"
